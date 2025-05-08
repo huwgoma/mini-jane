@@ -1,11 +1,14 @@
 -- Mini-Jane
 
+
 -- Reset
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
+
 -- Enum Types
 CREATE TYPE appt_status AS ENUM('Not Arrived', 'Arrived', 'Cancelled', 'No Show');
+
 
 -- Tables
 CREATE TABLE users (
@@ -33,7 +36,6 @@ CREATE TABLE disciplines (
   clinical boolean      NOT NULL DEFAULT false
 );
 
--- Join Table for Staff-Disciplines
 CREATE TABLE staff_disciplines (
   id            serial  PRIMARY KEY,
   staff_id      integer REFERENCES staff ON DELETE CASCADE NOT NULL,
@@ -44,7 +46,6 @@ CREATE TABLE staff_disciplines (
 CREATE TABLE treatments (
   id            serial       PRIMARY KEY,
   name          varchar(255) NOT NULL,
-  -- Discipline ID must correspond to a clinical discipline
   discipline_id integer      REFERENCES disciplines ON DELETE CASCADE NOT NULL,
   duration      integer      NOT NULL CHECK((duration BETWEEN 5 AND 180) AND (duration % 5 = 0)),
                              -- Only 5-minute intervals, up to 3 hours
@@ -62,8 +63,10 @@ CREATE TABLE appointments (
   appt_status   appt_status DEFAULT 'Not Arrived'
 );
 
+
 -- Functions
-CREATE OR REPLACE FUNCTION verify_clinical_discipline() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION verify_staff_member_offers_treatment() 
+RETURNS trigger AS $$
 -- Raise error if the staff member does not offer the selected treatment.
   BEGIN
     IF NOT EXISTS (
@@ -77,9 +80,27 @@ CREATE OR REPLACE FUNCTION verify_clinical_discipline() RETURNS trigger AS $$
   END;
 $$ LANGUAGE plpgsql;
 
+-- Raise error if the specified discipline is non-clinical
+CREATE OR REPLACE FUNCTION verify_clinical_discipline()
+RETURNS trigger AS $$
+  BEGIN
+    IF (SELECT clinical FROM disciplines WHERE id = NEW.discipline_id) = false
+    THEN RAISE EXCEPTION 'Cannot create treatment - Discipline type is non-clinical.';
+    END IF;
+    RETURN NEW;
+  END;
+$$ LANGUAGE plpgsql;
+
+
 -- -- Triggers
-CREATE OR REPLACE TRIGGER verify_clinical_discipline BEFORE INSERT ON appointments
-FOR EACH ROW EXECUTE FUNCTION verify_clinical_discipline();
+CREATE OR REPLACE TRIGGER verify_staff_member_offers_treatment 
+  BEFORE INSERT ON appointments
+  FOR EACH ROW EXECUTE FUNCTION verify_staff_member_offers_treatment();
+
+CREATE OR REPLACE trigger verify_clinical_discipline
+  BEFORE INSERT ON treatments
+  FOR EACH ROW EXECUTE FUNCTION verify_clinical_discipline();
+
 
 -- Seed
 INSERT INTO users (first_name, last_name, birthday)
@@ -88,8 +109,9 @@ VALUES ('Hugo',    'Ma',      '1997-09-14'), -- Admin
        ('Kevin',   'Ho',      '1993-09-11'), -- PT
        ('Alan',    'Mitri',   '1980-05-04'), -- MT
        ('Alexis',  'Butler',  '1997-07-21'), -- DC
-       ('Hendrik', 'Swart',   '1930-05-04'), -- Patient
-       ('Phil',    'Genesis', '1980-06-30'); -- Admin and PT
+       ('Hendrik', 'S',       '1930-05-04'), -- Patient
+       ('Phil',    'Genesis', '1980-06-30'), -- Admin and PT
+       ('Gina',    'P',       '1978-03-14'); -- Patient
 
 INSERT INTO staff (user_id, biography)
 VALUES (1, ''),
@@ -101,7 +123,8 @@ VALUES (1, ''),
 
 INSERT INTO patients (user_id)
 VALUES (1), -- Hugo
-       (6); -- Hendrik
+       (6), -- Hendrik
+       (8); -- Gina
 
 INSERT INTO disciplines (name, title, clinical)
 VALUES ('Physiotherapy',   'PT', true),
@@ -127,8 +150,8 @@ VALUES ('PT - Initial',   1, 45, 100.00),
        ('DC - Treatment', 3, 20, 75.00);
 
 INSERT INTO appointments(staff_id, patient_id, treatment_id)
-VALUES 
-  (2, 1, 2),  -- Annie  - Hugo    - PT Tx
-  (4, 1, 4),  -- Alan   - Hugo    - MT 45 Minutes
-  (3, 6, 1);  -- Kevin  - Hendrik - PT Tx
-  --(1, 6, 2);  -- Hugo   - Hendrik - PT Treatment (invalid)
+VALUES (2, 1, 2),  -- Annie  - Hugo    - PT Tx
+       (4, 1, 4),  -- Alan   - Hugo    - MT 45 Minutes
+       (3, 6, 1),  -- Kevin  - Hendrik - PT Ax
+       (2, 8, 1),  -- Annie  - Gina    - PT Ax
+       (5, 8, 6);  -- Alexis - Gina    - PT Ax
