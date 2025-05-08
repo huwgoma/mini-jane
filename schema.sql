@@ -16,7 +16,6 @@ CREATE TABLE users (
   -- Login Info
 );
 
-
 CREATE TABLE patients (
   user_id integer PRIMARY KEY REFERENCES users ON DELETE CASCADE
   -- Other patient-specific info
@@ -61,32 +60,26 @@ CREATE TABLE appointments (
   treatment_id  integer REFERENCES treatments ON DELETE CASCADE NOT NULL,
   date_time     timestamp DEFAULT NOW() NOT NULL,
   appt_status   appt_status DEFAULT 'Not Arrived'
-  
-  -- Before insert/update, verify that:
-  --  The staff member the appointment is being booked under possesses the
-  --  discipline that the treatment type is classified under.
-
-  -- 
-
 );
 
-
--- CREATE OR REPLACE FUNCTION verify_clinical_discipline() RETURNS trigger AS $$
---   BEGIN
---     IF NOT EXISTS ( 
---       SELECT 1 FROM disciplines JOIN staff_disciplines ON disciplines.id = discipline_id 
---       WHERE staff_id = NEW.staff_id AND clinical = true
---     ) THEN RAISE EXCEPTION 'Cannot book appointment - staff member is not a practitioner.';
---     END IF;
---     RETURN NEW;
---   END;
--- -- Raise error if staff id does not have a clinical discipline
--- $$ LANGUAGE plpgsql;
-
+-- Functions
+CREATE OR REPLACE FUNCTION verify_clinical_discipline() RETURNS trigger AS $$
+-- Raise error if the staff member does not offer the selected treatment.
+  BEGIN
+    IF NOT EXISTS (
+      SELECT 1 FROM staff_disciplines AS sd
+      JOIN disciplines ON disciplines.id = sd.discipline_id
+      JOIN treatments  ON disciplines.id = treatments.discipline_id
+      WHERE sd.staff_id = NEW.staff_id AND treatments.id = NEW.treatment_id
+    ) THEN RAISE EXCEPTION 'Cannot book appointment - Staff member does not offer the specified treatment.';
+    END IF;
+    RETURN NEW;
+  END;
+$$ LANGUAGE plpgsql;
 
 -- -- Triggers
--- CREATE OR REPLACE TRIGGER verify_clinical_discipline BEFORE INSERT ON appointments
--- FOR EACH ROW EXECUTE FUNCTION verify_clinical_discipline();
+CREATE OR REPLACE TRIGGER verify_clinical_discipline BEFORE INSERT ON appointments
+FOR EACH ROW EXECUTE FUNCTION verify_clinical_discipline();
 
 -- Seed
 INSERT INTO users (first_name, last_name, birthday)
@@ -95,7 +88,7 @@ VALUES ('Hugo',    'Ma',      '1997-09-14'), -- Admin
        ('Kevin',   'Ho',      '1993-09-11'), -- PT
        ('Alan',    'Mitri',   '1980-05-04'), -- MT
        ('Alexis',  'Butler',  '1997-07-21'), -- DC
-       ('Hendrik', 'Swart',  '1930-05-04'),  -- Patient
+       ('Hendrik', 'Swart',   '1930-05-04'), -- Patient
        ('Phil',    'Genesis', '1980-06-30'); -- Admin and PT
 
 INSERT INTO staff (user_id, biography)
@@ -105,6 +98,10 @@ VALUES (1, ''),
        (4, ''),
        (5, ''),
        (7, '');
+
+INSERT INTO patients (user_id)
+VALUES (1), -- Hugo
+       (6); -- Hendrik
 
 INSERT INTO disciplines (name, title, clinical)
 VALUES ('Physiotherapy',   'PT', true),
@@ -129,4 +126,9 @@ VALUES ('PT - Initial',   1, 45, 100.00),
        ('DC - Initial',   3, 40, 120.00),
        ('DC - Treatment', 3, 20, 75.00);
 
-
+INSERT INTO appointments(staff_id, patient_id, treatment_id)
+VALUES 
+  (2, 1, 2),  -- Annie  - Hugo    - PT Tx
+  (4, 1, 4),  -- Alan   - Hugo    - MT 45 Minutes
+  (3, 6, 1);  -- Kevin  - Hendrik - PT Tx
+  --(1, 6, 2);  -- Hugo   - Hendrik - PT Treatment (invalid)
