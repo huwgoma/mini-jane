@@ -105,13 +105,14 @@ CREATE OR REPLACE trigger verify_clinical_discipline
 -- Seed
 INSERT INTO users (first_name, last_name, birthday)
 VALUES ('Hugo',    'Ma',      '1997-09-14'), -- Admin
-       ('Annie',   'Hu',      '1995-06-03'), -- PT
+       ('Annie',   'Hu',      '1999-06-03'), -- PT
        ('Kevin',   'Ho',      '1993-09-11'), -- PT
        ('Alan',    'Mitri',   '1980-05-04'), -- MT
        ('Alexis',  'Butler',  '1997-07-21'), -- DC
-       ('Hendrik', 'S',       '1930-05-04'), -- Patient
+       ('Hendrik', 'Swart',   '1930-05-04'), -- Patient
        ('Phil',    'Genesis', '1980-06-30'), -- Admin and PT
-       ('Gina',    'P',       '1978-03-14'); -- Patient
+       ('Carol',   'Scott',   '1978-03-14'), -- Patient
+       ('Dan',     'Torres',  '1990-08-24'); -- Patient
 
 INSERT INTO staff (user_id, biography)
 VALUES (1, ''),
@@ -124,7 +125,8 @@ VALUES (1, ''),
 INSERT INTO patients (user_id)
 VALUES (1), -- Hugo
        (6), -- Hendrik
-       (8); -- Gina
+       (8), -- Gina
+       (9); -- Dan
 
 INSERT INTO disciplines (name, title, clinical)
 VALUES ('Physiotherapy',   'PT', true),
@@ -149,9 +151,10 @@ VALUES ('PT - Initial',   1, 45, 100.00),
        ('DC - Initial',   3, 40, 120.00),
        ('DC - Treatment', 3, 20, 75.00);
 
-INSERT INTO appointments(staff_id, patient_id, treatment_id)
-VALUES (2, 1, 2),  -- Annie  - Hugo    - PT Tx
-       (4, 1, 4),  -- Alan   - Hugo    - MT 45 Minutes
-       (3, 6, 1),  -- Kevin  - Hendrik - PT Ax
-       (2, 8, 1),  -- Annie  - Gina    - PT Ax
-       (5, 8, 6);  -- Alexis - Gina    - PT Ax
+INSERT INTO appointments(staff_id, patient_id, treatment_id, date_time)
+VALUES (2, 1, 2, '2025-10-08 11:00 AM'),              -- Annie  - Hugo    - PT Tx
+       (4, 1, 4, CURRENT_DATE + '9:00AM'::time),      -- Alan   - Hugo    - MT 45 Minutes
+       (3, 6, 1, CURRENT_DATE + 1 + '9:00AM'::time),  -- Kevin  - Hendrik - PT Ax
+       (2, 8, 1, CURRENT_DATE + 1 + '9:00AM'::time),  -- Annie  - Gina    - PT Ax
+       (5, 8, 6, CURRENT_DATE + 1 + '10:00AM'::time), -- Alexis - Gina    - PT Ax
+       (2, 9, 2, CURRENT_DATE + 1 + '10:00AM'::time); -- Annie  - Dan     - PT Tx
