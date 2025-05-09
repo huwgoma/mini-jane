@@ -5,3 +5,9 @@ ruby '3.2.2'
 gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'puma'
+gem 'pg'
+
+group :development do
+  require 'pry'
+end
+
