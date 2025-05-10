@@ -16,4 +16,19 @@ class PGAdapter
 
     # Format into application structure
   end
+
+  def load_scheduled_practitioners
+    sql = <<~SQL
+      SELECT users.id AS staff_id, users.first_name,
+             STRING_AGG(disciplines.name, '/') AS disciplines
+      FROM users
+      JOIN staff ON users.id = staff.user_id
+      JOIN staff_disciplines sd ON staff.user_id = sd.staff_id
+      JOIN disciplines ON sd.discipline_id = disciplines.id
+      WHERE disciplines.clinical = true
+      GROUP BY users.id;  
+    SQL
+
+    query(sql)
+  end
 end

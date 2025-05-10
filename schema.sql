@@ -138,7 +138,7 @@ VALUES (1, 4),         -- Hugo   -> Administrative
        (3, 1),         -- Kevin  -> PT
        (4, 2),         -- Alan   -> MT
        (5, 3),         -- Alexis -> DC
-       (7, 1), (7, 4); -- Phil   -> PT and Admin
+       (7, 1), (7, 3), (7, 4); -- Phil   -> PT, Chiro and Admin
 
 INSERT INTO treatments(name, discipline_id, duration, price)
 VALUES ('PT - Initial',   1, 45, 100.00),
