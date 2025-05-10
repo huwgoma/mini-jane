@@ -14,7 +14,7 @@ end
 configure :development do
   require 'pry'
   require 'sinatra/reloader'
-  # also_reload
+  also_reload 'pg_adapter.rb'
 end
 
 before do
