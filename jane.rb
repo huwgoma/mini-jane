@@ -2,7 +2,7 @@
 
 require 'sinatra'
 require 'sinatra/contrib'
-
+require_relative 'pg_adapter'
 
 configure do
   enable :sessions
@@ -12,10 +12,20 @@ configure do
 end
 
 configure :development do
+  require 'pry'
   require 'sinatra/reloader'
   # also_reload
 end
 
+before do
+  @storage = PGAdapter.new
+end
+
 get '/' do
-  'Hello'
+  @schedule = @storage.load_daily_schedule(Date.today.to_s)
+  # { Physiotherapy: 
+  #   { 1 => Practitioner(@id = 1, @name = ...,
+  #       @appts = [Appointment(@id=1, @patient='',)])
+  #   }
+  # }
 end
