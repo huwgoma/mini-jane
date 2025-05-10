@@ -10,12 +10,10 @@ class PGAdapter
   end
 
   def load_daily_schedule(date)
-    practitioners = load_practitioners
-    # 1) Load a list of all practitioners 
-    # (* scheduled for given date but we do that later)
-    # 
-    # 2) Load a list of all appointments scheduled for the
-    #    given date.
-    #  
+    practitioners = load_scheduled_practitioners
+    appointments = load_scheduled_appointments(date)
+
+
+    # Format into application structure
   end
 end
