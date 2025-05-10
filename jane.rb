@@ -3,7 +3,7 @@
 require 'sinatra'
 require 'sinatra/contrib'
 require_relative 'pg_adapter'
-Dir.glob('lib/*.rb').each { |file| require file }
+Dir.glob('lib/*.rb').each { |file| require_relative file }
 
 configure do
   enable :sessions
@@ -15,7 +15,7 @@ end
 configure :development do
   require 'pry'
   require 'sinatra/reloader'
-  also_reload 'pg_adapter.rb, lib/*.rb'
+  also_reload 'pg_adapter.rb', 'lib/*.rb'
 end
 
 before do

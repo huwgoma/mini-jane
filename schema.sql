@@ -149,9 +149,9 @@ VALUES ('PT - Initial',   1, 45, 100.00),
        ('DC - Initial',   3, 40, 120.00),
        ('DC - Treatment', 3, 20, 75.00);
 
-INSERT INTO appointments(staff_id, patient_id, treatment_id)
-VALUES (2, 1, 2),  -- Annie  - Hugo    - PT Tx
-       (4, 1, 4),  -- Alan   - Hugo    - MT 45 Minutes
-       (3, 6, 1),  -- Kevin  - Hendrik - PT Ax
-       (2, 8, 1),  -- Annie  - Gina    - PT Ax
-       (5, 8, 6);  -- Alexis - Gina    - PT Ax
+INSERT INTO appointments(staff_id, patient_id, treatment_id, date_time)
+VALUES (2, 1, 2, CURRENT_DATE + '9:00AM'::time),  -- Annie  - Hugo    - PT Tx
+       (4, 1, 4, CURRENT_DATE + '9:30AM'::time),  -- Alan   - Hugo    - MT 45 Minutes
+       (3, 6, 1, CURRENT_DATE + '11:00AM'::time),  -- Kevin  - Hendrik - PT Ax
+       (2, 8, 1, CURRENT_DATE + '11:00AM'::time),  -- Annie  - Gina    - PT Ax
+       (5, 8, 6, CURRENT_DATE + '11:45AM'::time);  -- Alexis - Gina    - PT Ax

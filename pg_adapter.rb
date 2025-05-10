@@ -13,7 +13,7 @@ class PGAdapter
     practitioners = load_scheduled_practitioners
     
     appointments = load_scheduled_appointments(date)
-    binding.pry
+    format_daily_schedule(practitioners, appointments)
     
     # Format into application structure
   end
@@ -57,9 +57,33 @@ class PGAdapter
   def format_daily_schedule(practitioners, appointments)
     schedule = {}
 
-    practitioners.each do |practitioner|
-      
+    appts_by_staff_id = appointments.each_with_object({}) do |row, appts|
+      id = row['id'].to_i
+      staff_id = row['staff_id'].to_i
+      patient = row['patient_name']
+      tx_name = row['tx_name']
+      tx_length = row['tx_length']
+      datetime = row['datetime']
+
+      appointment = Appointment.new(id, patient, tx_name, tx_length, datetime)
+
+      appts[staff_id] ||= []
+
+      appts[staff_id] << appointment
     end
-    # schedule[discipline][staff_id] = Practitioner
+
+    practitioners.each do |row|
+      id = row['staff_id'].to_i
+      disciplines = row['disciplines']
+      practitioner = Practitioner.new(id, row['name'])
+      appts = appts_by_staff_id[id]
+      practitioner.add_appointments(appts)
+
+      schedule[disciplines] ||= {}
+
+      schedule[disciplines][id] = practitioner
+    end
+
+    schedule
   end
 end
