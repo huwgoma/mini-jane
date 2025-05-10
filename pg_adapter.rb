@@ -51,4 +51,13 @@ class PGAdapter
 
     query(sql, date)
   end
+
+  def format_daily_schedule(practitioners, appointments)
+    schedule = {}
+
+    practitioners.each do |practitioner|
+      
+    end
+    # schedule[discipline][staff_id] = Practitioner
+  end
 end
