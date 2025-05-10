@@ -30,7 +30,8 @@ class PGAdapter
       JOIN staff_disciplines sd ON staff.user_id = sd.staff_id
       JOIN disciplines ON sd.discipline_id = disciplines.id
       WHERE disciplines.clinical = true
-      GROUP BY users.id;  
+      GROUP BY users.id
+      ORDER BY STRING_AGG(disciplines.id::text, '');
     SQL
 
     query(sql)
@@ -46,7 +47,8 @@ class PGAdapter
       JOIN patients ON appts.patient_id = patients.user_id
       JOIN users ON patients.user_id = users.id
       JOIN treatments ON appts.treatment_id = treatments.id
-      WHERE appts.date_time::date = $1;
+      WHERE appts.date_time::date = $1
+      ORDER BY "datetime";
     SQL
 
     query(sql, date)
