@@ -4,6 +4,7 @@ require 'sinatra'
 require 'sinatra/contrib'
 require 'date_core'
 require_relative 'pg_adapter'
+Dir.glob('lib/*.rb').each { |file| require_file }
 
 configure do
   enable :sessions
