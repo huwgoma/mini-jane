@@ -8,6 +8,5 @@ gem 'puma'
 gem 'pg'
 
 group :development do
-  require 'pry'
+  gem 'pry'
 end
-
