@@ -104,29 +104,31 @@ CREATE OR REPLACE trigger verify_clinical_discipline
 
 -- Seed
 INSERT INTO users (first_name, last_name, birthday)
-VALUES ('Hugo',    'Ma',      '1997-09-14'), -- Admin
-       ('Annie',   'Hu',      '1999-06-03'), -- PT
-       ('Kevin',   'Ho',      '1993-09-11'), -- PT
-       ('Alan',    'Mitri',   '1980-05-04'), -- MT
-       ('Alexis',  'Butler',  '1997-07-21'), -- DC
-       ('Hendrik', 'Swart',   '1930-05-04'), -- Patient
-       ('Phil',    'Genesis', '1980-06-30'), -- Admin and PT
-       ('Carol',   'Scott',   '1978-03-14'), -- Patient
-       ('Dan',     'Torres',  '1990-08-24'); -- Patient
+VALUES ('Hugo',    'Ma',      '1997-09-14'), 
+       ('Annie',   'Hu',      '1999-06-03'), 
+       ('Kevin',   'Ho',      '1993-09-11'), 
+       ('Alan',    'Mitri',   '1980-05-04'), 
+       ('Alexis',  'Butler',  '1997-07-21'), 
+       ('Hendrik', 'Swart',   '1930-05-04'), 
+       ('Phil',    'Genesis', '1980-06-30'),
+       ('Carol',   'Scott',   '1978-03-14'), 
+       ('Dan',     'Torres',  '1990-08-24'),
+       ('Jeff',    'Leps',    '1975-10-29'); 
 
 INSERT INTO staff (user_id, biography)
-VALUES (1, ''),
-       (2, ''),
-       (3, ''),
-       (4, ''),
-       (5, ''),
-       (7, '');
+VALUES (1, ''), -- Hugo
+       (2, ''), -- Annie
+       (3, ''), -- Kevin
+       (4, ''), -- Alan
+       (5, ''), -- Alexis
+       (7, ''); -- Phil
 
 INSERT INTO patients (user_id)
-VALUES (1), -- Hugo
-       (6), -- Hendrik
-       (8), -- Carol
-       (9); -- Dan
+VALUES (1),  -- Hugo
+       (6),  -- Hendrik
+       (8),  -- Carol
+       (9),  -- Dan
+       (10); -- Jeff
 
 INSERT INTO disciplines (name, title, clinical)
 VALUES ('Physiotherapy',   'PT', true),
@@ -152,9 +154,31 @@ VALUES ('PT - Initial',   1, 45, 100.00),
        ('DC - Treatment', 3, 20, 75.00);
 
 INSERT INTO appointments(staff_id, patient_id, treatment_id, "datetime")
-VALUES (2, 1, 2, '2025-10-08 11:00 AM'),              -- Annie  - Hugo    - PT Tx
-       (4, 1, 4, CURRENT_DATE + '9:00AM'::time),      -- Alan   - Hugo    - MT 45 Minutes
-       (3, 6, 1, CURRENT_DATE + 1 + '9:00AM'::time),  -- Kevin  - Hendrik - PT Ax
-       (2, 8, 1, CURRENT_DATE + 1 + '9:00AM'::time),  -- Annie  - Carol   - PT Ax
-       (5, 8, 6, CURRENT_DATE + 1 + '10:00AM'::time), -- Alexis - Carol   - PT Ax
-       (2, 9, 2, CURRENT_DATE + 1 + '10:00AM'::time); -- Annie  - Dan     - PT Tx
+VALUES -- Fixed Date (Oct 08, 2025)
+       (2, 1, 1,  '2025-10-08 10:00AM'), -- Annie / Hugo / PT Ax
+       (2, 8, 2,  '2025-10-08 11:00AM'), -- Annie / Carol / PT Tx
+       (3, 6, 2,  '2025-10-08 2:00PM'),  -- Kevin / Hendrik / PT Tx
+       (7, 10, 2, '2025-10-08 10:00AM'), -- Phil / Jeff / PT Tx
+       (4, 10, 4, '2025-10-08 11:00AM'), -- Alan / Jeff / MT 45
+       (5, 10, 7, '2025-10-08 12:00PM'), -- Alexis / Jeff / DC Tx
+       -- Yesterday
+       (2, 1, 1,  CURRENT_DATE - 1 + '9:00AM'::time),  -- Annie / Hugo / PT Ax
+       (2, 8, 2,  CURRENT_DATE - 1 + '10:00AM'::time), -- Annie / Carol / PT Tx
+       (3, 6, 2,  CURRENT_DATE - 1 + '1:00PM'::time),  -- Kevin / Hendrik / PT Tx
+       (7, 10, 2, CURRENT_DATE - 1 + '9:00AM'::time),  -- Phil / Jeff / PT Tx
+       (4, 10, 4, CURRENT_DATE - 1 + '10:00AM'::time), -- Alan / Jeff / MT 45
+       (5, 10, 7, CURRENT_DATE - 1 + '11:00AM'::time), -- Alexis / Jeff / DC Tx
+       -- Today
+       (2, 1, 1,  CURRENT_DATE + '10:00AM'::time), -- Annie / Hugo / PT Ax
+       (2, 8, 2,  CURRENT_DATE + '11:00AM'::time), -- Annie / Carol / PT Tx
+       (3, 6, 2,  CURRENT_DATE + '2:00PM'::time),  -- Kevin / Hendrik / PT Tx
+       (7, 10, 2, CURRENT_DATE + '10:00AM'::time), -- Phil / Jeff / PT Tx
+       (4, 10, 4, CURRENT_DATE + '11:00AM'::time), -- Alan / Jeff / MT 45
+       (5, 10, 7, CURRENT_DATE + '12:00PM'::time), -- Alexis / Jeff / DC Tx
+       -- Tomorrow
+       (2, 1, 1,  CURRENT_DATE + 1 + '11:00AM'::time), -- Annie / Hugo / PT Ax
+       (2, 8, 2,  CURRENT_DATE + 1 + '12:00PM'::time), -- Annie / Carol / PT Tx
+       (3, 6, 2,  CURRENT_DATE + 1 + '3:00PM'::time),  -- Kevin / Hendrik / PT Tx
+       (7, 10, 2, CURRENT_DATE + 1 + '11:00AM'::time), -- Phil / Jeff / PT Tx
+       (4, 10, 4, CURRENT_DATE + 1 + '12:00PM'::time), -- Alan / Jeff / MT 45
+       (5, 10, 7, CURRENT_DATE + 1 + '1:00PM'::time);  -- Alexis / Jeff / DC Tx

@@ -13,4 +13,9 @@ class TestJane < Minitest::Test
   def app
     Sinatra::Application
   end
+
+  # Admin Schedule Page
+  def test_admin_schedule
+    # Displays: Date, Disciplines, Practitioners, and Appointments
+  end
 end

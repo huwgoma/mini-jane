@@ -28,7 +28,7 @@ not_found do
   redirect '/admin/schedule/'
 end
 
-# 
+# Admin Schedule Page
 get '/admin/schedule/:date?' do
   @date = params[:date] || Date.today.to_s
   @schedule = @storage.load_daily_schedule(@date)
