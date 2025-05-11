@@ -59,7 +59,7 @@ CREATE TABLE appointments (
   staff_id      integer REFERENCES staff ON DELETE CASCADE NOT NULL,
   patient_id    integer REFERENCES patients ON DELETE CASCADE NOT NULL,
   treatment_id  integer REFERENCES treatments ON DELETE CASCADE NOT NULL,
-  date_time     timestamp DEFAULT NOW() NOT NULL,
+  "datetime"    timestamp DEFAULT NOW() NOT NULL,
   appt_status   appt_status DEFAULT 'Not Arrived'
 );
 
@@ -125,7 +125,7 @@ VALUES (1, ''),
 INSERT INTO patients (user_id)
 VALUES (1), -- Hugo
        (6), -- Hendrik
-       (8), -- Gina
+       (8), -- Carol
        (9); -- Dan
 
 INSERT INTO disciplines (name, title, clinical)
@@ -135,11 +135,11 @@ VALUES ('Physiotherapy',   'PT', true),
        ('Administrative',  NULL, false);
        
 INSERT INTO staff_disciplines(staff_id, discipline_id)
-VALUES (1, 4),         -- Hugo   -> Administrative
-       (2, 1),         -- Annie  -> PT
-       (3, 1),         -- Kevin  -> PT
-       (4, 2),         -- Alan   -> MT
-       (5, 3),         -- Alexis -> DC
+VALUES (1, 4),                 -- Hugo   -> Administrative
+       (2, 1),                 -- Annie  -> PT
+       (3, 1),                 -- Kevin  -> PT
+       (4, 2),                 -- Alan   -> MT
+       (5, 3),                 -- Alexis -> DC
        (7, 1), (7, 3), (7, 4); -- Phil   -> PT, Chiro and Admin
 
 INSERT INTO treatments(name, discipline_id, duration, price)
@@ -151,10 +151,10 @@ VALUES ('PT - Initial',   1, 45, 100.00),
        ('DC - Initial',   3, 40, 120.00),
        ('DC - Treatment', 3, 20, 75.00);
 
-INSERT INTO appointments(staff_id, patient_id, treatment_id, date_time)
+INSERT INTO appointments(staff_id, patient_id, treatment_id, "datetime")
 VALUES (2, 1, 2, '2025-10-08 11:00 AM'),              -- Annie  - Hugo    - PT Tx
        (4, 1, 4, CURRENT_DATE + '9:00AM'::time),      -- Alan   - Hugo    - MT 45 Minutes
        (3, 6, 1, CURRENT_DATE + 1 + '9:00AM'::time),  -- Kevin  - Hendrik - PT Ax
-       (2, 8, 1, CURRENT_DATE + 1 + '9:00AM'::time),  -- Annie  - Gina    - PT Ax
-       (5, 8, 6, CURRENT_DATE + 1 + '10:00AM'::time), -- Alexis - Gina    - PT Ax
+       (2, 8, 1, CURRENT_DATE + 1 + '9:00AM'::time),  -- Annie  - Carol   - PT Ax
+       (5, 8, 6, CURRENT_DATE + 1 + '10:00AM'::time), -- Alexis - Carol   - PT Ax
        (2, 9, 2, CURRENT_DATE + 1 + '10:00AM'::time); -- Annie  - Dan     - PT Tx

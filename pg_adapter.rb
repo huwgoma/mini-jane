@@ -13,11 +13,9 @@ class PGAdapter
 
   def load_daily_schedule(date)
     practitioners = load_scheduled_practitioners
-    
     appointments = load_scheduled_appointments(date)
+
     format_daily_schedule(practitioners, appointments)
-    
-    # Format into application structure
   end
 
   private
@@ -43,51 +41,55 @@ class PGAdapter
   def load_scheduled_appointments(date)
     sql = <<~SQL
       SELECT appts.id, appts.staff_id, 
-             CONCAT(users.first_name, ' ', users.last_name) AS patient_name,
+             CONCAT(users.first_name, ' ', users.last_name) AS pt_name,
              treatments.name AS tx_name, treatments.duration AS tx_length,
-             appts.date_time AS "datetime"
+             appts.datetime
       FROM appointments AS appts
       JOIN patients ON appts.patient_id = patients.user_id
       JOIN users ON patients.user_id = users.id
       JOIN treatments ON appts.treatment_id = treatments.id
-      WHERE appts.date_time::date = $1
-      ORDER BY "datetime";
+      WHERE appts.datetime::date = $1
+      ORDER BY appts.datetime;
     SQL
 
     query(sql, date)
   end
 
+  # Formatting Methods (PG::Result -> Application Format)
   def format_daily_schedule(practitioners, appointments)
-    schedule = {}
+    appointments_by_staff_id = format_appointments_by_staff_id(appointments)
+    schedule = format_practitioners_by_discipline(practitioners, appointments_by_staff_id)
+    
+    schedule
+  end
 
-    appts_by_staff_id = appointments.each_with_object({}) do |row, appts|
+  def format_appointments_by_staff_id(appointments)
+    appointments.each_with_object({}) do |row, hash|
       id = row['id'].to_i
       staff_id = row['staff_id'].to_i
-      patient = row['patient_name']
+      pt_name = row['pt_name']
       tx_name = row['tx_name']
-      tx_length = row['tx_length']
+      tx_length = row['tx_length'].to_i
       datetime = row['datetime']
 
-      appointment = Appointment.new(id, patient, tx_name, tx_length, datetime)
+      appointment = Appointment.new(id, pt_name, tx_name, tx_length, datetime)
 
-      appts[staff_id] ||= []
-
-      appts[staff_id] << appointment
+      hash[staff_id] ||= []
+      hash[staff_id] << appointment
     end
+  end
 
-    practitioners.each do |row|
-      id = row['staff_id'].to_i
+  def format_practitioners_by_discipline(practitioners, appointments_by_staff_id)
+    practitioners.each_with_object({}) do |row, hash|
+      staff_id = row['staff_id'].to_i
       disciplines = row['disciplines']
-      practitioner = Practitioner.new(id, row['first_name'], row['last_name'])
-      binding.pry
-      appts = appts_by_staff_id[id]
-      practitioner.add_to_schedule(appts)
+      first_name, last_name = row['first_name'], row['last_name']
 
-      schedule[disciplines] ||= {}
+      appointments = appointments_by_staff_id.fetch(staff_id, [])
+      practitioner = Practitioner.new(staff_id, first_name, last_name, appointments)
 
-      schedule[disciplines][id] = practitioner
+      hash[disciplines] ||= {}
+      hash[disciplines][staff_id] = practitioner
     end
-
-    schedule
   end
 end

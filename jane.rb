@@ -30,10 +30,10 @@ end
 
 # 
 get '/admin/schedule' do
-  @date = Date.today.to_s
+  @date = '2025-05-12'
   @schedule = @storage.load_daily_schedule(@date)
 
   binding.pry
   erb :schedule
-  
+
 end

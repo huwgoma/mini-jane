@@ -20,13 +20,16 @@ class Staff < User
 end
 
 class Practitioner < Staff
-  def initialize(id, first_name, last_name)
+  attr_reader :schedule
+
+  def initialize(id, first_name, last_name, appointments = [])
     super(id, first_name, last_name)
-    @appointments = []
+    @schedule = []
+    add_to_schedule(appointments)
   end
 
   def add_to_schedule(*appointments)
     # Validate 
-    @appointments.push(*appointments.flatten)
+    schedule.push(*appointments.flatten)
   end
 end

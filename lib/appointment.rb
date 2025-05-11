@@ -1,8 +1,8 @@
 class Appointment
-  def initialize(id, patient, tx_name, tx_length, date_time)
+  def initialize(id, pt_name, tx_name, tx_length, datetime)
     @id = id
-    @patient = patient
+    @pt_name = pt_name
     @tx_name, @tx_length = tx_name, tx_length
-    @date_time = date_time
+    @datetime = datetime
   end
 end
