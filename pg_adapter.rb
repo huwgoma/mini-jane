@@ -23,11 +23,10 @@ class PGAdapter
   private
 
   attr_reader :connection, :logger
-  
+
   def load_scheduled_practitioners
     sql = <<~SQL
-      SELECT users.id AS staff_id, 
-             CONCAT(users.first_name, ' ', users.last_name) AS name,
+      SELECT users.id AS staff_id, users.first_name, users.last_name,
              STRING_AGG(disciplines.name, '/') AS disciplines
       FROM users
       JOIN staff ON users.id = staff.user_id
@@ -79,9 +78,10 @@ class PGAdapter
     practitioners.each do |row|
       id = row['staff_id'].to_i
       disciplines = row['disciplines']
-      practitioner = Practitioner.new(id, row['name'])
+      practitioner = Practitioner.new(id, row['first_name'], row['last_name'])
+      binding.pry
       appts = appts_by_staff_id[id]
-      practitioner.add_appointments(appts)
+      practitioner.add_to_schedule(appts)
 
       schedule[disciplines] ||= {}
 

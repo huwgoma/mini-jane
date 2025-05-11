@@ -20,8 +20,13 @@ class Staff < User
 end
 
 class Practitioner < Staff
-  def initialize(id, first_name, last_name, disciplines)
+  def initialize(id, first_name, last_name)
     super(id, first_name, last_name)
-    @disciplines = disciplines
+    @appointments = []
+  end
+
+  def add_to_schedule(*appointments)
+    # Validate 
+    @appointments.push(*appointments.flatten)
   end
 end
