@@ -25,15 +25,13 @@ before do
 end
 
 not_found do
-  redirect '/admin/schedule'
+  redirect '/admin/schedule/'
 end
 
 # 
-get '/admin/schedule' do
-  @date = '2025-05-12'
+get '/admin/schedule/:date?' do
+  @date = params[:date] || Date.today.to_s
   @schedule = @storage.load_daily_schedule(@date)
 
-  binding.pry
   erb :schedule
-
 end

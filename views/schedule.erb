@@ -1,7 +1,27 @@
 <h2><%= @date %></h2>
 
+<%# Display Schedule: Disciplines-Practitioners-Appointments %>
 <ul>
-  <% @appointments.each do |appt| %>
-    <%= appt %>
-  <% end %>
+<% @schedule.each do |discipline, practitioners| %>
+  <li>
+    <%# Disciplines %>
+    <%= discipline %>
+    <ul>      
+    <% practitioners.each do |staff_id, practitioner| %>
+      <li>
+        <%# Practitioners %>
+        <%= practitioner.full_name %>
+        <ul>
+          <% practitioner.schedule.each do |appointment| %>
+            <li>
+              <%# Appointments %>
+              <%= appointment %>
+            </li>
+          <% end %>
+        </ul>
+      </li>
+    <% end %>
+    </ul>
+  </li>
+<% end %>
 </ul>
