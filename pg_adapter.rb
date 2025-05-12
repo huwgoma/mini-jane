@@ -7,7 +7,8 @@ class PGAdapter
   end
 
   def query(sql, *params)
-    logger.info("#{sql}, #{params}")
+    logger.info("#{sql}, #{params}") if logger
+    
     connection.exec_params(sql, params)
   end
 

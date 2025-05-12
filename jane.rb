@@ -11,6 +11,8 @@ configure do
   set :session_secret, SecureRandom.hex(32)
 
   set :erb, :escape_html => true
+
+  set :storage, PGAdapter.new   # Connection sharing
 end
 
 configure :development do
@@ -19,9 +21,10 @@ configure :development do
   also_reload 'pg_adapter.rb', 'lib/*.rb'
 end
 
+
 # Routes
 before do
-  @storage = PGAdapter.new(logger: logger)
+  @storage = settings.storage
 end
 
 not_found do
