@@ -3,7 +3,8 @@ require 'pg'
 class PGAdapter
   def initialize(logger: nil)
     @logger = logger
-    @connection = PG.connect(dbname: 'jane')
+    @connection = nil # Defer connection until needed
+    # PG.connect(dbname: 'jane')
   end
 
   def query(sql, *params)
@@ -21,7 +22,18 @@ class PGAdapter
 
   private
 
-  attr_reader :connection, :logger
+  attr_reader :logger
+
+  def connection
+    @connection ||= PG.connect(dbname: env_db_name)
+  end
+
+  def env_db_name
+    case ENV['RACK_ENV']
+    when 'test'        then 'test_jane'
+    when 'development' then 'jane'
+    end
+  end
 
   def load_scheduled_practitioners
     sql = <<~SQL
