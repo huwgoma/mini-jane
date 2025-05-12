@@ -17,21 +17,39 @@ class TestJane < Minitest::Test
 
   def setup
     app.settings.storage = PGAdapter.new
+    @storage = app.settings.storage
   end
 
   # Admin Schedule Page
-  def test_admin_schedule
+  def test_admin_schedule_one_appointment
+    date = '2025-05-12'
+    create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)
+    create_practitioner
+    create_patient
+    create_appointment
     # Displays: Date, Disciplines, Practitioners, and Appointments
     # date = ___
     # create appointments (staff: annie, )
     # create practitioners (annie, )
     get '/admin/schedule/'
+
     assert_equal(200, last_response.status)
+
   end
 
   private
 
   # Helpers for generating test data before tests
+  def create_discipline(discipline)
+    name     = discipline[:name]
+    title    = discipline[:title]
+    clinical = discipline[:clinical]
+
+    sql = "INSERT INTO disciplines(name, title, clinical)
+           VALUES($1, $2, $3);"
+    @storage.query(sql, name, title, clinical)
+  end
+
   def create_user(name, birthday)
     
   end

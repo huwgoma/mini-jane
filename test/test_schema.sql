@@ -32,7 +32,7 @@ CREATE TABLE staff (
 CREATE TABLE disciplines (
   id       serial       PRIMARY KEY,
   name     varchar(255) NOT NULL UNIQUE,
-  title    varchar(2),
+  title    varchar(2)   DEFAULT '',
   clinical boolean      NOT NULL DEFAULT false
 );
 

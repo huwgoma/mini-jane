@@ -4,7 +4,6 @@ class PGAdapter
   def initialize(logger: nil)
     @logger = logger
     @connection = nil # Defer connection until needed
-    # PG.connect(dbname: 'jane')
   end
 
   def query(sql, *params)
