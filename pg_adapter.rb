@@ -54,7 +54,7 @@ class PGAdapter
     sql = <<~SQL
       SELECT appts.id, appts.staff_id, 
              CONCAT(users.first_name, ' ', users.last_name) AS pt_name,
-             treatments.name AS tx_name, treatments.duration AS tx_length,
+             treatments.name AS tx_name, treatments.length AS tx_length,
              appts.datetime
       FROM appointments AS appts
       JOIN patients ON appts.patient_id = patients.user_id

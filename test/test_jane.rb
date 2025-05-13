@@ -105,14 +105,7 @@ class TestJane < Minitest::Test
     result.first['id'].to_i
   end
 
-  #
-  def insert_and_return_discipline(discipline)
-    name     = discipline[:name]
-    title    = discipline[:title]
-    clinical = discipline[:clinical]
-
-    sql = "INSERT INTO disciplines(name, title, clinical)
-           VALUES($1, $2, $3);"
-    @storage.query(sql, name, title, clinical)
+  def insert_treatment_returning_id(name, discipline_id, length)
+    
   end
 end
