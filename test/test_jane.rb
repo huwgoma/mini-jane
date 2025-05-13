@@ -20,10 +20,17 @@ class TestJane < Minitest::Test
     @storage = app.settings.storage
   end
 
+  def teardown
+    # Clear all data from tables
+    @storage.query('TRUNCATE users CASCADE;')
+    @storage.query('TRUNCATE disciplines CASCADE;')
+  end
+
   # Admin Schedule Page
   def test_admin_schedule_one_appointment
     date = '2025-05-12'
     create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)
+    binding.pry
     create_practitioner
     create_patient
     create_appointment
