@@ -1,0 +1,28 @@
+
+[1mFrom:[0m /home/hugo/launch_school/RB175-185_Projects/mini-jane/test/test_jane.rb:65 TestJane#test_admin_schedule_fixed_date_one_practitioner_one_appointment:
+
+    [1;34m59[0m: [32mdef[0m [1;34mtest_admin_schedule_fixed_date_one_practitioner_one_appointment[0m
+    [1;34m60[0m:   date = [31m[1;31m'[0m[31m2024-10-08[1;31m'[0m[31m[0m
+    [1;34m61[0m: 
+    [1;34m62[0m: 
+    [1;34m63[0m:   staff_id = create_profile(create_user([31m[1;31m'[0m[31mAnnie Hu[1;31m'[0m[31m[0m), [35mtype[0m: [31m[1;31m'[0m[31mstaff[1;31m'[0m[31m[0m)
+    [1;34m64[0m:   patient_id = create_profile(create_user([31m[1;31m'[0m[31mHugo Ma[1;31m'[0m[31m[0m))
+ => [1;34m65[0m:   binding.pry
+    [1;34m66[0m: 
+    [1;34m67[0m:   discipline_id = create_discipline()
+    [1;34m68[0m: 
+    [1;34m69[0m: 
+    [1;34m70[0m:   staff_id, patient_id = create_users([31m[1;31m'[0m[31mAnnie Hu[1;31m'[0m[31m[0m, [31m[1;31m'[0m[31mHugo Ma[1;31m'[0m[31m[0m)
+    [1;34m71[0m:   binding.pry
+    [1;34m72[0m:   [1;34m# create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',[0m
+    [1;34m73[0m:   [1;34m#                            datetime: "#{date} 10:00AM", discipline: 'Physiotherapy',[0m
+    [1;34m74[0m:   [1;34m#                            tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)[0m
+    [1;34m75[0m: 
+    [1;34m76[0m:   get [31m[1;31m'[0m[31m/admin/schedule/2024-10-08[1;31m'[0m[31m[0m
+    [1;34m77[0m: 
+    [1;34m78[0m:   assert_includes(last_response.body, [31m[1;31m"[0m[31m<h2>#{date}[0m[31m[1;31m"[0m[31m[0m)
+    [1;34m79[0m:   assert_includes(last_response.body, [31m[1;31m'[0m[31mPhysiotherapy[1;31m'[0m[31m[0m)
+    [1;34m80[0m:   assert_includes(last_response.body, [31m[1;31m'[0m[31mAnnie Hu[1;31m'[0m[31m[0m)
+    [1;34m81[0m:   assert_includes(last_response.body, [31m[1;31m"[0m[31m#{date}[0m[31m 10:00:00 - Hugo Ma - PT - Initial[1;31m"[0m[31m[0m)
+    [1;34m82[0m: [32mend[0m
+
