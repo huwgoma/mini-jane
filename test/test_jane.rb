@@ -38,23 +38,9 @@ class TestJane < Minitest::Test
                                datetime: '2025-05-12 10:00AM', discipline: 'Physiotherapy',
                                tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)
 
-    # create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)    
-    
-
-    # insert_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)
-    # insert_treatment(name: 'PT - Ax', discipline_id: )
-    # binding.pry
-    # create_practitioner
-    # create_patient
-    # create_appointment
-    # Displays: Date, Disciplines, Practitioners, and Appointments
-    # date = ___
-    # create appointments (staff: annie, )
-    # create practitioners (annie, )
     get '/admin/schedule/'
 
     assert_equal(200, last_response.status)
-
   end
 
   private
@@ -74,13 +60,7 @@ class TestJane < Minitest::Test
     treatment_id = insert_treatment_returning_id(tx_name, discipline_id, tx_length, tx_price)
     insert_staff_discipline(staff_id, discipline_id)
     
-    binding.pry
-
-    # Create discipline (based on tx name's prefix) (eg. PT -> Physiotherapy) -> d id
-    # Create treatment (discipline id)
-    # Insert record into staff_disciplines join
-    # 
-    # Create appt
+    insert_appointment(staff_id, patient_id, datetime, treatment_id)
   end
 
   def insert_user_returning_id(full_name)
@@ -119,5 +99,11 @@ class TestJane < Minitest::Test
     sql = "INSERT INTO staff_disciplines(staff_id, discipline_id)
            VALUES ($1, $2);"
     @storage.query(sql, staff_id, discipline_id)
+  end
+
+  def insert_appointment(staff_id, patient_id, datetime, treatment_id)
+    sql = "INSERT INTO appointments (staff_id, patient_id, datetime, treatment_id)
+           VALUES($1, $2, $3, $4);"
+    @storage.query(sql, staff_id, patient_id, datetime, treatment_id)
   end
 end

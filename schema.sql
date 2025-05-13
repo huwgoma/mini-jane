@@ -59,8 +59,8 @@ CREATE TABLE appointments (
   staff_id      integer REFERENCES staff ON DELETE CASCADE NOT NULL,
   patient_id    integer REFERENCES patients ON DELETE CASCADE NOT NULL,
   treatment_id  integer REFERENCES treatments ON DELETE CASCADE NOT NULL,
-  "datetime"    timestamp DEFAULT NOW() NOT NULL,
-  appt_status   appt_status DEFAULT 'Not Arrived'
+  datetime      timestamp DEFAULT NOW() NOT NULL,
+  status        appt_status DEFAULT 'Not Arrived'
 );
 
 
