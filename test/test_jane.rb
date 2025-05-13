@@ -31,16 +31,20 @@ class TestJane < Minitest::Test
   end
 
   # Admin Schedule Page
-  def test_admin_schedule_one_appointment
-    date = '2025-05-12'
+  def test_admin_schedule_fixed_date_one_practitioner_one_appointment
+    date = '2024-10-08'
 
     create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
-                               datetime: '2025-05-12 10:00AM', discipline: 'Physiotherapy',
+                               datetime: "#{date} 10:00AM", discipline: 'Physiotherapy',
                                tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)
 
-    get '/admin/schedule/'
+    get '/admin/schedule/2024-10-08'
 
     assert_equal(200, last_response.status)
+    assert_includes(last_response.body, "<h2>#{date}")
+    assert_includes(last_response.body, 'Physiotherapy')
+    assert_includes(last_response.body, 'Annie Hu')
+    assert_includes(last_response.body, "#{date} 10:00:00 - Hugo Ma - PT - Initial")
   end
 
   private
@@ -49,7 +53,6 @@ class TestJane < Minitest::Test
   def create_appointment_cascade(staff_name:, patient_name:, 
                                  datetime:, discipline:,
                                  tx_name:, tx_length:, tx_price:)
-
     staff_id = insert_user_returning_id(staff_name)
     patient_id = insert_user_returning_id(patient_name)
 
