@@ -26,7 +26,7 @@ CREATE TABLE patients (
 
 CREATE TABLE staff (
   user_id   integer PRIMARY KEY REFERENCES users ON DELETE CASCADE,
-  biography text
+  biography text    DEFAULT ''
 );
 
 CREATE TABLE disciplines (

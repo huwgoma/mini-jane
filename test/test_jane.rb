@@ -59,7 +59,12 @@ class TestJane < Minitest::Test
   # Helpers for generating test data before tests
   def create_appointment_cascade(staff_name:, patient_name:, datetime:,
                                  tx_name:, tx_length:)
-    user_id = insert_user_returning_id(staff_name)
+    staff_id = insert_user_returning_id(staff_name)
+    patient_id = insert_user_returning_id(patient_name)
+
+    insert_user_profile(staff_id, table: 'staff')
+    insert_user_profile(patient_id, table: 'patients')
+
     binding.pry
     # Create user (staff and patient) -> user ids (staff and patient)
     # Create staff profile (user id (staff)) and patient profile (user id (patient))
@@ -77,6 +82,12 @@ class TestJane < Minitest::Test
 
     result.first['id'].to_i
   end
+
+  def insert_user_profile(user_id, table: 'patients')
+    sql = "INSERT INTO #{table} (user_id) VALUES ($1)"
+    @storage.query(sql, user_id)
+  end
+
   
 
   #
