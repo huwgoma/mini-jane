@@ -30,6 +30,7 @@ class TestJane < Minitest::Test
 
   def test_admin_schedule_fixed_date_one_practitioner_one_appointment
     date = '2024-10-08'
+    time = '10:00:00'
 
     staff_id = return_id(create_user('Annie Hu'))
     create_profile(staff_id, type: 'staff')
@@ -40,18 +41,16 @@ class TestJane < Minitest::Test
     discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
     treatment_id = return_id(create_treatment('PT - Initial', discipline_id, 
                                               length: 45, price: 100.00))
-    create_staff_discipline_association(staff_id, disicpline_id)
+    create_staff_discipline_association(staff_id, discipline_id)
 
-    create_appointment(staff_id, patient_id, "#{date} 10:00AM", treatment_id)
-
-    binding.pry
+    create_appointment(staff_id, patient_id, treatment_id, "#{date} #{time}")
 
     get '/admin/schedule/2024-10-08'
 
     assert_includes(last_response.body, "<h2>#{date}")
     assert_includes(last_response.body, 'Physiotherapy')
     assert_includes(last_response.body, 'Annie Hu')
-    assert_includes(last_response.body, "#{date} 10:00:00 - Hugo Ma - PT - Initial")
+    assert_includes(last_response.body, "#{date} #{time} - Hugo Ma - PT - Initial")
   end
 
   def test_admin_schedule_default_today
@@ -92,8 +91,10 @@ class TestJane < Minitest::Test
   end
 
   # Create a dummy appointment
-  def create_appointment(staff_id, patient_id, treatment_id, datetime, status)
-    sql = "INSERT INTO appointments(staff_)"
+  def create_appointment(staff_id, patient_id, treatment_id, datetime)
+    sql = "INSERT INTO appointments(staff_id, patient_id, treatment_id, datetime)
+           VALUES($1, $2, $3, $4);"
+    @storage.query(sql, staff_id, patient_id, treatment_id, datetime)
   end
 
   # Create a dummy user
