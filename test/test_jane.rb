@@ -113,7 +113,9 @@ class TestJane < Minitest::Test
 
   # Create a dummy treatment type
   def create_treatment(name, discipline_id, length:, price:)
-    
+    sql = "INSERT INTO treatments (name, discipline_id, length, price)
+           VALUES($1, $2, $3, $4) RETURNING *;"
+    @storage.query(sql, name, discipline_id, length, price)
   end
 
 
