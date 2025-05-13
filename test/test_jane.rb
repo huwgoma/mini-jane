@@ -54,23 +54,36 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_schedule_default_today
+    today = Date.today.to_s
+    get '/admin/schedule/'
+
+    assert_includes(last_response.body, today)
+  end
+
+  def test_admin_schedule_default_today
     skip
     today = Date.today.to_s
     yesterday = Date.today.prev_day.to_s
 
-    # Appointment scheduled for today; should be displayed.
-    # - Capture PG::Result object for use in subsequent appointments
-    appointment = create_appointment_cascade(
-                  staff_name: 'Annie Hu', patient_name: 'Hugo Ma', 
-                  datetime: "#{today} 10:00AM", discipline: 'Physiotherapy',
-                  tx_name: 'PT - Treatment', tx_length: 30, tx_price: 85.00
-                 ).first
+    staff_id = return_id(create_user('Annie Hu'))
+    create_profile(staff_id, type: 'staff')
 
+    patient_id = return_id(create_user('Hugo Ma'))
+    create_profile(patient_id)
+
+    discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
+    pt_ax_id = return_id(create_treatment('PT - Initial', discipline_id, 
+                                          length: 45, price: 100.00))
+    pt_tx_id = return_id(create_treatment('PT - Treatment', discipline_id, 
+                                          length: 30, price: 85.00))
+    create_staff_discipline_association(staff_id, discipline_id)
+
+    
+    # Appointment scheduled for today; should be displayed.
+    create_appointment(staff_id, patient_id, pt_tx_id, "#{today} 10:00AM")
 
     # Appointment scheduled for yesterday - Should not be displayed
-    # staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
-    # datetime: "#{yesterday} 10:00AM", discipline: 'Physiotherapy',
-    # tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)
+    create_appointment(staff_id, patient_id, pt_ax_id, "#{yesterday} 10:00AM")
 
     get '/admin/schedule/'
 
@@ -134,61 +147,61 @@ class TestJane < Minitest::Test
 
 
 
-  def create_appointment_cascade(staff_name:, patient_name:, datetime:, 
-                                 discipline:, tx_name:, tx_length:, tx_price:)
-    staff_id = insert_user_returning_id(staff_name)
-    patient_id = insert_user_returning_id(patient_name)
-    insert_user_profile(staff_id, table: 'staff')
-    insert_user_profile(patient_id, table: 'patients')
+  # def create_appointment_cascade(staff_name:, patient_name:, datetime:, 
+  #                                discipline:, tx_name:, tx_length:, tx_price:)
+  #   staff_id = insert_user_returning_id(staff_name)
+  #   patient_id = insert_user_returning_id(patient_name)
+  #   insert_user_profile(staff_id, table: 'staff')
+  #   insert_user_profile(patient_id, table: 'patients')
 
-    discipline_id = insert_discipline_returning_id(discipline)
-    treatment_id = insert_treatment_returning_id(tx_name, discipline_id, tx_length, tx_price)
-    insert_staff_discipline(staff_id, discipline_id)
+  #   discipline_id = insert_discipline_returning_id(discipline)
+  #   treatment_id = insert_treatment_returning_id(tx_name, discipline_id, tx_length, tx_price)
+  #   insert_staff_discipline(staff_id, discipline_id)
     
-    insert_and_return_appointment(staff_id, patient_id, datetime, treatment_id)
-  end
+  #   insert_and_return_appointment(staff_id, patient_id, datetime, treatment_id)
+  # end
 
-  def insert_user_returning_id(full_name)
-    first_name, last_name = full_name.split(' ')
-    sql = "INSERT INTO users (first_name, last_name)
-           VALUES ($1, $2) RETURNING id;"
-    result = @storage.query(sql, first_name, last_name)
+  # def insert_user_returning_id(full_name)
+  #   first_name, last_name = full_name.split(' ')
+  #   sql = "INSERT INTO users (first_name, last_name)
+  #          VALUES ($1, $2) RETURNING id;"
+  #   result = @storage.query(sql, first_name, last_name)
 
-    result.first['id'].to_i
-  end
+  #   result.first['id'].to_i
+  # end
 
-  def insert_user_profile(user_id, table: 'patients')
-    sql = "INSERT INTO #{table} (user_id) VALUES ($1)"
-    @storage.query(sql, user_id)
-  end
+  # def insert_user_profile(user_id, table: 'patients')
+  #   sql = "INSERT INTO #{table} (user_id) VALUES ($1)"
+  #   @storage.query(sql, user_id)
+  # end
 
-  def insert_discipline_returning_id(discipline, clinical: true)
-    title = DISCIPLINE_TITLES[discipline]
+  # def insert_discipline_returning_id(discipline, clinical: true)
+  #   title = DISCIPLINE_TITLES[discipline]
     
-    sql = "INSERT INTO disciplines(name, title, clinical)
-           VALUES($1, $2, $3) RETURNING id;"
-    result = @storage.query(sql, discipline, title, clinical)
+  #   sql = "INSERT INTO disciplines(name, title, clinical)
+  #          VALUES($1, $2, $3) RETURNING id;"
+  #   result = @storage.query(sql, discipline, title, clinical)
 
-    result.first['id'].to_i
-  end
+  #   result.first['id'].to_i
+  # end
 
-  def insert_treatment_returning_id(name, discipline_id, length, price)
-    sql = "INSERT INTO treatments (name, discipline_id, length, price)
-           VALUES($1, $2, $3, $4) RETURNING id;"
-    result = @storage.query(sql, name, discipline_id, length, price)
+  # def insert_treatment_returning_id(name, discipline_id, length, price)
+  #   sql = "INSERT INTO treatments (name, discipline_id, length, price)
+  #          VALUES($1, $2, $3, $4) RETURNING id;"
+  #   result = @storage.query(sql, name, discipline_id, length, price)
 
-    result.first['id'].to_i
-  end
+  #   result.first['id'].to_i
+  # end
 
-  def insert_staff_discipline(staff_id, discipline_id)
-    sql = "INSERT INTO staff_disciplines(staff_id, discipline_id)
-           VALUES ($1, $2);"
-    @storage.query(sql, staff_id, discipline_id)
-  end
+  # def insert_staff_discipline(staff_id, discipline_id)
+  #   sql = "INSERT INTO staff_disciplines(staff_id, discipline_id)
+  #          VALUES ($1, $2);"
+  #   @storage.query(sql, staff_id, discipline_id)
+  # end
 
-  def insert_and_return_appointment(staff_id, patient_id, datetime, treatment_id)
-    sql = "INSERT INTO appointments (staff_id, patient_id, datetime, treatment_id)
-           VALUES($1, $2, $3, $4) RETURNING *;"
-    @storage.query(sql, staff_id, patient_id, datetime, treatment_id)
-  end
+  # def insert_and_return_appointment(staff_id, patient_id, datetime, treatment_id)
+  #   sql = "INSERT INTO appointments (staff_id, patient_id, datetime, treatment_id)
+  #          VALUES($1, $2, $3, $4) RETURNING *;"
+  #   @storage.query(sql, staff_id, patient_id, datetime, treatment_id)
+  # end
 end
