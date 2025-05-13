@@ -72,6 +72,8 @@ class TestJane < Minitest::Test
 
     discipline_id = insert_discipline_returning_id(discipline)
     treatment_id = insert_treatment_returning_id(tx_name, discipline_id, tx_length, tx_price)
+    insert_staff_discipline(staff_id, discipline_id)
+    
     binding.pry
 
     # Create discipline (based on tx name's prefix) (eg. PT -> Physiotherapy) -> d id
@@ -111,5 +113,11 @@ class TestJane < Minitest::Test
     result = @storage.query(sql, name, discipline_id, length, price)
 
     result.first['id'].to_i
+  end
+
+  def insert_staff_discipline(staff_id, discipline_id)
+    sql = "INSERT INTO staff_disciplines(staff_id, discipline_id)
+           VALUES ($1, $2);"
+    @storage.query(sql, staff_id, discipline_id)
   end
 end
