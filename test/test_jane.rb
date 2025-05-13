@@ -29,7 +29,16 @@ class TestJane < Minitest::Test
   # Admin Schedule Page
   def test_admin_schedule_one_appointment
     date = '2025-05-12'
-    create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)
+
+    create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
+                               datetime: '2025-05-12 10:00AM',
+                               tx_name: 'PT - Initial', tx_length: 45)
+
+    create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)    
+    
+
+    insert_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)
+    insert_treatment(name: 'PT - Ax', discipline_id: )
     binding.pry
     create_practitioner
     create_patient
@@ -46,8 +55,32 @@ class TestJane < Minitest::Test
 
   private
 
+  
   # Helpers for generating test data before tests
-  def create_discipline(discipline)
+  def create_appointment_cascade(staff_name:, patient_name:, datetime:,
+                                 tx_name:, tx_length:)
+    user_id = insert_user_returning_id(staff_name)
+    binding.pry
+    # Create user (staff and patient) -> user ids (staff and patient)
+    # Create staff profile (user id (staff)) and patient profile (user id (patient))
+    # 
+    # Create discipline (based on tx name's prefix) (eg. PT -> Physiotherapy) -> d id
+    # Create treatment (discipline id)
+  end
+
+  def insert_user_returning_id(full_name)
+    first_name, last_name = full_name.split(' ')
+    sql = "INSERT INTO users (first_name, last_name)
+           VALUES ($1, $2)
+           RETURNING id;"
+    result = @storage.query(sql, first_name, last_name)
+
+    result.first['id'].to_i
+  end
+  
+
+  #
+  def insert_and_return_discipline(discipline)
     name     = discipline[:name]
     title    = discipline[:title]
     clinical = discipline[:clinical]
@@ -55,9 +88,5 @@ class TestJane < Minitest::Test
     sql = "INSERT INTO disciplines(name, title, clinical)
            VALUES($1, $2, $3);"
     @storage.query(sql, name, title, clinical)
-  end
-
-  def create_user(name, birthday)
-    
   end
 end
