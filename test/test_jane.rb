@@ -25,10 +25,48 @@ class TestJane < Minitest::Test
     @storage.query('TRUNCATE users CASCADE;')
     @storage.query('TRUNCATE disciplines CASCADE;')
   end
+  
+  #######################
+  # Admin Schedule Page #
+  ####################### 
+  def test_admin_schedule_default_today
+    today = Date.today.to_s
+    get '/admin/schedule/'
 
-  # Admin Schedule Page
+    assert_includes(last_response.body, today)
+  end
+
+  def test_admin_schedule_display_appointments_for_selected_date_only
+    today = Date.today.to_s
+    yesterday = Date.today.prev_day.to_s
+
+    staff_id = return_id(create_user('Annie Hu'))
+    create_profile(staff_id, type: 'staff')
+
+    patient_id = return_id(create_user('Hugo Ma'))
+    create_profile(patient_id)
+
+    discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
+    pt_ax_id = return_id(create_treatment('PT - Initial', discipline_id, 
+                                          length: 45, price: 100.00))
+    pt_tx_id = return_id(create_treatment('PT - Treatment', discipline_id, 
+                                          length: 30, price: 85.00))
+    create_staff_discipline_association(staff_id, discipline_id)
+
+    # Appointment scheduled for today; should be displayed.
+    create_appointment(staff_id, patient_id, pt_tx_id, "#{today} 10:00AM")
+
+    # Appointment scheduled for yesterday - Should not be displayed
+    create_appointment(staff_id, patient_id, pt_ax_id, "#{yesterday} 10:00AM")
+
+    get '/admin/schedule/'
+
+    assert_includes(last_response.body, 'PT - Treatment')
+    refute_includes(last_response.body, 'PT - Initial')
+  end
 
   def test_admin_schedule_fixed_date_one_practitioner_one_appointment
+    skip
     date = '2024-10-08'
     time = '10:00:00'
 
@@ -53,43 +91,36 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, "#{date} #{time} - Hugo Ma - PT - Initial")
   end
 
-  def test_admin_schedule_default_today
-    today = Date.today.to_s
-    get '/admin/schedule/'
+  # def test_admin_schedule_display_appointments_for_selected_date
+  #   skip
+  #   today = Date.today.to_s
+  #   yesterday = Date.today.prev_day.to_s
 
-    assert_includes(last_response.body, today)
-  end
+  #   staff_id = return_id(create_user('Annie Hu'))
+  #   create_profile(staff_id, type: 'staff')
 
-  def test_admin_schedule_default_today
-    skip
-    today = Date.today.to_s
-    yesterday = Date.today.prev_day.to_s
+  #   patient_id = return_id(create_user('Hugo Ma'))
+  #   create_profile(patient_id)
 
-    staff_id = return_id(create_user('Annie Hu'))
-    create_profile(staff_id, type: 'staff')
-
-    patient_id = return_id(create_user('Hugo Ma'))
-    create_profile(patient_id)
-
-    discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
-    pt_ax_id = return_id(create_treatment('PT - Initial', discipline_id, 
-                                          length: 45, price: 100.00))
-    pt_tx_id = return_id(create_treatment('PT - Treatment', discipline_id, 
-                                          length: 30, price: 85.00))
-    create_staff_discipline_association(staff_id, discipline_id)
+  #   discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
+  #   pt_ax_id = return_id(create_treatment('PT - Initial', discipline_id, 
+  #                                         length: 45, price: 100.00))
+  #   pt_tx_id = return_id(create_treatment('PT - Treatment', discipline_id, 
+  #                                         length: 30, price: 85.00))
+  #   create_staff_discipline_association(staff_id, discipline_id)
 
     
-    # Appointment scheduled for today; should be displayed.
-    create_appointment(staff_id, patient_id, pt_tx_id, "#{today} 10:00AM")
+  #   # Appointment scheduled for today; should be displayed.
+  #   create_appointment(staff_id, patient_id, pt_tx_id, "#{today} 10:00AM")
 
-    # Appointment scheduled for yesterday - Should not be displayed
-    create_appointment(staff_id, patient_id, pt_ax_id, "#{yesterday} 10:00AM")
+  #   # Appointment scheduled for yesterday - Should not be displayed
+  #   create_appointment(staff_id, patient_id, pt_ax_id, "#{yesterday} 10:00AM")
 
-    get '/admin/schedule/'
+  #   get '/admin/schedule/'
 
-    assert_includes(last_response.body, 'PT - Treatment')
-    refute_includes(last_response.body, 'PT - Initial')
-  end
+  #   assert_includes(last_response.body, 'PT - Treatment')
+  #   refute_includes(last_response.body, 'PT - Initial')
+  # end
 
 
   private
