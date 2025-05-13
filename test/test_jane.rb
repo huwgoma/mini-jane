@@ -40,10 +40,11 @@ class TestJane < Minitest::Test
     discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
     treatment_id = return_id(create_treatment('PT - Initial', discipline_id, 
                                               length: 45, price: 100.00))
+    create_staff_discipline_association(staff_id, disicpline_id)
+
+    create_appointment(staff_id, patient_id, "#{date} 10:00AM", treatment_id)
+
     binding.pry
-    # create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
-    #                            datetime: "#{date} 10:00AM", discipline: 'Physiotherapy',
-    #                            tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)
 
     get '/admin/schedule/2024-10-08'
 
@@ -90,6 +91,11 @@ class TestJane < Minitest::Test
     result.first['id'].to_i  
   end
 
+  # Create a dummy appointment
+  def create_appointment(staff_id, patient_id, treatment_id, datetime, status)
+    sql = "INSERT INTO appointments(staff_)"
+  end
+
   # Create a dummy user
   def create_user(name)
     first_name, last_name = name.split
@@ -118,6 +124,12 @@ class TestJane < Minitest::Test
     @storage.query(sql, name, discipline_id, length, price)
   end
 
+  # Create a staff-discipline M-M association
+  def create_staff_discipline_association(staff_id, discipline_id)
+    sql = "INSERT INTO staff_disciplines (staff_id, discipline_id)
+           VALUES($1, $2);"
+    @storage.query(sql, staff_id, discipline_id)
+  end
 
 
 
