@@ -49,7 +49,7 @@ CREATE TABLE treatments (
   discipline_id integer      REFERENCES disciplines ON DELETE CASCADE NOT NULL,
   duration      integer      NOT NULL CHECK((duration BETWEEN 5 AND 180) AND (duration % 5 = 0)),
                              -- Only 5-minute intervals, up to 3 hours
-  price         money        NOT NULL CHECK(price::numeric >= 0.00),
+  price         money        NOT NULL CHECK(price::numeric >= 0.00) DEFAULT 0.00,
   UNIQUE(discipline_id, name)
   -- Each discipline can only have one treatment type of the same name
 );

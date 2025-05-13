@@ -11,6 +11,10 @@ require_relative '../jane'
 class TestJane < Minitest::Test
   include Rack::Test::Methods
 
+  DISCIPLINE_TITLES = { 
+    'Physiotherapy' => 'PT', 'Massage Therapy' => 'MT', 'Chiropractic' => 'DC'
+  }
+
   def app
     Sinatra::Application
   end
@@ -31,18 +35,18 @@ class TestJane < Minitest::Test
     date = '2025-05-12'
 
     create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
-                               datetime: '2025-05-12 10:00AM',
+                               datetime: '2025-05-12 10:00AM', discipline: 'Physiotherapy',
                                tx_name: 'PT - Initial', tx_length: 45)
 
-    create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)    
+    # create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)    
     
 
-    insert_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)
-    insert_treatment(name: 'PT - Ax', discipline_id: )
-    binding.pry
-    create_practitioner
-    create_patient
-    create_appointment
+    # insert_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)
+    # insert_treatment(name: 'PT - Ax', discipline_id: )
+    # binding.pry
+    # create_practitioner
+    # create_patient
+    # create_appointment
     # Displays: Date, Disciplines, Practitioners, and Appointments
     # date = ___
     # create appointments (staff: annie, )
@@ -55,29 +59,32 @@ class TestJane < Minitest::Test
 
   private
 
-  
   # Helpers for generating test data before tests
-  def create_appointment_cascade(staff_name:, patient_name:, datetime:,
+  def create_appointment_cascade(staff_name:, patient_name:, 
+                                 datetime:, discipline:,
                                  tx_name:, tx_length:)
+
     staff_id = insert_user_returning_id(staff_name)
     patient_id = insert_user_returning_id(patient_name)
 
     insert_user_profile(staff_id, table: 'staff')
     insert_user_profile(patient_id, table: 'patients')
 
+    discipline_id = insert_discipline_returning_id(discipline)
+    treatment_id = insert_treatment_returning_id(tx_name, discipline_id, tx_length)
     binding.pry
-    # Create user (staff and patient) -> user ids (staff and patient)
-    # Create staff profile (user id (staff)) and patient profile (user id (patient))
-    # 
+
     # Create discipline (based on tx name's prefix) (eg. PT -> Physiotherapy) -> d id
     # Create treatment (discipline id)
+    # Insert record into staff_disciplines join
+    # 
+    # Create appt
   end
 
   def insert_user_returning_id(full_name)
     first_name, last_name = full_name.split(' ')
     sql = "INSERT INTO users (first_name, last_name)
-           VALUES ($1, $2)
-           RETURNING id;"
+           VALUES ($1, $2) RETURNING id;"
     result = @storage.query(sql, first_name, last_name)
 
     result.first['id'].to_i
@@ -88,7 +95,15 @@ class TestJane < Minitest::Test
     @storage.query(sql, user_id)
   end
 
-  
+  def insert_discipline_returning_id(discipline, clinical: true)
+    title = DISCIPLINE_TITLES[discipline]
+    
+    sql = "INSERT INTO disciplines(name, title, clinical)
+           VALUES($1, $2, $3) RETURNING id;"
+    result = @storage.query(sql, discipline, title, clinical)
+
+    result.first['id'].to_i
+  end
 
   #
   def insert_and_return_discipline(discipline)
