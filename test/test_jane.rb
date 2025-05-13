@@ -36,7 +36,7 @@ class TestJane < Minitest::Test
 
     create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
                                datetime: '2025-05-12 10:00AM', discipline: 'Physiotherapy',
-                               tx_name: 'PT - Initial', tx_length: 45)
+                               tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)
 
     # create_discipline(name: 'Physiotherapy', title: 'PT', clinical: true)    
     
@@ -62,7 +62,7 @@ class TestJane < Minitest::Test
   # Helpers for generating test data before tests
   def create_appointment_cascade(staff_name:, patient_name:, 
                                  datetime:, discipline:,
-                                 tx_name:, tx_length:)
+                                 tx_name:, tx_length:, tx_price:)
 
     staff_id = insert_user_returning_id(staff_name)
     patient_id = insert_user_returning_id(patient_name)
@@ -71,7 +71,7 @@ class TestJane < Minitest::Test
     insert_user_profile(patient_id, table: 'patients')
 
     discipline_id = insert_discipline_returning_id(discipline)
-    treatment_id = insert_treatment_returning_id(tx_name, discipline_id, tx_length)
+    treatment_id = insert_treatment_returning_id(tx_name, discipline_id, tx_length, tx_price)
     binding.pry
 
     # Create discipline (based on tx name's prefix) (eg. PT -> Physiotherapy) -> d id
@@ -105,7 +105,11 @@ class TestJane < Minitest::Test
     result.first['id'].to_i
   end
 
-  def insert_treatment_returning_id(name, discipline_id, length)
-    
+  def insert_treatment_returning_id(name, discipline_id, length, price)
+    sql = "INSERT INTO treatments (name, discipline_id, length, price)
+           VALUES($1, $2, $3, $4) RETURNING id;"
+    result = @storage.query(sql, name, discipline_id, length, price)
+
+    result.first['id'].to_i
   end
 end

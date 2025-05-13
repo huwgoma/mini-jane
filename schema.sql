@@ -92,7 +92,7 @@ RETURNS trigger AS $$
 $$ LANGUAGE plpgsql;
 
 
--- -- Triggers
+-- Triggers
 CREATE OR REPLACE TRIGGER verify_staff_member_offers_treatment 
   BEFORE INSERT ON appointments
   FOR EACH ROW EXECUTE FUNCTION verify_staff_member_offers_treatment();
@@ -102,7 +102,7 @@ CREATE OR REPLACE trigger verify_clinical_discipline
   FOR EACH ROW EXECUTE FUNCTION verify_clinical_discipline();
 
 
--- -- Seed
+-- Seed
 -- INSERT INTO users (first_name, last_name, birthday)
 -- VALUES ('Hugo',    'Ma',      '1997-09-14'), 
 --        ('Annie',   'Hu',      '1999-06-03'), 
