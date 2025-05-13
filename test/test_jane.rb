@@ -11,10 +11,6 @@ require_relative '../jane'
 class TestJane < Minitest::Test
   include Rack::Test::Methods
 
-  DISCIPLINE_TITLES = { 
-    'Physiotherapy' => 'PT', 'Massage Therapy' => 'MT', 'Chiropractic' => 'DC'
-  }
-
   def app
     Sinatra::Application
   end
@@ -31,6 +27,32 @@ class TestJane < Minitest::Test
   end
 
   # Admin Schedule Page
+
+  def test_admin_schedule_fixed_date_one_practitioner_one_appointment
+    date = '2024-10-08'
+
+    staff_id = return_id(create_user('Annie Hu'))
+    create_profile(staff_id, type: 'staff')
+
+    patient_id = return_id(create_user('Hugo Ma'))
+    create_profile(patient_id)
+
+    discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
+    treatment_id = return_id(create_treatment('PT - Initial', discipline_id, 
+                                              length: 45, price: 100.00))
+    binding.pry
+    # create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
+    #                            datetime: "#{date} 10:00AM", discipline: 'Physiotherapy',
+    #                            tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)
+
+    get '/admin/schedule/2024-10-08'
+
+    assert_includes(last_response.body, "<h2>#{date}")
+    assert_includes(last_response.body, 'Physiotherapy')
+    assert_includes(last_response.body, 'Annie Hu')
+    assert_includes(last_response.body, "#{date} 10:00:00 - Hugo Ma - PT - Initial")
+  end
+
   def test_admin_schedule_default_today
     skip
     today = Date.today.to_s
@@ -56,31 +78,6 @@ class TestJane < Minitest::Test
     refute_includes(last_response.body, 'PT - Initial')
   end
 
-  def test_admin_schedule_fixed_date_one_practitioner_one_appointment
-    date = '2024-10-08'
-
-    staff_id = extract_id(create_user('Annie Hu'))
-    create_profile(staff_id, type: 'staff')
-
-    patient_id = extract_id(create_user('Hugo Ma'))
-    create_profile(patient_id)
-
-    # discipline_id = create_discipline('Physiotherapy', clinical: true)
-
-
-    # staff_id, patient_id = create_users('Annie Hu', 'Hugo Ma')
-    binding.pry
-    # create_appointment_cascade(staff_name: 'Annie Hu', patient_name: 'Hugo Ma',
-    #                            datetime: "#{date} 10:00AM", discipline: 'Physiotherapy',
-    #                            tx_name: 'PT - Initial', tx_length: 45, tx_price: 100.00)
-
-    get '/admin/schedule/2024-10-08'
-
-    assert_includes(last_response.body, "<h2>#{date}")
-    assert_includes(last_response.body, 'Physiotherapy')
-    assert_includes(last_response.body, 'Annie Hu')
-    assert_includes(last_response.body, "#{date} 10:00:00 - Hugo Ma - PT - Initial")
-  end
 
   private
   
@@ -88,8 +85,8 @@ class TestJane < Minitest::Test
   #################################################
   # Helpers for generating test data before tests #
   #################################################
-  # Extract the ID from a PG::Result object
-  def extract_id(result)
+  # Return the ID from a PG::Result object
+  def return_id(result)
     result.first['id'].to_i  
   end
 
@@ -103,13 +100,22 @@ class TestJane < Minitest::Test
 
   # Create a dummy profile (staff/patient)
   def create_profile(user_id, type: 'patients')
-    sql = "INSERT INTO #{type} (user_id) VALUES ($1);"
+    sql = "INSERT INTO #{type} (user_id) VALUES ($1) RETURNING *;"
     @storage.query(sql, user_id)
   end
 
-  def create_discipline
-  
+  # Create a dummy discipline
+  def create_discipline(name, title: '', clinical: true)
+    sql = "INSERT INTO disciplines (name, title, clinical)
+           VALUES($1, $2, $3) RETURNING *;"
+    @storage.query(sql, name, title, clinical)
   end
+
+  # Create a dummy treatment type
+  def create_treatment(name, discipline_id, length:, price:)
+    
+  end
+
 
 
 
