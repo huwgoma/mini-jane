@@ -1,27 +1,33 @@
 <h2><%= @date %></h2>
 
 <%# Display Schedule: Disciplines-Practitioners-Appointments %>
-<ul class='discipline-list'>
-<% @schedule.each do |discipline, practitioners| %>
-  <li>
-    <%# Disciplines %>
-    <%= discipline %>
-    <ul class='practitioner-list'>   
-    <% practitioners.each do |staff_id, practitioner| %>
-      <li>
-        <%# Practitioners %>
-        <%= practitioner.full_name %>
-        <ul class='appointment-list'>
-          <% practitioner.schedule.each do |appointment| %>
-            <li>
-              <%# Appointments %>
-              <%= appointment %>
-            </li>
-          <% end %>
-        </ul>
-      </li>
-    <% end %>
-    </ul>
-  </li>
+<%# Empty (No Practitioners) %>
+<% if @schedule.empty? %>
+  <p>Hmm...you don't have any practitioners scheduled for today.</p>
+<% else %>
+  <ul class='discipline-list'>
+  <% @schedule.each do |discipline, practitioners| %>
+    <li>
+      <%# Disciplines %>
+      <%= discipline %>
+      <ul class='practitioner-list'>   
+      <% practitioners.each do |staff_id, practitioner| %>
+        <li>
+          <%# Practitioners %>
+          <%= practitioner.full_name %>
+          <ul class='appointment-list'>
+            <% practitioner.schedule.each do |appointment| %>
+              <li>
+                <%# Appointments %>
+                <%= appointment %>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+      </ul>
+    </li>
+  <% end %>
+  </ul>
 <% end %>
-</ul>
+
