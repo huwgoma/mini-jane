@@ -44,7 +44,7 @@ class PGAdapter
       JOIN disciplines ON sd.discipline_id = disciplines.id
       WHERE disciplines.clinical = true
       GROUP BY users.id
-      ORDER BY STRING_AGG(disciplines.id::text, '');
+      ORDER BY STRING_AGG(disciplines.id::text, ''), users.first_name, users.last_name;
     SQL
 
     query(sql)
