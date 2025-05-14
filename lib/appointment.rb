@@ -8,7 +8,11 @@ class Appointment
     @datetime = datetime
   end
 
+  def time
+    datetime.strftime('%H:%M%p')    
+  end
+
   def to_s
-    "#{datetime} - #{pt_name} - #{tx_name}"
+    "#{time} - #{pt_name} - #{tx_name}"
   end
 end

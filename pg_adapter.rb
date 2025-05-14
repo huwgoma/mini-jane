@@ -82,7 +82,7 @@ class PGAdapter
       pt_name = row['pt_name']
       tx_name = row['tx_name']
       tx_length = row['tx_length'].to_i
-      datetime = row['datetime']
+      datetime = DateTime.parse(row['datetime'])
 
       appointment = Appointment.new(id, pt_name, tx_name, tx_length, datetime)
 
