@@ -12,7 +12,7 @@ configure do
 
   set :erb, :escape_html => true
 
-  set :storage, PGAdapter.new   # Connection sharing
+  set :storage, PGAdapter.new
 end
 
 configure :development do

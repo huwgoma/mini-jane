@@ -65,29 +65,23 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_schedule_fixed_date_one_practitioner_one_appointment
-    skip
     date = '2024-10-08'
-    time = '10:00:00'
+    time = '10:00AM'
 
-    staff_id = return_id(create_user('Annie Hu'))
-    create_profile(staff_id, type: 'staff')
-
-    patient_id = return_id(create_user('Hugo Ma'))
-    create_profile(patient_id)
-
-    discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
-    treatment_id = return_id(create_treatment('PT - Initial', discipline_id, 
-                                              length: 45, price: 100.00))
-    create_staff_discipline_association(staff_id, discipline_id)
-
-    create_appointment(staff_id, patient_id, treatment_id, "#{date} #{time}")
+    create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true },
+      patient: { name: 'Hugo Ma', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 },
+      datetime: "#{date} #{time}"
+    )
 
     get '/admin/schedule/2024-10-08'
 
     assert_includes(last_response.body, "<h2>#{date}")
     assert_includes(last_response.body, 'Physiotherapy')
     assert_includes(last_response.body, 'Annie Hu')
-    assert_includes(last_response.body, "#{date} #{time} - Hugo Ma - PT - Initial")
+    assert_includes(last_response.body, "#{time} - Hugo Ma - PT - Initial")
   end
 
   private
