@@ -40,24 +40,23 @@ class TestJane < Minitest::Test
     today = Date.today.to_s
     yesterday = Date.today.prev_day.to_s
 
-    staff_id = return_id(create_user('Annie Hu'))
-    create_profile(staff_id, type: 'staff')
-
-    patient_id = return_id(create_user('Hugo Ma'))
-    create_profile(patient_id)
-
-    discipline_id = return_id(create_discipline('Physiotherapy', title: 'PT'))
-    pt_ax_id = return_id(create_treatment('PT - Initial', discipline_id, 
-                                          length: 45, price: 100.00))
-    pt_tx_id = return_id(create_treatment('PT - Treatment', discipline_id, 
-                                          length: 30, price: 85.00))
-    create_staff_discipline_association(staff_id, discipline_id)
-
     # Appointment scheduled for today; should be displayed.
-    create_appointment(staff_id, patient_id, pt_tx_id, "#{today} 10:00AM")
-
-    # Appointment scheduled for yesterday - Should not be displayed
-    create_appointment(staff_id, patient_id, pt_ax_id, "#{yesterday} 10:00AM")
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true },
+      patient: { name: 'Hugo Ma', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Treatment', length: 30, price: 85.00 },
+      datetime: "#{today} 10:00AM"
+    )
+    
+    # Appointment scheduled for yesterday; should not be displayed.
+    create_appointment_cascade(
+      staff: { id: context[:staff_id] },
+      patient: { id: context[:patient_id] },
+      discipline: { id: context[:discipline_id] },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 },
+      datetime: "#{yesterday} 10:00AM"
+    )
 
     get '/admin/schedule/'
 
