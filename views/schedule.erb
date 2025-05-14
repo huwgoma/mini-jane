@@ -1,17 +1,17 @@
 <h2><%= @date %></h2>
 
 <%# Display Schedule: Disciplines-Practitioners-Appointments %>
-<ul>
+<ul class='discipline-list'>
 <% @schedule.each do |discipline, practitioners| %>
   <li>
     <%# Disciplines %>
     <%= discipline %>
-    <ul>      
+    <ul class='practitioner-list'>   
     <% practitioners.each do |staff_id, practitioner| %>
       <li>
         <%# Practitioners %>
         <%= practitioner.full_name %>
-        <ul>
+        <ul class='appointment-list'>
           <% practitioner.schedule.each do |appointment| %>
             <li>
               <%# Appointments %>

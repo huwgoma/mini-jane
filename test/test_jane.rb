@@ -95,7 +95,6 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_schedule_multiple_practitioners_one_discipline
-    skip
     # Annie - Hugo - PT Initial, 10:00AM
     context = create_appointment_cascade(
       staff: { name: 'Annie Hu', create_profile: true },
@@ -115,8 +114,14 @@ class TestJane < Minitest::Test
     )
 
     get '/admin/schedule/'
-    
-    assert_includes(last_response.body, "<ul><li>Physiotherapy")
+    doc = Nokogiri::HTML(last_response.body)
+
+    # Assert that the Physiotherapy Discipline has 2 practitioner <li>s.
+    physio_list = doc.css('ul>li').find { |li| li.text.include?('Physiotherapy') }.at_css('ul')
+    physios = physio_list.css('>li').map(&:text)
+
+    assert_equal(2, physios.size)
+    ['Annie Hu', 'Kevin Ho'].each { |name| assert_includes(physios.join, name)}
   end
 
   private
