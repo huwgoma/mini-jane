@@ -33,10 +33,11 @@ class TestJane < Minitest::Test
   #######################
   # Admin Schedule Page #
   ####################### 
-  def test_admin_schedule_default_today
+  def test_empty_admin_schedule_default_today
     get '/admin/schedule/'
 
     assert_includes(last_response.body, TODAY)
+    assert_includes(last_response.body, "you don't have any practitioners scheduled for today.")
   end
 
   def test_admin_schedule_display_appointments_for_selected_date_only
@@ -155,8 +156,6 @@ class TestJane < Minitest::Test
       assert_includes(last_response.body, discipline)
     end
   end
-
-  
 
   private
 
