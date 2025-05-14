@@ -124,6 +124,40 @@ class TestJane < Minitest::Test
     ['Annie Hu', 'Kevin Ho'].each { |name| assert_includes(physios.join, name)}
   end
 
+  def test_admin_schedule_multiple_disciplines
+    # Annie - Hugo - PT Initial, 10:00AM
+    create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true },
+      patient: { name: 'Hugo Ma', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Treatment', length: 30, price: 85.00 },
+      datetime: "#{TODAY} 10:00AM"
+    )
+    # Alexis - Hendrik - DC Initial, 12:00PM
+    create_appointment_cascade(
+      staff: { name: 'Alexis Butler', create_profile: true },
+      patient: { name: 'Hendrik Swart', create_profile: true },
+      discipline: { name: 'Chiropractic', title: 'DC' },
+      treatment: { name: 'DC - Initial', length: 40, price: 120.00 },
+      datetime: "#{TODAY} 12:00PM"
+    )
+
+    get '/admin/schedule/'
+    doc = Nokogiri::HTML(last_response.body)
+
+    # Assert that there are two discipline <li> items: Physiotherapy and Chiro
+    discipline_list = doc.at_css('ul.discipline-list')
+    disciplines = discipline_list.css('>li').map(&:text)
+
+    assert_equal(2, disciplines.size)
+    
+    ['Physiotherapy', 'Chiropractic'].each do |discipline| 
+      assert_includes(last_response.body, discipline)
+    end
+  end
+
+  
+
   private
 
   #################################################
