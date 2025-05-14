@@ -22,8 +22,9 @@ class TestJane < Minitest::Test
 
   def teardown
     # Clear all data from tables
-    @storage.query('TRUNCATE users CASCADE;')
-    @storage.query('TRUNCATE disciplines CASCADE;')
+    @storage.query("SELECT set_config('client_min_messages', 'warning', 'false');")
+    @storage.query("TRUNCATE users RESTART IDENTITY CASCADE;")
+    @storage.query("TRUNCATE disciplines RESTART IDENTITY CASCADE;")
   end
   
   #######################
