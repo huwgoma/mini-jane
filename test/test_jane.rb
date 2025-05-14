@@ -5,11 +5,14 @@ Minitest::Reporters.use!
 require 'minitest/autorun'
 require 'rack/test'
 require 'pry'
+require 'nokogiri'
 
 require_relative '../jane'
 
 class TestJane < Minitest::Test
   include Rack::Test::Methods
+
+  TODAY = Date.today.to_s
 
   def app
     Sinatra::Application
@@ -31,14 +34,12 @@ class TestJane < Minitest::Test
   # Admin Schedule Page #
   ####################### 
   def test_admin_schedule_default_today
-    today = Date.today.to_s
     get '/admin/schedule/'
 
-    assert_includes(last_response.body, today)
+    assert_includes(last_response.body, TODAY)
   end
 
   def test_admin_schedule_display_appointments_for_selected_date_only
-    today = Date.today.to_s
     yesterday = Date.today.prev_day.to_s
 
     # Appointment scheduled for today; should be displayed.
@@ -47,7 +48,7 @@ class TestJane < Minitest::Test
       patient: { name: 'Hugo Ma', create_profile: true },
       discipline: { name: 'Physiotherapy', title: 'PT' },
       treatment: { name: 'PT - Treatment', length: 30, price: 85.00 },
-      datetime: "#{today} 10:00AM"
+      datetime: "#{TODAY} 10:00AM"
     )
     
     # Appointment scheduled for yesterday; should not be displayed.
@@ -65,7 +66,7 @@ class TestJane < Minitest::Test
     refute_includes(last_response.body, 'PT - Initial')
   end
 
-  def test_admin_schedule_fixed_date_one_practitioner_one_appointment
+  def test_admin_schedule_nested_structure
     date = '2024-10-08'
     time = '10:00AM'
 
@@ -78,11 +79,44 @@ class TestJane < Minitest::Test
     )
 
     get '/admin/schedule/2024-10-08'
+    doc = Nokogiri::HTML(last_response.body)
 
-    assert_includes(last_response.body, "<h2>#{date}")
-    assert_includes(last_response.body, 'Physiotherapy')
-    assert_includes(last_response.body, 'Annie Hu')
-    assert_includes(last_response.body, "#{time} - Hugo Ma - PT - Initial")
+    assert_includes(doc.css('h2').map(&:text), date)
+
+    physio_li = doc.css('ul > li').find { |li| li.text.include?('Physiotherapy') }
+    refute_nil(physio_li, 'Expected to find an <li> discipline item named Physiotherapy.')
+
+    annie_li = physio_li.css('ul > li').find { |li| li.text.include?('Annie')}
+    refute_nil(annie_li, 'Expected to find an <li> practitioner item named Annie.')
+    
+    appt_li = annie_li.css('ul > li').find { |li| li.text.include?("#{time} - Hugo Ma - PT - Initial") }
+    refute_nil(appt_li, 
+      "Expected to find an <li> appointment item for #{time} - Hugo Ma - PT - Initial.")
+  end
+
+  def test_admin_schedule_multiple_practitioners_one_discipline
+    skip
+    # Annie - Hugo - PT Initial, 10:00AM
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true },
+      patient: { name: 'Hugo Ma', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Treatment', length: 30, price: 85.00 },
+      datetime: "#{TODAY} 10:00AM"
+    )
+
+    # Kevin - Hendrik - PT Treatment, 2:00PM
+    create_appointment_cascade(
+      staff: { name: 'Kevin Ho', create_profile: true },
+      patient: { name: 'Hendrik Swart', create_profile: true },
+      discipline: { id: context[:discipline_id] },
+      treatment: { id: context[:treatment_id] },
+      datetime: "#{TODAY} 2:00PM"
+    )
+
+    get '/admin/schedule/'
+    
+    assert_includes(last_response.body, "<ul><li>Physiotherapy")
   end
 
   private

@@ -9,7 +9,7 @@ class Appointment
   end
 
   def time
-    datetime.strftime('%H:%M%p')    
+    datetime.strftime('%l:%M%p')    
   end
 
   def to_s
