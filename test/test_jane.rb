@@ -176,6 +176,10 @@ class TestJane < Minitest::Test
     staff_names.each { |name| staff_listings.join.include?(name) }
   end
 
+  def test_admin_view_staff_member
+    
+  end
+
   private
 
   #################################################

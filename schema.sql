@@ -15,6 +15,8 @@ CREATE TABLE users (
   id          serial       PRIMARY KEY,
   first_name  varchar(255) NOT NULL,
   last_name   varchar(255) NOT NULL,
+  email       varchar(50),
+  phone       numeric(20),
   birthday    date
   -- Login Info
 );
@@ -103,17 +105,17 @@ CREATE OR REPLACE trigger verify_clinical_discipline
 
 
 -- Seed
--- INSERT INTO users (first_name, last_name, birthday)
--- VALUES ('Hugo',    'Ma',      '1997-09-14'), 
---        ('Annie',   'Hu',      '1999-06-03'), 
---        ('Kevin',   'Ho',      '1993-09-11'), 
---        ('Alan',    'Mitri',   '1980-05-04'), 
---        ('Alexis',  'Butler',  '1997-07-21'), 
---        ('Hendrik', 'Swart',   '1930-05-04'), 
---        ('Phil',    'Genesis', '1980-06-30'),
---        ('Carol',   'Scott',   '1978-03-14'), 
---        ('Dan',     'Torres',  '1990-08-24'),
---        ('Jeff',    'Leps',    '1975-10-29'); 
+-- INSERT INTO users (first_name, last_name, email, phone, birthday)
+-- VALUES ('Hugo',    'Ma',      'huwgoma@gmail.com',      6476758914, '1997-09-14'), 
+--        ('Annie',   'Hu',      'hu.annie06@gmail.com',   6476089210, '1999-06-03'), 
+--        ('Kevin',   'Ho',      'kevinnnho@gmail.com',    6475338232, '1993-09-11'), 
+--        ('Alan',    'Mitri',   'alan.mitri@hotmail.com', NULL,       '1980-05-04'), 
+--        ('Alexis',  'Butler',  'alexiss@gmail.com',      9059737080, '1997-07-21'), 
+--        ('Hendrik', 'Swart',    NULL,                    NULL,       '1930-05-04'), 
+--        ('Phil',    'Genesis', 'phil@gmail.com',         4165506666, '1980-06-30'),
+--        ('Carol',   'Scott',    NULL,                    NULL,       '1978-03-14'), 
+--        ('Dan',     'Torres',   NULL,                    NULL,       '1990-08-24'),
+--        ('Jeff',    'Leps',     NULL,                    NULL,       '1975-10-29'); 
 
 -- INSERT INTO staff (user_id, biography)
 -- VALUES (1, ''), -- Hugo
