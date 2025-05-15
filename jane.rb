@@ -49,9 +49,9 @@ end
 # - CRUD for treatments
 # - Flesh out schedule 
 
-# # # # # # # # # # # # 
-# Admin Schedule Page # 
-# # # # # # # # # # # # 
+# # # # # # # # # # 
+# Admin - Schedule # 
+# # # # # # # # # # 
 
 # Redirect Date (Pretty Date URL)
 get '/admin/schedule/redirect' do
@@ -65,4 +65,15 @@ get '/admin/schedule/?:date?/?' do
   @schedule = @storage.load_daily_schedule(@date)
 
   render_with_layout(:schedule)
+end
+
+# # # # # # # # # 
+# Admin - Staff # 
+# # # # # # # # # 
+
+# View all staff
+get '/admin/staff/?' do
+  @staff = @storage.load_all_staff
+  binding.pry
+  render_with_layout(:all_staff)
 end

@@ -19,6 +19,15 @@ class PGAdapter
     format_daily_schedule(practitioners, appointments)
   end
 
+  def load_all_staff
+    sql = "SELECT staff.user_id, users.first_name, users.last_name 
+           FROM users JOIN staff ON users.id = staff.user_id
+           ORDER BY first_name, last_name, user_id;"
+    result = query(sql)
+
+    result.map { |staff| format_staff_listing(staff) }
+  end
+
   private
 
   attr_reader :logger
@@ -66,7 +75,9 @@ class PGAdapter
     query(sql, date)
   end
 
-  # Formatting Methods (PG::Result -> Application Format)
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  # Formatting Methods (PG::Result -> Application Format) #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   def format_daily_schedule(practitioners, appointments)
     appointments_by_staff_id = format_appointments_by_staff_id(appointments)
     schedule = format_practitioners_by_discipline(practitioners, appointments_by_staff_id)
@@ -102,5 +113,12 @@ class PGAdapter
       hash[disciplines] ||= {}
       hash[disciplines][staff_id] = practitioner
     end
+  end
+
+  def format_staff_listing(row)
+    id = row['user_id'].to_i
+    first_name, last_name = row['first_name'], row['last_name']
+  
+    Staff.new(id, first_name, last_name)
   end
 end
