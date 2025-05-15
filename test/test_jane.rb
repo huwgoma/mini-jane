@@ -163,17 +163,17 @@ class TestJane < Minitest::Test
   def test_admin_view_all_staff
     staff_names = ['Annie Hu', 'Hugo Ma', 'Kevin Ho', 'Alan Mitri']
     staff_names.each do |name|
-      create_user(name)
-      create_profile(name, type: 'staff')
+      user_id = return_id(create_user(name))
+      create_profile(user_id, type: 'staff')
     end
 
     get '/admin/staff'
-    doc = Nokogiri::HTML(last_response.body)
-    
-    staff_list = doc.at_css('ul.staff-list')
+    doc = Nokogiri::HTML(last_response.body)    
+    staff_listings = doc.css('ul.staff-list > li').map(&:text)
 
-    
     # Assert there is an <li> element for each name in /staff
+    assert_equal(staff_names.size, staff_listings.size)
+    staff_names.each { |name| staff_listings.join.include?(name) }
   end
 
   private

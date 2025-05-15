@@ -77,3 +77,8 @@ get '/admin/staff/?' do
 
   render_with_layout(:all_staff)
 end
+
+# View a specific staff member
+get '/admin/staff/:staff_id/?' do
+  
+end
