@@ -1,0 +1,13 @@
+<h2><%= @staff_member.full_name %></h2>
+
+<p><strong>Name:</strong> <%= @staff_member.full_name %></p>
+
+<p><strong>Disciplines:</strong> <%= @staff_member.disciplines %></p>
+
+<p><strong>Email:</strong> <%= @staff_member.email || 'No Email Address' %></p>
+
+<p><strong>Phone Number:</strong> <%= @staff_member.phone || 'No Phone Number' %></p>
+
+<% if @staff_member.bio %>
+  <p><strong>Bio:</strong> <%= @staff_member.bio %></p>
+<% end %>

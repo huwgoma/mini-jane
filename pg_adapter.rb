@@ -31,9 +31,9 @@ class PGAdapter
   end
 
   def load_staff_member(staff_id)
-    sql = "SELECT users.first_name, users.last_name, 
-                  users.email, users.phone, users.birthday,
-                  staff.biography, STRING_AGG(disciplines.name, ', ')
+    sql = "SELECT users.id, users.first_name, users.last_name, 
+                  users.email, users.phone, staff.biography,
+                  STRING_AGG(disciplines.name, ', ') AS disciplines
            FROM users
            JOIN staff ON users.id = staff.user_id
            JOIN staff_disciplines ON staff.user_id = staff_id
@@ -132,10 +132,22 @@ class PGAdapter
     end
   end
 
-  def format_staff_listing(row)
-    id = row['user_id'].to_i
-    first_name, last_name = row['first_name'], row['last_name']
+  def format_staff_listing(staff)
+    id = staff['user_id'].to_i
+    first_name, last_name = staff['first_name'], staff['last_name']
   
     Staff.new(id, first_name, last_name)
+  end
+
+  def format_staff_member(staff)
+    id = staff['id'].to_i
+    first_name, last_name = staff['first_name'], staff['last_name']
+    email, phone = staff['email'], staff['phone']
+    bio = staff['biography']
+    disciplines = staff['disciplines']
+    
+    Staff.new(id, first_name, last_name, 
+              email: email, phone: phone, 
+              bio: bio, disciplines: disciplines)
   end
 end

@@ -81,7 +81,7 @@ end
 # View a specific staff member
 get '/admin/staff/:staff_id/?' do
   staff_id = params[:staff_id].to_i
-  @staff_member = @storage.load_staff(staff_id)
+  @staff_member = @storage.load_staff_member(staff_id)
 
   render_with_layout(:staff)
 end

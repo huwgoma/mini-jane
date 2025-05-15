@@ -1,7 +1,8 @@
 class User
-  attr_reader :first_name, :last_name, :id
+  attr_reader :id, :first_name, :last_name, :email, :phone, :birthday
 
-  def initialize(id, first_name, last_name, email=nil, phone=nil, birthday=nil)
+  def initialize(id, first_name, last_name, 
+                 email: nil, phone: nil, birthday: nil)
     @id = id
     @first_name, @last_name = first_name, last_name
     @email, @phone = email, phone
@@ -18,10 +19,15 @@ class Patient < User
 end
 
 class Staff < User
-  def initialize(id, first_name, last_name,
-                 email=nil, phone=nil, birthday=nil, disciplines)
-  
-  end               
+  attr_reader :bio, :disciplines 
+
+  def initialize(id, first_name, last_name, 
+                 email: nil, phone: nil, bio: nil, disciplines: nil)
+    super(id, first_name, last_name, email: email, phone: phone)
+    @bio = bio
+    @disciplines = disciplines
+  end
+
 end
 
 class Practitioner < Staff

@@ -28,20 +28,20 @@ CREATE TABLE patients (
 
 CREATE TABLE staff (
   user_id   integer PRIMARY KEY REFERENCES users ON DELETE CASCADE,
-  biography text    DEFAULT ''
+  biography text
 );
 
 CREATE TABLE disciplines (
   id       serial       PRIMARY KEY,
   name     varchar(255) NOT NULL UNIQUE,
-  title    varchar(2)   DEFAULT '',
+  title    varchar(2),
   clinical boolean      NOT NULL DEFAULT false
 );
 
 CREATE TABLE staff_disciplines (
   id            serial  PRIMARY KEY,
   staff_id      integer REFERENCES staff ON DELETE CASCADE NOT NULL,
-  discipline_id integer REFERENCES disciplines    ON DELETE CASCADE NOT NULL,
+  discipline_id integer REFERENCES disciplines ON DELETE CASCADE NOT NULL,
   UNIQUE(staff_id, discipline_id)
 );
 
@@ -112,18 +112,18 @@ CREATE OR REPLACE trigger verify_clinical_discipline
 --        ('Alan',    'Mitri',   'alan.mitri@hotmail.com', NULL,       '1980-05-04'), 
 --        ('Alexis',  'Butler',  'alexiss@gmail.com',      9059737080, '1997-07-21'), 
 --        ('Hendrik', 'Swart',    NULL,                    NULL,       '1930-05-04'), 
---        ('Phil',    'Genesis', 'phil@gmail.com',         4165506666, '1980-06-30'),
+--        ('Phil',    'Genesis',  NULL,                    4165506666, '1980-06-30'),
 --        ('Carol',   'Scott',    NULL,                    NULL,       '1978-03-14'), 
 --        ('Dan',     'Torres',   NULL,                    NULL,       '1990-08-24'),
 --        ('Jeff',    'Leps',     NULL,                    NULL,       '1975-10-29'); 
 
 -- INSERT INTO staff (user_id, biography)
--- VALUES (1, ''), -- Hugo
---        (2, ''), -- Annie
---        (3, ''), -- Kevin
---        (4, ''), -- Alan
---        (5, ''), -- Alexis
---        (7, ''); -- Phil
+-- VALUES (1, ''),             -- Hugo
+--        (2, ''),             -- Annie
+--        (3, ''),             -- Kevin
+--        (4, ''),             -- Alan
+--        (5, ''),             -- Alexis
+--        (7, 'Owner of SJV'); -- Phil
 
 -- INSERT INTO patients (user_id)
 -- VALUES (1),  -- Hugo

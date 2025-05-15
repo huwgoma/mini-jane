@@ -177,16 +177,30 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_view_staff_member_all_fields
-    skip
-    create_discipline('Physiotherapy', 'PT', clinical: true)
-
+    discipline_id = return_id(create_discipline('Physiotherapy', 'PT', clinical: true))
     user_id = return_id(create_user('Annie Hu', 
                                      email: 'hu_annie06@gmail.com',
                                      phone: 6476089210))
-    create_profile(user_id, type: 'staff', bio: 'Annie!')
-    # Displays name, disciplines (aggregated), email, phone, bio
-    # placeholders if no email/phone
-    # No bio if bio is null
+    create_staff_profile(user_id, bio: 'Annie!')
+    create_staff_discipline_association(user_id, discipline_id)
+
+    get "/admin/staff/#{user_id}"
+    doc = Nokogiri::HTML(last_response.body)
+
+    name_field = doc.at_xpath("//p[strong[contains(text(), 'Name:')]]").text
+    assert_equal('Name: Annie Hu', name_field)
+
+    discipline_field = doc.at_xpath("//p[strong[contains(text(), 'Disciplines:')]]").text
+    assert_equal('Disciplines: Physiotherapy', discipline_field)
+
+    email_field = doc.at_xpath("//p[strong[contains(text(), 'Email:')]]").text
+    assert_equal('Email: hu_annie06@gmail.com', email_field)
+
+    phone_field = doc.at_xpath("//p[strong[contains(text(), 'Phone Number:')]]").text
+    assert_equal('Phone Number: 6476089210', phone_field)
+
+    bio_field = doc.at_xpath("//p[strong[contains(text(), 'Bio:')]]").text
+    assert_equal('Bio: Annie!', bio_field)
   end
 
   private
