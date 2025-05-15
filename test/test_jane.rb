@@ -203,6 +203,22 @@ class TestJane < Minitest::Test
     assert_equal('Bio: Annie!', bio_field)
   end
 
+  def test_admin_view_staff_member_multiple_disciplines
+    physio_id = return_id(create_discipline('Physiotherapy', 'PT', clinical: true))
+    chiro_id = return_id(create_discipline('Chiropractic', 'DC', clinical: true))
+    user_id = return_id(create_user('Quinn Powell-Jones', 
+                                     email: 'quinn@gmail.com',
+                                     phone: 4167891234))
+    create_staff_profile(user_id, bio: "Hi I'm Quinn I'm a physio and chiro nice to meet you!")
+    create_staff_discipline_association(user_id, physio_id)
+    create_staff_discipline_association(user_id, chiro_id)
+
+    get "/admin/staff/#{user_id}"
+    doc = Nokogiri::HTML(last_response.body)
+
+    discipline_field = doc.at_xpath("//p[strong[contains(text(), 'Disciplines:')]]").text
+    assert_equal('Disciplines: Physiotherapy, Chiropractic', discipline_field)
+  end
   private
 
   #################################################
