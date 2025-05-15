@@ -41,7 +41,16 @@ end
 # - CRUD for disciplines
 # - CRUD for treatments
 
-# Admin Schedule Page
+# # # # # # # # # # # # 
+# Admin Schedule Page # 
+# # # # # # # # # # # # 
+
+# Redirect Date (Pretty Date URL)
+get '/admin/schedule/redirect' do
+  redirect "/admin/schedule/#{params[:date]}"
+end
+
+# Main Admin Schedule Page
 get '/admin/schedule/:date?' do
   @date = Date.parse(params[:date] || Date.today.to_s)
   @yesterday, @tomorrow = @date.prev_day, @date.next_day
