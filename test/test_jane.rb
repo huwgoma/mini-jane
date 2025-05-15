@@ -164,7 +164,7 @@ class TestJane < Minitest::Test
     staff_names = ['Annie Hu', 'Hugo Ma', 'Kevin Ho', 'Alan Mitri']
     staff_names.each do |name|
       user_id = return_id(create_user(name))
-      create_profile(user_id, type: 'staff')
+      create_staff_profile(user_id)
     end
 
     get '/admin/staff'
@@ -176,8 +176,17 @@ class TestJane < Minitest::Test
     staff_names.each { |name| staff_listings.join.include?(name) }
   end
 
-  def test_admin_view_staff_member
-    
+  def test_admin_view_staff_member_all_fields
+    skip
+    create_discipline('Physiotherapy', 'PT', clinical: true)
+
+    user_id = return_id(create_user('Annie Hu', 
+                                     email: 'hu_annie06@gmail.com',
+                                     phone: 6476089210))
+    create_profile(user_id, type: 'staff', bio: 'Annie!')
+    # Displays name, disciplines (aggregated), email, phone, bio
+    # placeholders if no email/phone
+    # No bio if bio is null
   end
 
   private
@@ -189,10 +198,10 @@ class TestJane < Minitest::Test
   # Create an appointment along with any necessary join data
   def create_appointment_cascade(staff:, patient:, discipline:, treatment:, datetime:)
     staff_id = staff[:id]     || return_id(create_user(staff[:name]))
-    create_profile(staff_id, type: 'staff') if staff[:create_profile]
+    create_staff_profile(staff_id) if staff[:create_profile]
   
     patient_id = patient[:id] || return_id(create_user(patient[:name]))
-    create_profile(patient_id) if patient[:create_profile]
+    create_patient_profile(patient_id) if patient[:create_profile]
 
     discipline_id = discipline[:id] || return_id(create_discipline(discipline[:name], discipline[:title]))
   
@@ -220,21 +229,27 @@ class TestJane < Minitest::Test
   end
 
   # Create a dummy user
-  def create_user(name)
+  def create_user(name, email: nil, phone: nil, birthday: nil)
     first_name, last_name = name.split
     
-    sql = "INSERT INTO users(first_name, last_name) VALUES($1, $2) RETURNING *;"
-    @storage.query(sql, first_name, last_name)
+    sql = "INSERT INTO users(first_name, last_name, email, phone, birthday) 
+           VALUES($1, $2, $3, $4, $5) RETURNING *;"
+    @storage.query(sql, first_name, last_name, email, phone, birthday)
   end
 
   # Create a dummy profile (staff/patient)
-  def create_profile(user_id, type: 'patients')
-    sql = "INSERT INTO #{type} (user_id) VALUES ($1) RETURNING *;"
+  def create_staff_profile(user_id, bio: nil)
+    sql = "INSERT INTO staff VALUES ($1, $2) RETURNING *;"
+    @storage.query(sql, user_id, bio)
+  end
+
+  def create_patient_profile(user_id)
+    sql = "INSERT INTO patients (user_id) VALUES ($1) RETURNING *;"
     @storage.query(sql, user_id)
   end
 
   # Create a dummy discipline
-  def create_discipline(name, title = '', clinical: true)
+  def create_discipline(name, title = nil, clinical: true)
     sql = "INSERT INTO disciplines (name, title, clinical)
            VALUES($1, $2, $3) RETURNING *;"
     @storage.query(sql, name, title, clinical)
