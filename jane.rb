@@ -31,9 +31,20 @@ not_found do
   redirect '/admin/schedule/'
 end
 
+######### 
+# To Do #
+#########
+# - Flesh out schedule 
+# - CRUD for practitioners
+# - CRUD for patients
+# - CRUD for appointments
+# - CRUD for disciplines
+# - CRUD for treatments
+
 # Admin Schedule Page
 get '/admin/schedule/:date?' do
-  @date = params[:date] || Date.today.to_s
+  @date = Date.parse(params[:date] || Date.today.to_s)
+  @yesterday, @tomorrow = @date.prev_day, @date.next_day
   @schedule = @storage.load_daily_schedule(@date)
 
   erb :schedule

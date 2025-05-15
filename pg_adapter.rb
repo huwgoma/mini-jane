@@ -63,7 +63,6 @@ class PGAdapter
       WHERE appts.datetime::date = $1
       ORDER BY appts.datetime;
     SQL
-
     query(sql, date)
   end
 
