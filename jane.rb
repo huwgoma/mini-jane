@@ -74,6 +74,6 @@ end
 # View all staff
 get '/admin/staff/?' do
   @staff = @storage.load_all_staff
-  binding.pry
+
   render_with_layout(:all_staff)
 end

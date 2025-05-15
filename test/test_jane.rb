@@ -160,8 +160,22 @@ class TestJane < Minitest::Test
   ##############
   # Staff CRUD #
   ##############
-  
-  
+  def test_admin_view_all_staff
+    staff_names = ['Annie Hu', 'Hugo Ma', 'Kevin Ho', 'Alan Mitri']
+    staff_names.each do |name|
+      create_user(name)
+      create_profile(name, type: 'staff')
+    end
+
+    get '/admin/staff'
+    doc = Nokogiri::HTML(last_response.body)
+    
+    staff_list = doc.at_css('ul.staff-list')
+
+    
+    # Assert there is an <li> element for each name in /staff
+  end
+
   private
 
   #################################################

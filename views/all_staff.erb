@@ -1,0 +1,9 @@
+<ul class="staff-list">
+  <% @staff.each do |staff| %>
+    <li>
+      <a href="/admin/staff/<%= staff.id %>">
+        <%= staff.full_name %>
+      </a>
+    </li>
+  <% end %>
+</ul>
