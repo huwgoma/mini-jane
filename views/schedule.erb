@@ -1,8 +1,10 @@
+<%# Admin Schedule  %>
+
 <%# Date Navigation %>
 <h2><%= @date %></h2>
 
 <a href="/admin/schedule/<%= @yesterday %>"><button><</button></a>
-<a href="/admin/schedule/"><button>Today</button></a>
+<a href="/admin/schedule"><button>Today</button></a>
 <a href="/admin/schedule/<%= @tomorrow %>"><button>></button></a>
 
 <form action="/admin/schedule/redirect">

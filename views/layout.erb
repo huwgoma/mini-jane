@@ -5,8 +5,8 @@
     <title>Document</title>
   </head>
   <body>
-    <h1>Jane</h1>
-
-    <%== yield %>
+    <%= erb :admin_layout do %>
+      <%= yield %>
+    <% end %>
   </body>
 </html>
