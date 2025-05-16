@@ -26,6 +26,12 @@ helpers do
   def render_with_layout(view)
     erb view, layout: :admin_layout
   end
+
+  def was_checked?(group, value)
+    return if params[group].nil?
+
+    params[group].include?(value.to_s)
+  end
 end
 
 # Routes
@@ -89,7 +95,7 @@ post '/admin/staff/new/?' do
   first_name, last_name = params[:first_name], params[:last_name]
 
   session[:errors].push(*new_staff_errors(first_name, last_name))
-  
+
   if session[:errors].any?
     @disciplines = @storage.load_disciplines
     render_with_layout(:new_staff)

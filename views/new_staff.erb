@@ -4,22 +4,26 @@
   <div class="name-form">
     <div>
       <label for="first_name">First Name - Required</label>
-      <input type="text" name="first_name" id="first_name"> <%#required%>
+      <input type="text" name="first_name" id="first_name"
+        value="<%= params[:first_name] %>"> <%#required%>
     </div>
     
     <div>
       <label for="first_name">Last Name - Required</label>
-      <input type="text" name="last_name" id="last_name"> <%#required%>
+      <input type="text" name="last_name" id="last_name"
+        value="<%= params[:last_name] %>"> <%#required%>
     </div>
   </div>
   
   <div class="disciplines-form">
     <h3>Disciplines</h3>
     <fieldset>
+      <% checkbox_group = 'disciplines' %>
       <% @disciplines.each do |discipline| %>
         <div>
-          <input type="checkbox" name="disciplines[]" id="<%= discipline.name %>"
-            value="<%= discipline.id %>">
+          <input type="checkbox" name=<%= checkbox_group + '[]' %> id="<%= discipline.name %>"
+            value="<%= discipline.id %>" 
+            <%= 'checked' if was_checked?(checkbox_group, discipline.id) %>>
           <label for="<%= discipline.name %>"><%= discipline.name %></label>
         </div>
       <% end %>
@@ -30,18 +34,19 @@
     <h3>Contact Info</h3>
     <div>
       <label for="email">Email</label>
-      <input type="text" name="email" id="email">
+      <input type="text" name="email" id="email" value="<%= params[:email] %>">
     </div>
     
     <div>
       <label for="phone">Phone Number</label>
-      <input type="tel" name="phone" id="phone">
+      <input type="tel" name="phone" id="phone" value="<%= params[:phone] %>">
     </div>
   </div>
 
   <div class="bio-form">
     <h3>Bio</h3>
-    <textarea name="biography" id="biography" rows="10" cols="50"></textarea>
+    <textarea name="biography" id="biography" 
+      rows="10" cols="50"><%= params[:biography] %></textarea>
   </div>
 
   <%# Cancel/Submit  %>
