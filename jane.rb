@@ -93,6 +93,7 @@ end
 # Create a new staff member
 post '/admin/staff/new/?' do
   first_name, last_name = params[:first_name], params[:last_name]
+  
   session[:errors].push(*new_staff_errors(first_name, last_name))
 
   if session[:errors].any?
@@ -104,15 +105,6 @@ post '/admin/staff/new/?' do
     # Create staff disciplines for each discipline; if none, admin
   end
 
-
-  # Validate incoming staff member details
-  # - First and last name must be present and not empty
-  # 
-  # If valid,
-  # - Create a new user
-  # - Create a new staff profile
-  # - Add the necessary staff disciplines 
-  #   - If no disciplines are selected, default to administrative
 end
 
 # View all staff

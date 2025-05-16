@@ -238,16 +238,34 @@ class TestJane < Minitest::Test
     assert_nil(bio_field)
   end
 
-  def test_admin_create_staff_member_name_error
-    skip
-    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
-    mt_id = return_id(create_discipline('Massage Therapy', 'MT'))
-    binding.pry
-    post '/admin/staff/new', first_name: "", last_name: "Ma",
-      disciplines: ['1', '2']
-    # first name missing, last name missing, both missing
-    # - assert error message is present
-    # - assert other fields retain values
+  def test_admin_create_staff_member_missing_name_error
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT')).to_s
+    mt_id = return_id(create_discipline('Massage Therapy', 'MT')).to_s
+
+    post '/admin/staff/new', first_name: '', last_name: '',
+      disciplines: [pt_id, mt_id], email: 'hgm@gmail.com', phone: '6476758914',
+      biography: 'Hello I am under the water'
+    
+    doc = Nokogiri::HTML(last_response.body) 
+
+    # Error messages are present
+    assert_includes(last_response.body, 'Please enter a first name.')
+    assert_includes(last_response.body, 'Please enter a last name.')
+
+    # Fields retain values
+    ['Physiotherapy', 'Massage Therapy'].each do |discipline|
+      # Assert that there IS a checked label for each selected discipline
+      checked_label = doc.at_css('input[checked] + label[text()="' + discipline + '"]')
+      refute_nil(checked_label)
+    end
+
+    assert_includes(last_response.body, 'hgm@gmail.com')
+    assert_includes(last_response.body, '6476758914')
+    assert_includes(last_response.body, 'Hello I am under the water')
+  end
+
+  def test_admin_create_staff_member_strips_empty_names
+    # Try name = '   '
   end
 
   private
