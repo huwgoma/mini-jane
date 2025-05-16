@@ -265,7 +265,9 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_staff_member_strips_empty_names
-    # Try name = '   '
+    post '/admin/staff/new', first_name: '  ', last_name: 'Ma'
+
+    assert_includes(last_response.body, 'Please enter a first name.')
   end
 
   private
