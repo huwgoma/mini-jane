@@ -31,6 +31,7 @@ end
 # Routes
 before do
   @storage = settings.storage
+  session[:errors] ||= []
   # Verify admin status and set @admin accordingly.
   # Redirect if necessary
 end
