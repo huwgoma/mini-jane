@@ -1,17 +1,48 @@
 <h2>New Staff Member</h2>
 
-<form action="">
-  <div>
-    <label for="first_name">First Name - Required</label>
-    <input type="text" name="first_name" id="first_name" required>
+<form action="/admin/staff" method="post">
+  <div class="name-form">
+    <div>
+      <label for="first_name">First Name - Required</label>
+      <input type="text" name="first_name" id="first_name" required>
+    </div>
+    
+    <div>
+      <label for="first_name">Last Name - Required</label>
+      <input type="text" name="last_name" id="last_name" required>
+    </div>
   </div>
   
-  <div>
-    <label for="first_name">Last Name - Required</label>
-    <input type="text" name="last_name" id="last_name" required>
+  <div class="disciplines-form">
+    <h3>Disciplines</h3>
+    <fieldset>
+      <% @disciplines.each do |discipline| %>
+        <div>
+          <input type="checkbox" name="<%= discipline.name %>" id="<%= discipline.name %>"
+            value="<%= discipline.id %>">
+          <label for="<%= discipline.name %>"><%= discipline.name %></label>
+        </div>
+      <% end %>
+    </fieldset>
   </div>
-  
+
+  <div class="contact-form">
+    <h3>Contact Info</h3>
+    <div>
+      <label for="email">Email</label>
+      <input type="text" name="email" id="email">
+    </div>
+    
+    <div>
+      <label for="phone">Phone Number</label>
+      <input type="tel" name="phone" id="phone">
+    </div>
+  </div>
+
+  <%# Cancel/Submit  %>
   <div>
-    <label for="disciplines">Disciplines</label>
+    <a href="/admin/staff"><button type="button">Cancel</button></a>
+
+    <button type="submit">Save</button>
   </div>
 </form>

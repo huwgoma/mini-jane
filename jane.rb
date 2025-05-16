@@ -79,7 +79,7 @@ end
 # Form - Create new staff member
 get '/admin/staff/new/?' do
   @disciplines = @storage.load_disciplines
-  binding.pry
+
   render_with_layout(:new_staff)
 end
 
