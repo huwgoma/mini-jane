@@ -45,6 +45,14 @@ class PGAdapter
     format_staff_member(result.first)
   end
 
+  # Disciplines 
+  def load_disciplines
+    sql = "SELECT id, name FROM disciplines
+           WHERE clinical = true;"
+    result = query(sql)
+    result.map { |discipline| format_discipline(discipline) }
+  end
+
   private
 
   attr_reader :logger
@@ -149,5 +157,12 @@ class PGAdapter
     Staff.new(id, first_name, last_name, 
               email: email, phone: phone, 
               bio: bio, disciplines: disciplines)
+  end
+
+  def format_discipline(discipline)
+    id = discipline['id'].to_i
+    name = discipline['name']
+
+    Discipline.new(id, name)
   end
 end

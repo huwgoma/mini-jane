@@ -50,8 +50,9 @@ end
 # - CRUD for disciplines
 # - CRUD for treatments
 # - Flesh out schedule 
-# - Set "Administrative" discipline as the default if no discipline is given to a 
-#   staff member.
+# - Refactor disciplines - 
+#   - Remove non-clinical disciplines, and set 'administrative'
+#   as the default discipline if none is selected 
 
 # # # # # # # # # # 
 # Admin - Schedule # 
@@ -75,6 +76,13 @@ end
 # Admin - Staff # 
 # # # # # # # # # 
 
+# Form - Create new staff member
+get '/admin/staff/new/?' do
+  @disciplines = @storage.load_disciplines
+  binding.pry
+  render_with_layout(:new_staff)
+end
+
 # View all staff
 get '/admin/staff/?' do
   @staff = @storage.load_all_staff
@@ -89,3 +97,4 @@ get '/admin/staff/:staff_id/?' do
 
   render_with_layout(:staff)
 end
+
