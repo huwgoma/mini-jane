@@ -221,10 +221,8 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_view_staff_member_missing_optional_fields
-    # discipline_id = return_id(create_discipline('Physiotherapy', 'PT', clinical: true))
     user_id = return_id(create_user('Annie Hu'))
     create_staff_profile(user_id)
-    #create_staff_discipline_association(user_id, discipline_id)
 
     get "/admin/staff/#{user_id}"
     doc = Nokogiri::HTML(last_response.body)

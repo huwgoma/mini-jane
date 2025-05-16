@@ -24,7 +24,8 @@ class Staff < User
   def initialize(id, first_name, last_name, 
                  email: nil, phone: nil, bio: nil, disciplines: nil)
     super(id, first_name, last_name, email: email, phone: phone)
-    @bio = bio
+    
+    @bio = bio.strip if bio
     @disciplines = disciplines
   end
 

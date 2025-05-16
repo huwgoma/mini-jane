@@ -8,6 +8,6 @@
 
 <p><strong>Phone Number:</strong> <%= @staff_member.phone || 'No Phone Number' %></p>
 
-<% if @staff_member.bio %>
+<% unless @staff_member.bio.empty? %>
   <p><strong>Bio:</strong> <%= @staff_member.bio %></p>
 <% end %>
