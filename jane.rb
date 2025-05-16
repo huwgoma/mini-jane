@@ -93,7 +93,6 @@ end
 # Create a new staff member
 post '/admin/staff/new/?' do
   first_name, last_name = params[:first_name], params[:last_name]
-
   session[:errors].push(*new_staff_errors(first_name, last_name))
 
   if session[:errors].any?

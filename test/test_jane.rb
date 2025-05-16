@@ -239,6 +239,12 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_staff_member_name_error
+    skip
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    mt_id = return_id(create_discipline('Massage Therapy', 'MT'))
+    binding.pry
+    post '/admin/staff/new', first_name: "", last_name: "Ma",
+      disciplines: ['1', '2']
     # first name missing, last name missing, both missing
     # - assert error message is present
     # - assert other fields retain values

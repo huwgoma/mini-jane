@@ -19,16 +19,19 @@ class Patient < User
 end
 
 class Staff < User
-  attr_reader :bio, :disciplines 
+  attr_reader :disciplines 
 
   def initialize(id, first_name, last_name, 
                  email: nil, phone: nil, bio: nil, disciplines: nil)
     super(id, first_name, last_name, email: email, phone: phone)
     
-    @bio = bio.strip if bio
+    @bio = bio
     @disciplines = disciplines
   end
 
+  def bio
+    @bio.to_s.strip
+  end
 end
 
 class Practitioner < Staff
