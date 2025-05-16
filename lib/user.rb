@@ -2,11 +2,10 @@ class User
   attr_reader :id, :first_name, :last_name, :email, :phone, :birthday
 
   def initialize(id, first_name, last_name, 
-                 email: nil, phone: nil, birthday: nil)
+                 email: nil, phone: nil)
     @id = id
     @first_name, @last_name = first_name, last_name
     @email, @phone = email, phone
-    @birthday = @birthday
   end
 
   def full_name
@@ -15,7 +14,11 @@ class User
 end
 
 class Patient < User
-  
+  def initialize(id, first_name, email: nil, phone: nil, birthday: nil)
+    super(id, first_name, email: email, phone: phone)
+
+    @birthday = birthday
+  end
 end
 
 class Staff < User

@@ -310,12 +310,12 @@ class TestJane < Minitest::Test
   end
 
   # Create a dummy user
-  def create_user(name, email: nil, phone: nil, birthday: nil)
+  def create_user(name, email: nil, phone: nil)
     first_name, last_name = name.split
     
-    sql = "INSERT INTO users(first_name, last_name, email, phone, birthday) 
-           VALUES($1, $2, $3, $4, $5) RETURNING *;"
-    @storage.query(sql, first_name, last_name, email, phone, birthday)
+    sql = "INSERT INTO users(first_name, last_name, email, phone) 
+           VALUES($1, $2, $3, $4) RETURNING *;"
+    @storage.query(sql, first_name, last_name, email, phone)
   end
 
   # Create a dummy profile (staff/patient)
@@ -324,9 +324,9 @@ class TestJane < Minitest::Test
     @storage.query(sql, user_id, bio)
   end
 
-  def create_patient_profile(user_id)
-    sql = "INSERT INTO patients (user_id) VALUES ($1) RETURNING *;"
-    @storage.query(sql, user_id)
+  def create_patient_profile(user_id, birthday: nil)
+    sql = "INSERT INTO patients (user_id, birthday) VALUES ($1, $2) RETURNING *;"
+    @storage.query(sql, user_id, birthday)
   end
 
   # Create a dummy discipline

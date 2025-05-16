@@ -12,7 +12,8 @@ class PGAdapter
     connection.exec_params(sql, params)
   end
 
-  # Schedule
+  # # # # # # 
+  # Schedule # 
   def load_daily_schedule(date)
     practitioners = load_scheduled_practitioners
     appointments = load_scheduled_appointments(date)
@@ -20,7 +21,14 @@ class PGAdapter
     format_daily_schedule(practitioners, appointments)
   end
 
-  # Staff
+  # # # # # 
+  # Users #
+  def create_user(first_name, last_name, email, birthday)
+    
+  end
+
+  # # # # #
+  # Staff #
   def load_all_staff
     sql = "SELECT staff.user_id, users.first_name, users.last_name 
            FROM users JOIN staff ON users.id = staff.user_id
@@ -44,6 +52,7 @@ class PGAdapter
     
     format_staff_member(result.first)
   end
+
 
   # Disciplines 
   def load_disciplines

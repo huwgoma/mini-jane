@@ -100,6 +100,8 @@ post '/admin/staff/new/?' do
     @disciplines = @storage.load_disciplines
     render_with_layout(:new_staff)
   else
+    binding.pry
+    @storage.create_user()
     # Create user
     # Create staff
     # Create staff disciplines for each discipline; if none, admin

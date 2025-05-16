@@ -16,13 +16,13 @@ CREATE TABLE users (
   first_name  varchar(255) NOT NULL,
   last_name   varchar(255) NOT NULL,
   email       varchar(50),
-  phone       numeric(20),
-  birthday    date
+  phone       numeric(20)
   -- Login Info
 );
 
 CREATE TABLE patients (
-  user_id integer PRIMARY KEY REFERENCES users ON DELETE CASCADE
+  user_id integer PRIMARY KEY REFERENCES users ON DELETE CASCADE,
+  birthday    date
   -- Other patient-specific info
 );
 
@@ -104,18 +104,18 @@ CREATE OR REPLACE trigger verify_clinical_discipline
   FOR EACH ROW EXECUTE FUNCTION verify_clinical_discipline();
 
 
--- Seed
--- INSERT INTO users (first_name, last_name, email, phone, birthday)
--- VALUES ('Hugo',    'Ma',      'huwgoma@gmail.com',      6476758914, '1997-09-14'), 
---        ('Annie',   'Hu',      'hu.annie06@gmail.com',   6476089210, '1999-06-03'), 
---        ('Kevin',   'Ho',      'kevinnnho@gmail.com',    6475338232, '1993-09-11'), 
---        ('Alan',    'Mitri',   'alan.mitri@hotmail.com', NULL,       '1980-05-04'), 
---        ('Alexis',  'Butler',  'alexiss@gmail.com',      9059737080, '1997-07-21'), 
---        ('Hendrik', 'Swart',    NULL,                    NULL,       '1930-05-04'), 
---        ('Phil',    'Genesis',  NULL,                    4165506666, '1980-06-30'),
---        ('Carol',   'Scott',    NULL,                    NULL,       '1978-03-14'), 
---        ('Dan',     'Torres',   NULL,                    NULL,       '1990-08-24'),
---        ('Jeff',    'Leps',     NULL,                    NULL,       '1975-10-29'); 
+-- -- Seed
+-- INSERT INTO users (first_name, last_name, email, phone)
+-- VALUES ('Hugo',    'Ma',      'huwgoma@gmail.com',      6476758914), 
+--        ('Annie',   'Hu',      'hu.annie06@gmail.com',   6476089210), 
+--        ('Kevin',   'Ho',      'kevinnnho@gmail.com',    6475338232), 
+--        ('Alan',    'Mitri',   'alan.mitri@hotmail.com', NULL      ), 
+--        ('Alexis',  'Butler',  'alexiss@gmail.com',      9059737080), 
+--        ('Hendrik', 'Swart',    NULL,                    NULL      ), 
+--        ('Phil',    'Genesis',  NULL,                    4165506666),
+--        ('Carol',   'Scott',    NULL,                    NULL      ), 
+--        ('Dan',     'Torres',   NULL,                    NULL      ),
+--        ('Jeff',    'Leps',     NULL,                    NULL      ); 
 
 -- INSERT INTO staff (user_id, biography)
 -- VALUES (1, ''),             -- Hugo
@@ -125,12 +125,12 @@ CREATE OR REPLACE trigger verify_clinical_discipline
 --        (5, ''),             -- Alexis
 --        (7, 'Owner of SJV'); -- Phil
 
--- INSERT INTO patients (user_id)
--- VALUES (1),  -- Hugo
---        (6),  -- Hendrik
---        (8),  -- Carol
---        (9),  -- Dan
---        (10); -- Jeff
+-- INSERT INTO patients (user_id, birthday)
+-- VALUES (1,  '1997-09-14'),  -- Hugo
+--        (6,  '1930-05-04'),  -- Hendrik
+--        (8,  '1978-03-14'),  -- Carol
+--        (9,  '1990-08-24'),  -- Dan
+--        (10, '1975-10-29'); -- Jeff
 
 -- INSERT INTO disciplines (name, title, clinical)
 -- VALUES ('Physiotherapy',   'PT', true),
