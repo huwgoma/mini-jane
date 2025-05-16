@@ -1,15 +1,15 @@
 <h2>New Staff Member</h2>
 
-<form action="/admin/staff" method="post">
+<form action="/admin/staff/new" method="post">
   <div class="name-form">
     <div>
       <label for="first_name">First Name - Required</label>
-      <input type="text" name="first_name" id="first_name" required>
+      <input type="text" name="first_name" id="first_name"> <%#required%>
     </div>
     
     <div>
       <label for="first_name">Last Name - Required</label>
-      <input type="text" name="last_name" id="last_name" required>
+      <input type="text" name="last_name" id="last_name"> <%#required%>
     </div>
   </div>
   
@@ -18,7 +18,7 @@
     <fieldset>
       <% @disciplines.each do |discipline| %>
         <div>
-          <input type="checkbox" name="<%= discipline.name %>" id="<%= discipline.name %>"
+          <input type="checkbox" name="disciplines[]" id="<%= discipline.name %>"
             value="<%= discipline.id %>">
           <label for="<%= discipline.name %>"><%= discipline.name %></label>
         </div>
@@ -37,6 +37,11 @@
       <label for="phone">Phone Number</label>
       <input type="tel" name="phone" id="phone">
     </div>
+  </div>
+
+  <div class="bio-form">
+    <h3>Bio</h3>
+    <textarea name="biography" id="biography" rows="10" cols="50"></textarea>
   </div>
 
   <%# Cancel/Submit  %>

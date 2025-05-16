@@ -83,6 +83,32 @@ get '/admin/staff/new/?' do
   render_with_layout(:new_staff)
 end
 
+# Create a new staff member
+post '/admin/staff/new/?' do
+  first_name, last_name = params[:first_name], params[:last_name]
+
+  session[:errors].push(*new_staff_errors(first_name, last_name))
+  
+  if session[:errors].any?
+    @disciplines = @storage.load_disciplines
+    render_with_layout(:new_staff)
+  else
+    # Create user
+    # Create staff
+    # Create staff disciplines for each discipline; if none, admin
+  end
+
+
+  # Validate incoming staff member details
+  # - First and last name must be present and not empty
+  # 
+  # If valid,
+  # - Create a new user
+  # - Create a new staff profile
+  # - Add the necessary staff disciplines 
+  #   - If no disciplines are selected, default to administrative
+end
+
 # View all staff
 get '/admin/staff/?' do
   @staff = @storage.load_all_staff
@@ -98,3 +124,21 @@ get '/admin/staff/:staff_id/?' do
   render_with_layout(:staff)
 end
 
+# # # # # #  
+# Helpers #
+# # # # # #
+
+# # # # # # # # #  
+# Error Messages #
+def new_staff_errors(first_name, last_name)
+  errors = []
+  errors << 'Please enter a first name.' if empty_string?(first_name)
+  errors << 'Please enter a last name.' if empty_string?(last_name)
+  errors
+end
+
+# # # # # # # #   
+# Validations #
+def empty_string?(string)
+  string.strip.empty?
+end

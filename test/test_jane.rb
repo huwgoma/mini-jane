@@ -238,6 +238,12 @@ class TestJane < Minitest::Test
     assert_nil(bio_field)
   end
 
+  def test_admin_create_staff_member_name_error
+    # first name missing, last name missing, both missing
+    # - assert error message is present
+    # - assert other fields retain values
+  end
+
   private
 
   #################################################
