@@ -219,6 +219,27 @@ class TestJane < Minitest::Test
     discipline_field = doc.at_xpath("//p[strong[contains(text(), 'Disciplines:')]]").text
     assert_equal('Disciplines: Physiotherapy, Chiropractic', discipline_field)
   end
+
+  def test_admin_view_staff_member_missing_optional_fields
+    # discipline_id = return_id(create_discipline('Physiotherapy', 'PT', clinical: true))
+    user_id = return_id(create_user('Annie Hu'))
+    create_staff_profile(user_id)
+    #create_staff_discipline_association(user_id, discipline_id)
+
+    get "/admin/staff/#{user_id}"
+    doc = Nokogiri::HTML(last_response.body)
+
+    email_field = doc.at_xpath("//p[strong[contains(text(), 'Email:')]]").text
+    assert_equal('Email: No Email Address', email_field)
+
+    phone_field = doc.at_xpath("//p[strong[contains(text(), 'Phone Number:')]]").text
+    assert_equal('Phone Number: No Phone Number', phone_field)
+
+    # Bio does not show up if biography is nil
+    bio_field = doc.at_xpath("//p[strong[contains(text(), 'Bio:')]]")
+    assert_nil(bio_field)
+  end
+
   private
 
   #################################################

@@ -43,11 +43,15 @@ end
 # To Do #
 #########
 # - CRUD for staff
+# - Revisit nils (specifically - how optional fields are represented in schema)
+# 
 # - CRUD for patients
 # - CRUD for appointments
 # - CRUD for disciplines
 # - CRUD for treatments
 # - Flesh out schedule 
+# - Set "Administrative" discipline as the default if no discipline is given to a 
+#   staff member.
 
 # # # # # # # # # # 
 # Admin - Schedule # 

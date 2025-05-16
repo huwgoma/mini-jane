@@ -36,12 +36,12 @@ class PGAdapter
                   STRING_AGG(disciplines.name, ', ') AS disciplines
            FROM users
            JOIN staff ON users.id = staff.user_id
-           JOIN staff_disciplines ON staff.user_id = staff_id
-           JOIN disciplines ON disciplines.id = discipline_id
+           LEFT JOIN staff_disciplines ON staff.user_id = staff_id
+           LEFT JOIN disciplines ON disciplines.id = discipline_id
            WHERE users.id = $1
            GROUP BY users.id, staff.user_id;"
     result = query(sql, staff_id)
-
+    
     format_staff_member(result.first)
   end
 
