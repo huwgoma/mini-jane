@@ -243,7 +243,7 @@ class TestJane < Minitest::Test
     mt_id = return_id(create_discipline('Massage Therapy', 'MT')).to_s
 
     post '/admin/staff/new', first_name: '', last_name: '',
-      disciplines: [pt_id, mt_id], email: 'hgm@gmail.com', phone: '6476758914',
+      discipline_ids: [pt_id, mt_id], email: 'hgm@gmail.com', phone: '6476758914',
       biography: 'Hello I am under the water'
     
     doc = Nokogiri::HTML(last_response.body) 
