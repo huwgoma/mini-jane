@@ -49,8 +49,9 @@ end
 ######### 
 # To Do #
 #########
+#  - Revisit nils (specifically - how optional fields are represented in schema)
 # - CRUD for staff
-# - Revisit nils (specifically - how optional fields are represented in schema)
+#
 # 
 # - CRUD for patients
 # - CRUD for appointments
@@ -104,10 +105,8 @@ post '/admin/staff/new/?' do
 
     @storage.create_staff_profile(user_id, params[:biography])
     @storage.add_staff_disciplines(user_id, params[:discipline_ids])
-    binding.pry
-    # Create user
-    # Create staff
-    # Create staff disciplines for each discipline; if none, admin
+
+    redirect "/admin/staff/#{user_id}"
   end
 
 end

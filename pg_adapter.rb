@@ -64,36 +64,17 @@ class PGAdapter
   end
 
   def add_staff_disciplines(staff_id, discipline_ids)
-    administrative_id = query("SELECT id FROM disciplines WHERE name = 'Administrative'")
+    # Don't insert if no disciplines are given
+    return if discipline_ids.to_a.empty?
     
-    # Admin if empty/nil
-    discipline_ids = discipline_ids.to_a
-    # Array of discipline IDs
-    # VALUES 
-    # (staff_id, discipline_id_1), (staff_id, discipline_id_2), ...
-    # 
-    #
-    # discipline_ids = ["1", "2", "3", ...]
-    # VALUES 
-    # ($1, $2), ($1, $3), ($1, $4), ...
-    # query(sql, staff_id, *discipline_ids)
-    # 
-    # Input: An array of strings representing discipline IDs in string form
-    # eg. ["1", "2", "3"]
-    # Output: A string of comma-separated bracket-enclosed placeholder pairs. 
-    #   The first placeholder is a constant $1, while the second placeholder 
-    #   increments, starting at $2
-    # eg. "($1, $2), ($1, $3), ($1, $4)"
-
-    # Algorithm:
-    # Given an array of strings, discipline_ids:
-    # (Map) Iterate over discipline_ids with index. For each discipline id:
-    # - Generate a string: 
-    # "($1, $n)" where n is equal to index + 2
-    # EOI -> Join strings together
-
+    placeholders = discipline_ids.map.with_index do |id, index|
+      "($1, $#{index + 2})"
+    end.join(', ')
+    
     sql = "INSERT INTO staff_disciplines (staff_id, discipline_id)
-           VALUES"
+           VALUES #{placeholders};"
+
+    query(sql, staff_id, *discipline_ids)
   end
 
   # Disciplines 
