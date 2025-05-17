@@ -18,7 +18,7 @@
   <div class="disciplines-form">
     <h3>Disciplines</h3>
     <fieldset>
-      <% checkbox_group = 'disciplines' %>
+      <% checkbox_group = 'discipline_ids' %>
       <% @disciplines.each do |discipline| %>
         <div>
           <input type="checkbox" name=<%= "#{checkbox_group}[]" %> id="<%= discipline.name %>"

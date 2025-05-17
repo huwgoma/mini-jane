@@ -57,9 +57,7 @@ end
 # - CRUD for disciplines
 # - CRUD for treatments
 # - Flesh out schedule 
-# - Refactor disciplines - 
-#   - Remove non-clinical disciplines, and set 'administrative'
-#   as the default discipline if none is selected 
+
 
 # # # # # # # # # # 
 # Admin - Schedule # 
@@ -100,8 +98,13 @@ post '/admin/staff/new/?' do
     @disciplines = @storage.load_disciplines
     render_with_layout(:new_staff)
   else
+    user_id = @storage.create_user_return_id(
+                params[:first_name], params[:last_name], 
+                params[:email], params[:phone])
+
+    @storage.create_staff_profile(user_id, params[:biography])
+    @storage.add_staff_disciplines(user_id, params[:discipline_ids])
     binding.pry
-    @storage.create_user()
     # Create user
     # Create staff
     # Create staff disciplines for each discipline; if none, admin

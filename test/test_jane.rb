@@ -177,7 +177,7 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_view_staff_member_all_fields
-    discipline_id = return_id(create_discipline('Physiotherapy', 'PT', clinical: true))
+    discipline_id = return_id(create_discipline('Physiotherapy', 'PT'))
     user_id = return_id(create_user('Annie Hu', 
                                      email: 'hu_annie06@gmail.com',
                                      phone: 6476089210))
@@ -204,8 +204,8 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_view_staff_member_multiple_disciplines
-    physio_id = return_id(create_discipline('Physiotherapy', 'PT', clinical: true))
-    chiro_id = return_id(create_discipline('Chiropractic', 'DC', clinical: true))
+    physio_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    chiro_id = return_id(create_discipline('Chiropractic', 'DC'))
     user_id = return_id(create_user('Quinn Powell-Jones', 
                                      email: 'quinn@gmail.com',
                                      phone: 4167891234))
@@ -256,6 +256,7 @@ class TestJane < Minitest::Test
     ['Physiotherapy', 'Massage Therapy'].each do |discipline|
       # Assert that there IS a checked label for each selected discipline
       checked_label = doc.at_css('input[checked] + label[text()="' + discipline + '"]')
+
       refute_nil(checked_label)
     end
 
@@ -268,6 +269,10 @@ class TestJane < Minitest::Test
     post '/admin/staff/new', first_name: '  ', last_name: 'Ma'
 
     assert_includes(last_response.body, 'Please enter a first name.')
+  end
+
+  def test_admin_insert_staff_member
+    
   end
 
   private
@@ -330,10 +335,10 @@ class TestJane < Minitest::Test
   end
 
   # Create a dummy discipline
-  def create_discipline(name, title = nil, clinical: true)
-    sql = "INSERT INTO disciplines (name, title, clinical)
-           VALUES($1, $2, $3) RETURNING *;"
-    @storage.query(sql, name, title, clinical)
+  def create_discipline(name, title = nil)
+    sql = "INSERT INTO disciplines (name, title)
+           VALUES($1, $2) RETURNING *;"
+    @storage.query(sql, name, title)
   end
 
   # Create a dummy treatment type

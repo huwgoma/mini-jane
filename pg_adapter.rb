@@ -23,12 +23,22 @@ class PGAdapter
 
   # # # # # 
   # Users #
-  def create_user(first_name, last_name, email, birthday)
-    
+  def create_user_return_id(first_name, last_name, email, phone)
+    sql = "INSERT INTO users(first_name, last_name, email, phone)
+           VALUES($1, $2, $3, $4) RETURNING id;"
+    result = query(sql, first_name, last_name, email, phone)
+
+    result.first['id'].to_i
   end
 
   # # # # #
   # Staff #
+  def create_staff_profile(user_id, biography)
+    sql = "INSERT INTO staff(user_id, biography)
+           VALUES($1, $2);"
+    query(sql, user_id, biography)
+  end
+
   def load_all_staff
     sql = "SELECT staff.user_id, users.first_name, users.last_name 
            FROM users JOIN staff ON users.id = staff.user_id
@@ -53,11 +63,42 @@ class PGAdapter
     format_staff_member(result.first)
   end
 
+  def add_staff_disciplines(staff_id, discipline_ids)
+    administrative_id = query("SELECT id FROM disciplines WHERE name = 'Administrative'")
+    
+    # Admin if empty/nil
+    discipline_ids = discipline_ids.to_a
+    # Array of discipline IDs
+    # VALUES 
+    # (staff_id, discipline_id_1), (staff_id, discipline_id_2), ...
+    # 
+    #
+    # discipline_ids = ["1", "2", "3", ...]
+    # VALUES 
+    # ($1, $2), ($1, $3), ($1, $4), ...
+    # query(sql, staff_id, *discipline_ids)
+    # 
+    # Input: An array of strings representing discipline IDs in string form
+    # eg. ["1", "2", "3"]
+    # Output: A string of comma-separated bracket-enclosed placeholder pairs. 
+    #   The first placeholder is a constant $1, while the second placeholder 
+    #   increments, starting at $2
+    # eg. "($1, $2), ($1, $3), ($1, $4)"
+
+    # Algorithm:
+    # Given an array of strings, discipline_ids:
+    # (Map) Iterate over discipline_ids with index. For each discipline id:
+    # - Generate a string: 
+    # "($1, $n)" where n is equal to index + 2
+    # EOI -> Join strings together
+
+    sql = "INSERT INTO staff_disciplines (staff_id, discipline_id)
+           VALUES"
+  end
 
   # Disciplines 
   def load_disciplines
-    sql = "SELECT id, name FROM disciplines
-           WHERE clinical = true;"
+    sql = "SELECT id, name FROM disciplines;"
     result = query(sql)
     result.map { |discipline| format_discipline(discipline) }
   end
@@ -85,7 +126,6 @@ class PGAdapter
       JOIN staff ON users.id = staff.user_id
       JOIN staff_disciplines sd ON staff.user_id = sd.staff_id
       JOIN disciplines ON sd.discipline_id = disciplines.id
-      WHERE disciplines.clinical = true
       GROUP BY users.id
       ORDER BY STRING_AGG(disciplines.id::text, ''), users.first_name, users.last_name;
     SQL
@@ -147,6 +187,14 @@ class PGAdapter
       hash[disciplines] ||= {}
       hash[disciplines][staff_id] = practitioner
     end
+  end
+
+  def format_user(user)
+    id = user['id'].to_i
+    first_name, last_name = user['first_name'], user['last_name']
+    email, phone = user['email'], user['phone']
+
+    User.new(id, first_name, last_name, email: email, phone: phone)
   end
 
   def format_staff_listing(staff)

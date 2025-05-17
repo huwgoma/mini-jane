@@ -1,5 +1,5 @@
 class User
-  attr_reader :id, :first_name, :last_name, :email, :phone, :birthday
+  attr_reader :id, :first_name, :last_name, :email, :phone
 
   def initialize(id, first_name, last_name, 
                  email: nil, phone: nil)

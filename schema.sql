@@ -16,7 +16,7 @@ CREATE TABLE users (
   first_name  varchar(255) NOT NULL,
   last_name   varchar(255) NOT NULL,
   email       varchar(50),
-  phone       numeric(20)
+  phone       varchar(50)
   -- Login Info
 );
 
@@ -34,8 +34,7 @@ CREATE TABLE staff (
 CREATE TABLE disciplines (
   id       serial       PRIMARY KEY,
   name     varchar(255) NOT NULL UNIQUE,
-  title    varchar(2),
-  clinical boolean      NOT NULL DEFAULT false
+  title    varchar(2)
 );
 
 CREATE TABLE staff_disciplines (
@@ -82,26 +81,11 @@ RETURNS trigger AS $$
   END;
 $$ LANGUAGE plpgsql;
 
--- Raise error if the specified discipline is non-clinical
-CREATE OR REPLACE FUNCTION verify_clinical_discipline()
-RETURNS trigger AS $$
-  BEGIN
-    IF (SELECT clinical FROM disciplines WHERE id = NEW.discipline_id) = false
-    THEN RAISE EXCEPTION 'Cannot create treatment - Discipline type is non-clinical.';
-    END IF;
-    RETURN NEW;
-  END;
-$$ LANGUAGE plpgsql;
-
 
 -- Triggers
 CREATE OR REPLACE TRIGGER verify_staff_member_offers_treatment 
   BEFORE INSERT ON appointments
   FOR EACH ROW EXECUTE FUNCTION verify_staff_member_offers_treatment();
-
-CREATE OR REPLACE trigger verify_clinical_discipline
-  BEFORE INSERT ON treatments
-  FOR EACH ROW EXECUTE FUNCTION verify_clinical_discipline();
 
 
 -- -- Seed
@@ -132,19 +116,17 @@ CREATE OR REPLACE trigger verify_clinical_discipline
 --        (9,  '1990-08-24'),  -- Dan
 --        (10, '1975-10-29'); -- Jeff
 
--- INSERT INTO disciplines (name, title, clinical)
--- VALUES ('Physiotherapy',   'PT', true),
---        ('Massage Therapy', 'MT', true),
---        ('Chiropractic',    'DC', true),
---        ('Administrative',  NULL, false);
+-- INSERT INTO disciplines (name, title)
+-- VALUES ('Physiotherapy',   'PT'),
+--        ('Massage Therapy', 'MT'),
+--        ('Chiropractic',    'DC');
        
 -- INSERT INTO staff_disciplines(staff_id, discipline_id)
--- VALUES (1, 4),                 -- Hugo   -> Administrative
---        (2, 1),                 -- Annie  -> PT
---        (3, 1),                 -- Kevin  -> PT
---        (4, 2),                 -- Alan   -> MT
---        (5, 3),                 -- Alexis -> DC
---        (7, 1), (7, 3), (7, 4); -- Phil   -> PT, Chiro and Admin
+-- VALUES (2, 1),         -- Annie  -> PT
+--        (3, 1),         -- Kevin  -> PT
+--        (4, 2),         -- Alan   -> MT
+--        (5, 3),         -- Alexis -> DC
+--        (7, 1), (7, 3); -- Phil   -> PT, Chiro
 
 -- INSERT INTO treatments(name, discipline_id, length, price)
 -- VALUES ('PT - Initial',   1, 45, 100.00),
