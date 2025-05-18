@@ -32,6 +32,30 @@ helpers do
 
     params[group].include?(value.to_s)
   end
+
+  def prefill(attribute, params, object=nil)
+    params[attribute] || 
+    (object.method(attribute).call if object.respond_to?(attribute))
+  end
+  # Prefilled Values
+  # - If the value is present in params, use that value
+  # - Otherwise, check the given object for the value
+  # eg. First Name (Edit Staff)
+  # - If params[:first_name] is present, use that
+  # - Otherwise, use staff.first_name
+  # 
+  # Input: 
+  # - Symbol (parameter name), object (object instance to check if param is nil)
+  # Output: 
+  # - Value at params[parameter_name], value at object.parameter_name,
+  #   or nil
+  #   
+  # Given a symbol and object:
+  # - Attempt to return params[symbol]
+  # - If ^ is nil, 
+  #   attempt to call symbol method on the given object (if it exists
+  #   and if it responds)
+  # - return nil if both attempts fail
 end
 
 # Routes
@@ -49,9 +73,10 @@ end
 ######### 
 # To Do #
 #########
-#  - Revisit nils (specifically - how optional fields are represented in schema)
+# - Clear DB ONCE before test suite
+#  
 # - CRUD for staff
-#
+# - Revisit nils (specifically - how optional fields are represented in schema)
 # 
 # - CRUD for patients
 # - CRUD for appointments
@@ -124,6 +149,16 @@ get '/admin/staff/:staff_id/?' do
   @staff_member = @storage.load_staff_member(staff_id)
 
   render_with_layout(:staff)
+end
+
+# Form - Edit a specific staff member
+get '/admin/staff/:staff_id/edit/?' do
+  staff_id = params[:staff_id].to_i 
+
+  @staff_member = @storage.load_staff_member(staff_id)
+  @disciplines = @storage.load_disciplines
+  
+  render_with_layout(:edit_staff)
 end
 
 # # # # # #  
