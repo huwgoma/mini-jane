@@ -24,12 +24,12 @@ end
 class Staff < User
   attr_reader :disciplines 
 
-  def initialize(id, first_name, last_name, 
-                 email: nil, phone: nil, bio: nil, disciplines: nil)
+  def initialize(id, first_name, last_name, email: nil, phone: nil, 
+                 bio: nil, disciplines: nil)
     super(id, first_name, last_name, email: email, phone: phone)
     
     @bio = bio
-    @disciplines = disciplines
+    @disciplines = disciplines || 'Administrative'
   end
 
   def bio

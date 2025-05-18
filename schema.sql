@@ -102,11 +102,11 @@ VALUES ('Hugo',    'Ma',      'huwgoma@gmail.com',      6476758914),
        ('Jeff',    'Leps',     NULL,                    NULL      ); 
 
 INSERT INTO staff (user_id, biography)
-VALUES (1, ''),             -- Hugo
-       (2, ''),             -- Annie
-       (3, ''),             -- Kevin
-       (4, ''),             -- Alan
-       (5, ''),             -- Alexis
+VALUES (1, DEFAULT),             -- Hugo
+       (2, DEFAULT),             -- Annie
+       (3, DEFAULT),             -- Kevin
+       (4, DEFAULT),             -- Alan
+       (5, DEFAULT),             -- Alexis
        (7, 'Owner of SJV'); -- Phil
 
 INSERT INTO patients (user_id, birthday)
