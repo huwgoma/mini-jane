@@ -48,19 +48,11 @@ class PGAdapter
     result.map { |staff| format_staff_listing(staff) }
   end
 
-  def load_staff_member(staff_id)
-    sql = "SELECT users.id, users.first_name, users.last_name, 
-                  users.email, users.phone, staff.biography,
-                  STRING_AGG(disciplines.name, ', ') AS disciplines
-           FROM users
-           JOIN staff ON users.id = staff.user_id
-           LEFT JOIN staff_disciplines ON staff.user_id = staff_id
-           LEFT JOIN disciplines ON disciplines.id = discipline_id
-           WHERE users.id = $1
-           GROUP BY users.id, staff.user_id;"
-    result = query(sql, staff_id)
+  def load_staff_profile(staff_id)
+    staff_result = load_staff_member(staff_id)
+    staff_disciplines_result = load_disciplines_by_staff(staff_id)
     
-    format_staff_member(result.first)
+    format_staff_profile(staff_result.first, staff_disciplines_result)
   end
 
   def add_staff_disciplines(staff_id, discipline_ids)
@@ -99,6 +91,10 @@ class PGAdapter
     end
   end
 
+  # # # # # # # # # # # # # #
+  # Private Loading Methods #
+  # 
+  # Schedule # 
   def load_scheduled_practitioners
     sql = <<~SQL
       SELECT users.id AS staff_id, users.first_name, users.last_name,
@@ -128,6 +124,25 @@ class PGAdapter
       ORDER BY appts.datetime;
     SQL
     query(sql, date)
+  end
+
+  # Staff Profile
+  def load_staff_member(staff_id)
+    sql = "SELECT users.id, users.first_name, users.last_name, 
+                  users.email, users.phone, staff.biography
+           FROM users
+           JOIN staff ON users.id = staff.user_id
+           WHERE users.id = $1
+           GROUP BY users.id, staff.user_id;"
+    query(sql, staff_id)
+  end
+
+  def load_disciplines_by_staff(staff_id)
+    sql = "SELECT disciplines.id, disciplines.name
+           FROM disciplines
+           JOIN staff_disciplines ON disciplines.id = discipline_id
+           WHERE staff_id = $1;"
+    query(sql, staff_id)
   end
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -185,15 +200,15 @@ class PGAdapter
     Staff.new(id, first_name, last_name)
   end
 
-  def format_staff_member(staff)
+  def format_staff_profile(staff, disciplines)
     id = staff['id'].to_i
     first_name, last_name = staff['first_name'], staff['last_name']
     email, phone = staff['email'], staff['phone']
     biography = staff['biography']
-    disciplines = staff['disciplines']
+
+    disciplines = disciplines.map { |discipline| format_discipline(discipline) }
     
-    Staff.new(id, first_name, last_name, 
-              email: email, phone: phone, 
+    Staff.new(id, first_name, last_name, email: email, phone: phone,
               biography: biography, disciplines: disciplines)
   end
 

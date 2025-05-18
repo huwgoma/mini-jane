@@ -18,12 +18,12 @@
   <div class="disciplines-form">
     <h3>Disciplines</h3>
     <fieldset>
-      <% checkbox_group = 'discipline_ids' %>
+      <% group_name = 'discipline_ids' %>
       <% @disciplines.each do |discipline| %>
         <div>
-          <input type="checkbox" name=<%= "#{checkbox_group}[]" %> id="<%= discipline.name %>"
+          <input type="checkbox" name=<%= "#{group_name}[]" %> id="<%= discipline.name %>"
             value="<%= discipline.id %>" 
-            <%= 'checked' if was_checked?(checkbox_group, discipline.id, params) %>>
+            <%= 'checked' if prechecked?(group_name, discipline.id, params) %>>
           <label for="<%= discipline.name %>"><%= discipline.name %></label>
         </div>
       <% end %>

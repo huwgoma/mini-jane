@@ -27,7 +27,13 @@ helpers do
     erb view, layout: :admin_layout
   end
 
-  def was_checked?(group, value, params)
+  def prechecked?(group_name, value, params, object=nil)
+    #binding.pry
+    # Refactor:
+    # - If params[checkbox_group_name] is nil, additionally check 
+    # Whether the given value (discipline id, int) is in the given object's 
+    # @disciplines
+    # - @disciplines.any? { discipline.id == value }
     return if params[group].nil?
 
     params[group].include?(value.to_s)
@@ -37,25 +43,6 @@ helpers do
     params[attribute] || 
     (object.method(attribute).call if object.respond_to?(attribute))
   end
-  # Prefilled Values
-  # - If the value is present in params, use that value
-  # - Otherwise, check the given object for the value
-  # eg. First Name (Edit Staff)
-  # - If params[:first_name] is present, use that
-  # - Otherwise, use staff.first_name
-  # 
-  # Input: 
-  # - Symbol (parameter name), object (object instance to check if param is nil)
-  # Output: 
-  # - Value at params[parameter_name], value at object.parameter_name,
-  #   or nil
-  #   
-  # Given a symbol and object:
-  # - Attempt to return params[symbol]
-  # - If ^ is nil, 
-  #   attempt to call symbol method on the given object (if it exists
-  #   and if it responds)
-  # - return nil if both attempts fail
 end
 
 # Routes
@@ -70,6 +57,13 @@ not_found do
   redirect '/admin/schedule/'
 end
 
+# Commit
+# - Refactor staff member profiles: 
+#   - Load staff profile and staff disciplines separately
+#   - Refactor formatting and implementation of Staff objects to 
+#     represent @disciplines as an array of Discipline objects
+#
+#
 ######### 
 # To Do #
 #########
@@ -143,10 +137,10 @@ get '/admin/staff/?' do
   render_with_layout(:all_staff)
 end
 
-# View a specific staff member
+# View a specific staff profile
 get '/admin/staff/:staff_id/?' do
   staff_id = params[:staff_id].to_i
-  @staff_member = @storage.load_staff_member(staff_id)
+  @staff_profile = @storage.load_staff_profile(staff_id)
 
   render_with_layout(:staff)
 end
@@ -157,7 +151,7 @@ get '/admin/staff/:staff_id/edit/?' do
 
   @staff_member = @storage.load_staff_member(staff_id)
   @disciplines = @storage.load_disciplines
-  
+  # load staff disciplines
   render_with_layout(:edit_staff)
 end
 

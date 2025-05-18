@@ -25,11 +25,11 @@ class Staff < User
   attr_reader :disciplines 
 
   def initialize(id, first_name, last_name, email: nil, phone: nil, 
-                 biography: nil, disciplines: nil)
+                 biography: nil, disciplines: [])
     super(id, first_name, last_name, email: email, phone: phone)
     
     @biography = biography
-    @disciplines = disciplines || 'Administrative'
+    @disciplines = disciplines # ADmin if empty
   end
 
   def biography
