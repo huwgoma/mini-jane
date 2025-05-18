@@ -12,7 +12,7 @@
     <div>
       <label for="first_name">Last Name - Required</label>
       <input type="text" name="last_name" id="last_name"
-        value="<%= params[:last_name] %>"> <%#required%>
+        value="<%= prefill(:last_name, params, @staff_member) %>"> <%#required%>
     </div>
   </div>
   
@@ -35,19 +35,21 @@
     <h3>Contact Info</h3>
     <div>
       <label for="email">Email</label>
-      <input type="text" name="email" id="email" value="<%= params[:email] %>">
+      <input type="text" name="email" id="email" 
+        value="<%= prefill(:email, params, @staff_member) %>">
     </div>
     
     <div>
       <label for="phone">Phone Number</label>
-      <input type="tel" name="phone" id="phone" value="<%= params[:phone] %>">
+      <input type="tel" name="phone" id="phone" 
+        value="<%= prefill(:phone, params, @staff_member) %>">
     </div>
   </div>
 
   <div class="bio-form">
     <h3>Bio</h3>
     <textarea name="biography" id="biography" 
-      rows="10" cols="50"><%= params[:biography] %></textarea>
+      rows="10" cols="50"><%= prefill(:biography, params, @staff_member) %></textarea>
   </div>
 
   <%# Cancel/Submit  %>

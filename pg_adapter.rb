@@ -189,12 +189,12 @@ class PGAdapter
     id = staff['id'].to_i
     first_name, last_name = staff['first_name'], staff['last_name']
     email, phone = staff['email'], staff['phone']
-    bio = staff['biography']
+    biography = staff['biography']
     disciplines = staff['disciplines']
     
     Staff.new(id, first_name, last_name, 
               email: email, phone: phone, 
-              bio: bio, disciplines: disciplines)
+              biography: biography, disciplines: disciplines)
   end
 
   def format_discipline(discipline)

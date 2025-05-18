@@ -181,7 +181,7 @@ class TestJane < Minitest::Test
     user_id = return_id(create_user('Annie Hu', 
                                      email: 'hu_annie06@gmail.com',
                                      phone: 6476089210))
-    create_staff_profile(user_id, bio: 'Annie!')
+    create_staff_profile(user_id, biography: 'Annie!')
     create_staff_discipline_association(user_id, discipline_id)
 
     get "/admin/staff/#{user_id}"
@@ -209,7 +209,7 @@ class TestJane < Minitest::Test
     user_id = return_id(create_user('Quinn Powell-Jones', 
                                      email: 'quinn@gmail.com',
                                      phone: 4167891234))
-    create_staff_profile(user_id, bio: "Hi I'm Quinn I'm a physio and chiro nice to meet you!")
+    create_staff_profile(user_id, biography: "Hi I'm Quinn I'm a physio and chiro nice to meet you!")
     create_staff_discipline_association(user_id, physio_id)
     create_staff_discipline_association(user_id, chiro_id)
 
@@ -369,9 +369,9 @@ class TestJane < Minitest::Test
   end
 
   # Create a dummy profile (staff/patient)
-  def create_staff_profile(user_id, bio: nil)
+  def create_staff_profile(user_id, biography: nil)
     sql = "INSERT INTO staff VALUES ($1, $2) RETURNING *;"
-    @storage.query(sql, user_id, bio)
+    @storage.query(sql, user_id, biography)
   end
 
   def create_patient_profile(user_id, birthday: nil)
