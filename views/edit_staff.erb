@@ -24,7 +24,7 @@
         <div>
           <input type="checkbox" name=<%= "#{checkbox_group}[]" %> id="<%= discipline.name %>"
             value="<%= discipline.id %>" 
-            <%= 'checked' if was_checked?(checkbox_group, discipline.id) %>>
+            <%= 'checked' if was_checked?(checkbox_group, discipline.id, params) %>>
           <label for="<%= discipline.name %>"><%= discipline.name %></label>
         </div>
       <% end %>

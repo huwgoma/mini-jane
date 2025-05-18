@@ -27,7 +27,7 @@ helpers do
     erb view, layout: :admin_layout
   end
 
-  def was_checked?(group, value)
+  def was_checked?(group, value, params)
     return if params[group].nil?
 
     params[group].include?(value.to_s)
