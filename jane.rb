@@ -34,9 +34,9 @@ helpers do
     # Whether the given value (discipline id, int) is in the given object's 
     # @disciplines
     # - @disciplines.any? { discipline.id == value }
-    return if params[group].nil?
+    return if params[group_name].nil?
 
-    params[group].include?(value.to_s)
+    params[group_name].include?(value.to_s)
   end
 
   def prefill(attribute, params, object=nil)

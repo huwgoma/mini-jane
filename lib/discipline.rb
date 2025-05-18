@@ -4,4 +4,8 @@ class Discipline
   def initialize(id, name)
     @id, @name = id, name
   end
+
+  def to_s
+    name
+  end
 end

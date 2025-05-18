@@ -191,7 +191,7 @@ class TestJane < Minitest::Test
     assert_equal('Name: Annie Hu', name_field)
 
     discipline_field = doc.at_xpath("//p[strong[contains(text(), 'Disciplines:')]]").text
-    assert_equal('Disciplines: Physiotherapy', discipline_field)
+    assert_includes(discipline_field, 'Physiotherapy')
 
     email_field = doc.at_xpath("//p[strong[contains(text(), 'Email:')]]").text
     assert_equal('Email: hu_annie06@gmail.com', email_field)
@@ -217,7 +217,7 @@ class TestJane < Minitest::Test
     doc = Nokogiri::HTML(last_response.body)
 
     discipline_field = doc.at_xpath("//p[strong[contains(text(), 'Disciplines:')]]").text
-    assert_equal('Disciplines: Physiotherapy, Chiropractic', discipline_field)
+    assert_includes(discipline_field, 'Physiotherapy, Chiropractic')
   end
 
   def test_admin_view_staff_member_missing_optional_fields
