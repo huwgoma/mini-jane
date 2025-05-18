@@ -271,8 +271,53 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'Please enter a first name.')
   end
 
-  def test_admin_insert_staff_member
+  def test_admin_create_staff_member_success_all_fields_given
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT')).to_s
+    dc_id = return_id(create_discipline('Chiropractic', 'DC')).to_s
+
+    # Baseline: Empty DB
+    users_count = @storage.query("SELECT * FROM users;").ntuples
+    staff_count = @storage.query("SELECT * FROM staff;").ntuples
+    staff_disciplines_count = @storage.query("SELECT * FROM staff_disciplines").ntuples
     
+    assert_equal(0, users_count)
+    assert_equal(0, staff_count)
+    assert_equal(0, staff_disciplines_count)
+    
+    # Submit POST Request
+    post '/admin/staff/new', first_name: 'Annie', last_name: 'Hu',
+      email: 'annie@gmail.com', phone: '6479059550', biography: 'Annie!',
+      discipline_ids: [pt_id, dc_id]
+    
+    # Redirects
+    assert_equal(302, last_response.status)
+
+    # Modifies DB: Users
+    users_result = @storage.query("SELECT * FROM users;")
+    new_users_count = users_result.ntuples
+    new_user = users_result.first
+
+    assert_equal(1, new_users_count)
+    assert_equal('Annie', new_user['first_name'])
+    assert_equal('Hu', new_user['last_name'])
+    assert_equal('annie@gmail.com', new_user['email'])
+    assert_equal('6479059550', new_user['phone'])
+    
+    # Modifies DB: Staff
+    staff_result = @storage.query("SELECT * FROM staff;")
+    new_staff_count = staff_result.ntuples
+    new_staff = staff_result.first
+
+    assert_equal(1, new_staff_count)
+    assert_equal('Annie!', new_staff['biography'])
+
+    # Modifies DB: Staff Disciplines (2 - PT and DC)
+    staff_disciplines_result = @storage.query("SELECT * FROM staff_disciplines;")
+    staff_disciplines_count = staff_disciplines_result.ntuples
+    discipline_ids = staff_disciplines_result.map { |row| row['discipline_id'] }
+    
+    assert_equal(2, staff_disciplines_count)
+    assert_equal([pt_id, dc_id].sort, discipline_ids.sort)
   end
 
   private

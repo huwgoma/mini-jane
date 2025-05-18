@@ -73,7 +73,7 @@ class PGAdapter
     
     sql = "INSERT INTO staff_disciplines (staff_id, discipline_id)
            VALUES #{placeholders};"
-
+    
     query(sql, staff_id, *discipline_ids)
   end
 
