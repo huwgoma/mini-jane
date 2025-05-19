@@ -27,16 +27,12 @@ helpers do
     erb view, layout: :admin_layout
   end
 
-  def prechecked?(group_name, value, params, object=nil)
-    #binding.pry
-    # Refactor:
-    # - If params[checkbox_group_name] is nil, additionally check 
-    # Whether the given value (discipline id, int) is in the given object's 
-    # @disciplines
-    # - @disciplines.any? { discipline.id == value }
-    return if params[group_name].nil?
-
-    params[group_name].include?(value.to_s)
+  # Check if a given checkbox should be pre-checked.
+  # - Assumes the checkbox's value is the @id of some object.
+  def prechecked?(group_name, id, params, collection=[])    
+    # Check params[group_name] unless it is nil.
+    params[group_name]&.include?(id.to_s) || 
+      collection.any? { |obj| obj.id == id if obj.respond_to?(:id) }
   end
 
   def prefill(attribute, params, object=nil)
@@ -148,10 +144,9 @@ end
 # Form - Edit a specific staff member
 get '/admin/staff/:staff_id/edit/?' do
   staff_id = params[:staff_id].to_i 
-
-  @staff_member = @storage.load_staff_member(staff_id)
+  @staff_profile = @storage.load_staff_profile(staff_id)
   @disciplines = @storage.load_disciplines
-  # load staff disciplines
+
   render_with_layout(:edit_staff)
 end
 
