@@ -12,6 +12,17 @@ class PGAdapter
     connection.exec_params(sql, params)
   end
 
+  def record_exists?(table_name, id)
+    table_whitelist = schema_table_names
+    return unless table_whitelist.include?(table_name)
+
+    pk_column_name = schema_primary_key_column_name(table_name)
+    sql = "SELECT * FROM #{table_name} 
+           WHERE #{pk_column_name} = $1;"
+
+    query(sql, id).ntuples.positive?
+  end
+
   # # # # # # 
   # Schedule # 
   def load_daily_schedule(date)
@@ -69,7 +80,8 @@ class PGAdapter
     query(sql, staff_id, *discipline_ids)
   end
 
-  # Disciplines 
+  # # # # # # # #
+  # Disciplines #
   def load_disciplines
     sql = "SELECT id, name FROM disciplines;"
     result = query(sql)
@@ -89,6 +101,31 @@ class PGAdapter
     when 'test'        then 'test_jane'
     when 'development' then 'jane'
     end
+  end
+
+  # Query the names of all tables in public schema
+  def schema_table_names
+    sql = "SELECT table_name FROM information_schema.tables
+           WHERE table_schema = 'public';"
+    result = query(sql)
+
+    result.map { |row| row['table_name'] }
+  end
+
+  # Query the name of the PRIMARY KEY column 
+  def schema_primary_key_column_name(table_name)
+    sql = <<~SQL
+      SELECT DISTINCT ccu.column_name
+      FROM  information_schema.constraint_column_usage ccu
+      JOIN  information_schema.table_constraints       tc
+      ON    ccu.table_schema = tc.table_schema AND ccu.table_name = tc.table_name
+      WHERE ccu.table_schema   = 'public' AND
+            ccu.table_name     = $1       AND
+            tc.constraint_type = 'PRIMARY KEY';
+    SQL
+    result = query(sql, table_name)
+
+    result.first['column_name']
   end
 
   # # # # # # # # # # # # # #

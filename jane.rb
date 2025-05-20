@@ -54,10 +54,6 @@ not_found do
 end
 
 # Commit
-# - Refactor staff member profiles: 
-#   - Load staff profile and staff disciplines separately
-#   - Refactor formatting and implementation of Staff objects to 
-#     represent @disciplines as an array of Discipline objects
 #
 #
 ######### 
@@ -148,6 +144,29 @@ get '/admin/staff/:staff_id/edit/?' do
   @disciplines = @storage.load_disciplines
 
   render_with_layout(:edit_staff)
+end
+
+post '/admin/staff/:staff_id/edit' do
+  # Hidden input in edit staff form to pass ID?
+  staff_id = params[:staff_id]
+  first_name, last_name = params[:first_name], params[:last_name]
+
+  session[:errors].push(*edit_staff_errors(staff_id, first_name, last_name))
+end
+
+def edit_staff_errors(staff_id, first_name, last_name)
+  errors = []
+  errors.push(*new_staff_errors(first_name, last_name))
+  errors.push(*missing_staff_error(staff_id))
+  
+  # first name and last name present
+  # ID corresponds to an existing record in staff table
+end
+
+def missing_staff_error(staff_id)
+  unless @storage.record_exists?('staff', staff_id)
+    "Hmm..we couldn't find a staff member with that ID (#{staff_id})."
+  end
 end
 
 # # # # # #  
