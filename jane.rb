@@ -147,25 +147,26 @@ get '/admin/staff/:staff_id/edit/?' do
 end
 
 post '/admin/staff/:staff_id/edit' do
-  # Hidden input in edit staff form to pass ID?
   staff_id = params[:staff_id]
+  redirect_if_missing_id('staff', staff_id, '/admin/staff/')
+
   first_name, last_name = params[:first_name], params[:last_name]
+  session[:errors].push(*edit_staff_errors(first_name, last_name))
 
-  session[:errors].push(*edit_staff_errors(staff_id, first_name, last_name))
+  if session[:errors].any?
+    @staff_profile = @storage.load_staff_profile(staff_id)
+    @disciplines = @storage.load_disciplines
+
+    render_with_layout(:edit_staff)
+  else
+    # Update
+  end
 end
 
-def edit_staff_errors(staff_id, first_name, last_name)
-  errors = []
-  errors.push(*new_staff_errors(first_name, last_name))
-  errors.push(*missing_staff_error(staff_id))
-  
-  # first name and last name present
-  # ID corresponds to an existing record in staff table
-end
-
-def missing_staff_error(staff_id)
-  unless @storage.record_exists?('staff', staff_id)
-    "Hmm..we couldn't find a staff member with that ID (#{staff_id})."
+def redirect_if_missing_id(type, id, path)
+  unless @storage.record_exists?(type, id)
+    session[:errors] << "Hmm..that #{type} (id = #{id}) could not be found."
+    redirect path
   end
 end
 
@@ -173,17 +174,26 @@ end
 # Helpers #
 # # # # # #
 
-# # # # # # # # #  
-# Error Messages #
+# # # # # # # # # # # # # 
+# Error Message Setting #
+# - Errors for inserting a new staff member
 def new_staff_errors(first_name, last_name)
+  staff_name_errors(first_name, last_name)
+end
+# - Errors for updating an existing staff member 
+#   (currently identical to new_staff_errors, but may change)
+def edit_staff_errors(first_name, last_name)
+  staff_name_errors(first_name, last_name)
+end
+
+def staff_name_errors(first_name, last_name)
   errors = []
   errors << 'Please enter a first name.' if empty_string?(first_name)
   errors << 'Please enter a last name.' if empty_string?(last_name)
   errors
 end
-
 # # # # # # # #   
 # Validations #
 def empty_string?(string)
-  string.strip.empty?
+  string.to_s.strip.empty?
 end
