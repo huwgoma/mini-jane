@@ -164,7 +164,7 @@ class TestJane < Minitest::Test
     staff_names = ['Annie Hu', 'Hugo Ma', 'Kevin Ho', 'Alan Mitri']
     staff_names.each do |name|
       user_id = return_id(create_user(name))
-      create_staff_profile(user_id)
+      create_staff_member(user_id)
     end
 
     get '/admin/staff'
@@ -181,7 +181,7 @@ class TestJane < Minitest::Test
     user_id = return_id(create_user('Annie Hu', 
                                      email: 'hu_annie06@gmail.com',
                                      phone: 6476089210))
-    create_staff_profile(user_id, biography: 'Annie!')
+    create_staff_member(user_id, biography: 'Annie!')
     create_staff_discipline_association(user_id, discipline_id)
 
     get "/admin/staff/#{user_id}"
@@ -209,7 +209,7 @@ class TestJane < Minitest::Test
     user_id = return_id(create_user('Quinn Powell-Jones', 
                                      email: 'quinn@gmail.com',
                                      phone: 4167891234))
-    create_staff_profile(user_id, biography: "Hi I'm Quinn I'm a physio and chiro nice to meet you!")
+    create_staff_member(user_id, biography: "Hi I'm Quinn I'm a physio and chiro nice to meet you!")
     create_staff_discipline_association(user_id, physio_id)
     create_staff_discipline_association(user_id, chiro_id)
 
@@ -222,7 +222,7 @@ class TestJane < Minitest::Test
 
   def test_admin_view_staff_member_missing_optional_fields
     user_id = return_id(create_user('Annie Hu'))
-    create_staff_profile(user_id)
+    create_staff_member(user_id)
 
     get "/admin/staff/#{user_id}"
     doc = Nokogiri::HTML(last_response.body)
@@ -323,7 +323,7 @@ class TestJane < Minitest::Test
   def test_admin_edit_staff_member_empty_or_missing_name_error
     # Create a staff member
     user_id = return_id(create_user('Phil Genesis'))
-    create_staff_profile(user_id)
+    create_staff_member(user_id)
     
     # Edit the staff member (without names)
     post "/admin/staff/#{user_id}/edit", first_name: ' ', last_name: nil
@@ -334,7 +334,7 @@ class TestJane < Minitest::Test
 
   def test_admin_edit_staff_nonexistent_record_error_redirects
     user_id = return_id(create_user('Phil Genesis'))
-    create_staff_profile(user_id)
+    create_staff_member(user_id)
     bad_user_id = user_id + 1
     
     post "/admin/staff/#{bad_user_id}/edit", first_name: 'Phillip', last_name: 'Genesis'
@@ -353,7 +353,7 @@ class TestJane < Minitest::Test
   # Create an appointment along with any necessary join data
   def create_appointment_cascade(staff:, patient:, discipline:, treatment:, datetime:)
     staff_id = staff[:id]     || return_id(create_user(staff[:name]))
-    create_staff_profile(staff_id) if staff[:create_profile]
+    create_staff_member(staff_id) if staff[:create_profile]
   
     patient_id = patient[:id] || return_id(create_user(patient[:name]))
     create_patient_profile(patient_id) if patient[:create_profile]
@@ -393,7 +393,7 @@ class TestJane < Minitest::Test
   end
 
   # Create a dummy profile (staff/patient)
-  def create_staff_profile(user_id, biography: nil)
+  def create_staff_member(user_id, biography: nil)
     sql = "INSERT INTO staff VALUES ($1, $2) RETURNING *;"
     @storage.query(sql, user_id, biography)
   end

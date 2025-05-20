@@ -114,7 +114,7 @@ post '/admin/staff/new/?' do
                 params[:first_name], params[:last_name], 
                 params[:email], params[:phone])
 
-    @storage.create_staff_profile(user_id, params[:biography])
+    @storage.create_staff_member(user_id, params[:biography])
     @storage.add_staff_disciplines(user_id, params[:discipline_ids])
 
     redirect "/admin/staff/#{user_id}"

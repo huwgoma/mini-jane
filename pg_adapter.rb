@@ -44,7 +44,7 @@ class PGAdapter
 
   # # # # #
   # Staff #
-  def create_staff_profile(user_id, biography)
+  def create_staff_member(user_id, biography)
     sql = "INSERT INTO staff(user_id, biography)
            VALUES($1, $2);"
     query(sql, user_id, biography)
