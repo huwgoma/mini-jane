@@ -320,6 +320,30 @@ class TestJane < Minitest::Test
     assert_equal([pt_id, dc_id].sort, discipline_ids.sort)
   end
 
+  def test_admin_edit_staff_member_empty_or_missing_name_error
+    # Create a staff member
+    user_id = return_id(create_user('Phil Genesis'))
+    create_staff_profile(user_id)
+    
+    # Edit the staff member (without names)
+    post "/admin/staff/#{user_id}/edit", first_name: ' ', last_name: nil
+
+    assert_includes(last_response.body, 'Please enter a first name.')
+    assert_includes(last_response.body, 'Please enter a last name.')
+  end
+
+  def test_admin_edit_staff_nonexistent_record_error_redirects
+    user_id = return_id(create_user('Phil Genesis'))
+    create_staff_profile(user_id)
+    bad_user_id = user_id + 1
+    
+    post "/admin/staff/#{bad_user_id}/edit", first_name: 'Phillip', last_name: 'Genesis'
+    # Follow the redirect
+    get last_response['location']
+
+    assert_includes(last_response.body, "(id = #{bad_user_id}) could not be found.")
+  end
+
   private
 
   #################################################
