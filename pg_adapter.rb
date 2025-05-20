@@ -60,10 +60,12 @@ class PGAdapter
   end
 
   def load_staff_profile(staff_id)
-    staff_result = load_staff_member(staff_id)
+    staff = load_staff_member(staff_id).first
+    return if staff.nil?
+    
     staff_disciplines_result = load_disciplines_by_staff(staff_id)
     
-    format_staff_profile(staff_result.first, staff_disciplines_result)
+    format_staff_profile(staff, staff_disciplines_result)
   end
 
   def add_staff_disciplines(staff_id, discipline_ids)
