@@ -50,12 +50,12 @@ class PGAdapter
   end
 
   def load_all_staff
-    sql = "SELECT staff.user_id, users.first_name, users.last_name 
+    sql = "SELECT users.id, users.first_name, users.last_name 
            FROM users JOIN staff ON users.id = staff.user_id
            ORDER BY first_name, last_name, user_id;"
     result = query(sql)
 
-    result.map { |staff| format_staff_listing(staff) }
+    result.map { |staff| format_user_listing(staff, staff: true) }
   end
 
   def load_staff_profile(staff_id)
@@ -227,9 +227,8 @@ class PGAdapter
 
     query(sql, user_id, biography)
   end
-  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
   # Formatting Methods (PG::Result -> Application Format) #
-  # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   def format_daily_schedule(practitioners, appointments)
     appointments_by_staff_id = format_appointments_by_staff_id(appointments)
     schedule = format_practitioners_by_discipline(practitioners, appointments_by_staff_id)
@@ -267,19 +266,12 @@ class PGAdapter
     end
   end
 
-  def format_user(user)
+  def format_user_listing(user, staff: false)
     id = user['id'].to_i
     first_name, last_name = user['first_name'], user['last_name']
-    email, phone = user['email'], user['phone']
-
-    User.new(id, first_name, last_name, email: email, phone: phone)
-  end
-
-  def format_staff_listing(staff)
-    id = staff['user_id'].to_i
-    first_name, last_name = staff['first_name'], staff['last_name']
-  
-    Staff.new(id, first_name, last_name)
+    type = staff ? Staff : Patient
+    
+    type.new(id, first_name, last_name)
   end
 
   def format_staff_profile(staff, disciplines)
