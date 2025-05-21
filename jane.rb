@@ -173,7 +173,7 @@ end
 
 # Delete a specific staff member
 post '/admin/staff/:staff_id/delete' do
-  binding.pry
+  # 
 end
 
 # # # # # #  
