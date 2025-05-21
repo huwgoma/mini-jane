@@ -71,10 +71,8 @@ end
 # - Flesh out schedule 
 # - Delete cascade - appointments
 
-# # # # # # # # # # 
-# Admin - Schedule # 
-# # # # # # # # # # 
 
+# # Admin - Schedule # #
 # Redirect Date (Pretty Date URL)
 get '/admin/schedule/redirect' do
   redirect "/admin/schedule/#{params[:date]}"
@@ -89,10 +87,7 @@ get '/admin/schedule/?:date?/?' do
   render_with_layout(:schedule)
 end
 
-# # # # # # # # # 
-# Admin - Staff # 
-# # # # # # # # # 
-
+# # Admin - Staff # #
 # Form - Create new staff member
 get '/admin/staff/new/?' do
   @disciplines = @storage.load_disciplines
@@ -133,7 +128,7 @@ end
 get '/admin/staff/:staff_id/?' do
   staff_id = params[:staff_id].to_i
   redirect_if_missing_id('staff', staff_id, '/admin/staff')
-  
+
   @staff_profile = @storage.load_staff_profile(staff_id)
 
   render_with_layout(:staff)
@@ -186,16 +181,17 @@ post '/admin/staff/:staff_id/delete' do
   redirect '/admin/staff'
 end
 
-# # # # # #  
+# # Admin - Patients # #
+
+
 # Helpers #
-# # # # # #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)
     session[:errors] << "Hmm..that #{type} (id = #{id}) could not be found."
     redirect path
   end
 end
-# # # # # # # # # # # # # 
+
 # Error Message Setting #
 # - Errors for inserting a new staff member
 def new_staff_errors(first_name, last_name)
@@ -213,7 +209,7 @@ def staff_name_errors(first_name, last_name)
   errors << 'Please enter a last name.' if empty_string?(last_name)
   errors
 end
-# # # # # # # #   
+  
 # Validations #
 def empty_string?(string)
   string.to_s.strip.empty?

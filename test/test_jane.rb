@@ -410,6 +410,31 @@ class TestJane < Minitest::Test
     assert_equal('Name: Annie Hu', name_field)
   end
 
+  def test_admin_delete_staff_success_delete_cascades
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    user_id = return_id(create_user('Phil Genesis'))
+    create_staff_member(user_id)
+    create_staff_discipline_associations(user_id, pt_id)
+
+    user = @storage.query("SELECT * FROM users WHERE id = $1", user_id).first
+    staff = @storage.query("SELECT * FROM staff WHERE user_id = $1", user_id).first
+    sd = @storage.query("SELECT * FROM staff_disciplines WHERE staff_id = $1", user_id).first
+    
+    refute_nil(user)
+    refute_nil(staff)
+    refute_nil(sd)
+
+    post "/admin/staff/#{user_id}/delete"
+
+    user = @storage.query("SELECT * FROM users WHERE id = $1", user_id).first
+    staff = @storage.query("SELECT * FROM staff WHERE user_id = $1", user_id).first
+    sd = @storage.query("SELECT * FROM staff_disciplines WHERE staff_id = $1", user_id).first
+    
+    assert_nil(user)
+    assert_nil(staff)
+    assert_nil(sd)
+  end
+
   private
 
   # Helpers for generating test data before tests #
