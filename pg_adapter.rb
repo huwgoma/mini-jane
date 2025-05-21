@@ -103,7 +103,13 @@ class PGAdapter
   end
   
   # Patients # 
-  
+  def load_all_patients
+    sql = "SELECT users.id, users.first_name, users.last_name 
+           FROM users JOIN patients ON users.id = patients.user_id;"
+    result = query(sql)
+
+    result.map { |patient| format_user_listing(patient) }
+  end
 
   # Disciplines #
   def load_disciplines

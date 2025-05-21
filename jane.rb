@@ -181,12 +181,22 @@ post '/admin/staff/:staff_id/delete' do
 end
 
 # # Admin - Patients # #
+# View all patients
 get '/admin/patients' do
   # Commit: 
-  # - Update admin_layout.erb's patient link -> /admin/patients
   # - Build application route for /admin/patients
   # - Build PG Adapter load_patients
   # - Build view for /admin/patients
+  @patients = @storage.load_all_patients
+
+  render_with_layout(:all_patients)
+end
+
+# View a specific patient profile
+get '/admin/patients/:patient_id' do
+  patient_id = params[:patient_id]
+  
+  @patient_profile
 end
 
 # Helpers #

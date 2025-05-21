@@ -14,8 +14,10 @@ class User
 end
 
 class Patient < User
-  def initialize(id, first_name, email: nil, phone: nil, birthday: nil)
-    super(id, first_name, email: email, phone: phone)
+  def initialize(id, first_name, last_name, 
+                 email: nil, phone: nil, birthday: nil)
+    super(id, first_name, last_name, 
+          email: email, phone: phone)
 
     @birthday = birthday
   end
