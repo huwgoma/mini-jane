@@ -87,22 +87,21 @@ class PGAdapter
   def update_staff_profile(id, first_name, last_name, 
                            email, phone, biography, discipline_ids)
     update_user(id, first_name, last_name, email, phone)
-    #update_staff_member(id, biography)
-
+    update_staff_member(id, biography)
+    
     # update staff disciplines for the given staff
   end
 
   # private
-  def update_user(id, first_name, last_name, email, phone)
+  def update_staff_member(id, biography)
     sql = <<~SQL
-      UPDATE users
-      SET first_name = $2, last_name = $3,
-          email = $4, phone = $5
-      WHERE id = $1;
+      UPDATE staff
+      SET biography = $2
+      WHERE user_id = $1;
     SQL
 
-    query(sql, id, first_name, last_name, email, phone)
-  end
+    query(sql, id, biography)
+  end  
 
 
   # # # # # # # #
@@ -153,8 +152,8 @@ class PGAdapter
     result.first['column_name']
   end
 
-  # # # # # # # # # # # # # #
-  # Private Loading Methods #
+  # # # # # # # # # # # 
+  # Private DB Methods #
   # 
   # Schedule # 
   def load_scheduled_practitioners
@@ -186,6 +185,18 @@ class PGAdapter
       ORDER BY appts.datetime;
     SQL
     query(sql, date)
+  end
+
+  # Users 
+  def update_user(id, first_name, last_name, email, phone)
+    sql = <<~SQL
+      UPDATE users
+      SET first_name = $2, last_name = $3,
+          email = $4, phone = $5
+      WHERE id = $1;
+    SQL
+
+    query(sql, id, first_name, last_name, email, phone)
   end
 
   # Staff Profile
