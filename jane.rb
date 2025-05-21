@@ -132,6 +132,8 @@ end
 # View a specific staff profile
 get '/admin/staff/:staff_id/?' do
   staff_id = params[:staff_id].to_i
+  redirect_if_missing_id('staff', staff_id, '/admin/staff')
+  
   @staff_profile = @storage.load_staff_profile(staff_id)
 
   render_with_layout(:staff)
