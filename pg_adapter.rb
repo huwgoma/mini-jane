@@ -31,7 +31,6 @@ class PGAdapter
     format_daily_schedule(practitioners, appointments)
   end
 
-  # # # # # 
   # Users #
   def create_user_return_id(first_name, last_name, email, phone)
     sql = "INSERT INTO users(first_name, last_name, email, phone)
@@ -103,6 +102,9 @@ class PGAdapter
     add_staff_disciplines(staff_id, discipline_ids)
   end
   
+  # Patients # 
+  
+
   # Disciplines #
   def load_disciplines
     sql = "SELECT id, name FROM disciplines;"

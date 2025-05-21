@@ -59,7 +59,6 @@ end
 ######### 
 # To Do #
 #########
-# - Guard against staff nil access patterns
 #  
 # - Clear DB ONCE before test suite
 # 
@@ -182,7 +181,13 @@ post '/admin/staff/:staff_id/delete' do
 end
 
 # # Admin - Patients # #
-
+get '/admin/patients' do
+  # Commit: 
+  # - Update admin_layout.erb's patient link -> /admin/patients
+  # - Build application route for /admin/patients
+  # - Build PG Adapter load_patients
+  # - Build view for /admin/patients
+end
 
 # Helpers #
 def redirect_if_missing_id(type, id, path)
