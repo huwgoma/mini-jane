@@ -157,9 +157,7 @@ class TestJane < Minitest::Test
     end
   end
 
-  ##############
   # Staff CRUD #
-  ##############
   def test_admin_view_all_staff
     staff_names = ['Annie Hu', 'Hugo Ma', 'Kevin Ho', 'Alan Mitri']
     staff_names.each do |name|
@@ -398,6 +396,20 @@ class TestJane < Minitest::Test
 
     assert_equal(2, new_discipline_ids.size)
     assert_equal([pt_id, mt_id].sort, new_discipline_ids.sort)
+  end
+
+  def test_admin_edit_staff_success_redirects_to_staff_profile
+    user_id = return_id(create_user('Annie Hu'))
+    create_staff_member(user_id)
+
+    post "/admin/staff/#{user_id}/edit", first_name: 'Annie', last_name: 'Hu'
+
+    assert_equal(302, last_response.status)
+    get last_response['location']
+    doc = Nokogiri::HTML(last_response.body)
+
+    name_field = doc.at_xpath("//p[strong[contains(text(), 'Name:')]]").text
+    assert_equal('Name: Annie Hu', name_field)
   end
 
   private
