@@ -195,6 +195,7 @@ end
 # View a specific patient profile
 get '/admin/patients/:patient_id' do
   patient_id = params[:patient_id]
+  redirect_if_missing_id('patients', patient_id, '/admin/patients')
   
   @patient_profile
 end

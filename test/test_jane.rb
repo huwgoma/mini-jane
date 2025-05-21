@@ -445,6 +445,15 @@ class TestJane < Minitest::Test
     assert_includes(last_response['location'], '/admin/staff')
   end
 
+  # # Patients CRUD # # 
+  def test_admin_view_patient_redirects_nonexistent_id
+    bad_id = 5
+    get "/admin/patients/#{bad_id}"
+
+    assert_equal(302, last_response.status)
+    assert_includes(last_response['location'], '/admin/patients')
+  end
+
   private
 
   # Helpers for generating test data before tests #
