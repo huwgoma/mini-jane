@@ -450,9 +450,13 @@ class TestJane < Minitest::Test
   end
 
   # Create a staff-discipline M-M association
-  def create_staff_discipline_association(staff_id, discipline_id)
+  def create_staff_discipline_association(staff_id, *discipline_ids)
+    placeholders = discipline_ids.map.with_index do |id, index|
+      "($1, $#{index + 2})"
+    end.join(', ')
+
     sql = "INSERT INTO staff_disciplines (staff_id, discipline_id)
-           VALUES($1, $2);"
-    @storage.query(sql, staff_id, discipline_id)
+           VALUES #{placeholders};"
+    @storage.query(sql, staff_id, *discipline_ids)
   end
 end
