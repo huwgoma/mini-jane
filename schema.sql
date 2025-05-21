@@ -17,7 +17,7 @@ CREATE TABLE users (
   last_name   varchar(255) NOT NULL,
   email       varchar(50),
   phone       varchar(50)
-  -- Login Info
+  -- Login Info?
 );
 
 CREATE TABLE patients (

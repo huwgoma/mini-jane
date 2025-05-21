@@ -14,6 +14,10 @@
       <a href="/admin/staff">Staff</a>
       <a href="">Settings</a>
     </header>
+
+    <% if session[:success] %>
+      <div><%= session.delete(:success) %></div>
+    <% end %>
     
     <% if session[:errors].any? %>
       <div>

@@ -59,17 +59,17 @@ end
 ######### 
 # To Do #
 #########
-# - Clear DB ONCE before test suite
+# - Guard against staff nil access patterns
 #  
-# - CRUD for staff
-# - Revisit nils (specifically - how optional fields are represented in schema)
+# - Clear DB ONCE before test suite
+# 
 # 
 # - CRUD for patients
 # - CRUD for appointments
 # - CRUD for disciplines
 # - CRUD for treatments
 # - Flesh out schedule 
-
+# - Delete cascade - appointments
 
 # # # # # # # # # # 
 # Admin - Schedule # 
@@ -173,7 +173,15 @@ end
 
 # Delete a specific staff member
 post '/admin/staff/:staff_id/delete' do
-  # 
+  staff_id = params[:staff_id]
+  redirect_if_missing_id('staff', staff_id, '/admin/staff')
+
+  deleted = @storage.delete_staff_member(staff_id).first
+  # Validate from DB (appts)
+  name = "#{deleted['first_name']} #{deleted['last_name']}"
+  session[:success] = "Staff member #{name} successfully deleted."
+
+  redirect '/admin/staff'
 end
 
 # # # # # #  

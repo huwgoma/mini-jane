@@ -90,6 +90,12 @@ class PGAdapter
     overwrite_staff_disciplines(staff_id, discipline_ids)
   end
 
+  def delete_staff_member(staff_id)
+    # Cascades to staff -> staff_disciplines & appointments
+    sql = "DELETE FROM users WHERE id = $1 RETURNING *;"
+    query(sql, staff_id)
+  end
+
   def overwrite_staff_disciplines(staff_id, discipline_ids)
     delete_sql = "DELETE FROM staff_disciplines WHERE staff_id = $1;"
     query(delete_sql, staff_id)
