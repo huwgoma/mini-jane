@@ -1,6 +1,12 @@
 <%# Form for Editing a Staff Member %>
 <h2>Edit Staff Member - <%= @staff_profile.full_name %></h2>
 
+<%# Delete %>
+<form action="/admin/staff/<%= @staff_profile.id %>/delete" method="post">
+  <button type="submit">Delete Staff Member</button>
+</form>
+
+<%# Edit %>
 <form action="/admin/staff/<%= @staff_profile.id %>/edit" method="post">
   <div class="name-form">
     <div>

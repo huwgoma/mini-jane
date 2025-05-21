@@ -23,7 +23,6 @@ class PGAdapter
     query(sql, id).ntuples.positive?
   end
 
-  # # # # # # 
   # Schedule # 
   def load_daily_schedule(date)
     practitioners = load_scheduled_practitioners
@@ -42,7 +41,6 @@ class PGAdapter
     result.first['id'].to_i
   end
 
-  # # # # #
   # Staff #
   # - Member: Refers to the actual staff table
   # - Profile: Refers to a staff member + related users/disciplines
@@ -99,9 +97,6 @@ class PGAdapter
     add_staff_disciplines(staff_id, discipline_ids)
   end
   
-
-
-  # # # # # # # #
   # Disciplines #
   def load_disciplines
     sql = "SELECT id, name FROM disciplines;"

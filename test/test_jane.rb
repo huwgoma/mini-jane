@@ -30,9 +30,7 @@ class TestJane < Minitest::Test
     @storage.query("TRUNCATE disciplines RESTART IDENTITY CASCADE;")
   end
   
-  #######################
   # Admin Schedule Page #
-  ####################### 
   def test_empty_admin_schedule_default_today
     get '/admin/schedule/'
 
@@ -414,9 +412,7 @@ class TestJane < Minitest::Test
 
   private
 
-  #################################################
   # Helpers for generating test data before tests #
-  #################################################
   # Create an appointment along with any necessary join data
   def create_appointment_cascade(staff:, patient:, discipline:, treatment:, datetime:)
     staff_id = staff[:id]     || return_id(create_user(staff[:name]))
