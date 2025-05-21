@@ -149,10 +149,10 @@ end
 post '/admin/staff/:staff_id/edit' do
   staff_id = params[:staff_id]
   redirect_if_missing_id('staff', staff_id, '/admin/staff/')
-
+  
   first_name, last_name = params[:first_name], params[:last_name]
   session[:errors].push(*edit_staff_errors(first_name, last_name))
-
+  
   if session[:errors].any?
     @staff_profile = @storage.load_staff_profile(staff_id)
     @disciplines = @storage.load_disciplines
@@ -161,10 +161,10 @@ post '/admin/staff/:staff_id/edit' do
   else
     email, phone, biography = params[:email], params[:phone], params[:biography]
     discipline_ids = params[:discipline_ids].to_a
-    # Update staff/user fields
-    # Add/remove records from staff_disciplines appropriately
+
     @storage.update_staff_profile(staff_id, first_name, last_name, 
-                                  email, phone, biography, discipline_ids)
+                                  email: email, phone: phone, biography: biography,
+                                  discipline_ids: discipline_ids)
   end
 end
 

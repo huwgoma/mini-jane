@@ -85,22 +85,23 @@ class PGAdapter
   end
 
   def update_staff_profile(id, first_name, last_name, 
-                           email, phone, biography, discipline_ids)
+                           email: nil, phone: nil, biography: nil, 
+                           discipline_ids: [])
     update_user(id, first_name, last_name, email, phone)
     update_staff_member(id, biography)
-    
+
     # update staff disciplines for the given staff
   end
 
   # private
-  def update_staff_member(id, biography)
+  def update_staff_member(user_id, biography)
     sql = <<~SQL
       UPDATE staff
       SET biography = $2
       WHERE user_id = $1;
     SQL
 
-    query(sql, id, biography)
+    query(sql, user_id, biography)
   end  
 
 

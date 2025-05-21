@@ -344,7 +344,7 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, "(id = #{bad_user_id}) could not be found.")
   end
 
-  def test_admin_edit_staff_updates_users
+  def test_admin_edit_staff_updates_users_record
     user_id = return_id(create_user('Anie H', email: 'hu_annie@gmail.com'))
     create_staff_member(user_id)
     user = @storage.query("SELECT * FROM users WHERE id = $1", user_id).first
@@ -353,13 +353,28 @@ class TestJane < Minitest::Test
     assert_equal('H', user['last_name'])
     assert_equal('hu_annie@gmail.com', user['email'])
     
-    post "/admin/staff/#{user_id}/edit", first_name: 'Annie', last_name: 'Hu', email: 'hu_annie06@gmail.com'
+    post "/admin/staff/#{user_id}/edit", 
+      first_name: 'Annie', last_name: 'Hu', email: 'hu_annie06@gmail.com'
     
     updated_user = @storage.query("SELECT * FROM users WHERE id = $1", user_id).first
 
     assert_equal('Annie', updated_user['first_name'])
     assert_equal('Hu', updated_user['last_name'])
     assert_equal('hu_annie06@gmail.com', updated_user['email'])
+  end
+
+  def test_admin_edit_staff_updates_staff_record
+    user_id = return_id(create_user('Annie Hu'))
+    create_staff_member(user_id, biography: 'placeholder bio')
+    staff = @storage.query("SELECT * FROM staff WHERE user_id = $1", user_id).first
+
+    assert_equal('placeholder bio', staff['biography'])
+    
+    post "/admin/staff/#{user_id}/edit", 
+      first_name: 'Annie', last_name: 'Hu', biography: 'New biography!'
+
+    updated_staff = @storage.query("SELECT * FROM staff WHERE user_id = $1", user_id).first
+    assert_equal('New biography!', updated_staff['biography'])
   end
 
   private
