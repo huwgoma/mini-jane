@@ -84,25 +84,21 @@ class PGAdapter
     query(sql, staff_id, *discipline_ids)
   end
 
-  def update_staff_profile(id, first_name, last_name, 
+  def update_staff_profile(staff_id, first_name, last_name, 
                            email: nil, phone: nil, biography: nil, 
                            discipline_ids: [])
-    update_user(id, first_name, last_name, email, phone)
-    update_staff_member(id, biography)
-
-    # update staff disciplines for the given staff
+    update_user(staff_id, first_name, last_name, email, phone)
+    update_staff_member(staff_id, biography)
+    overwrite_staff_disciplines(staff_id, discipline_ids)
   end
 
-  # private
-  def update_staff_member(user_id, biography)
-    sql = <<~SQL
-      UPDATE staff
-      SET biography = $2
-      WHERE user_id = $1;
-    SQL
+  def overwrite_staff_disciplines(staff_id, discipline_ids)
+    delete_sql = "DELETE FROM staff_disciplines WHERE staff_id = $1;"
+    query(delete_sql, staff_id)
 
-    query(sql, user_id, biography)
-  end  
+    add_staff_disciplines(staff_id, discipline_ids)
+  end
+  
 
 
   # # # # # # # #
@@ -219,6 +215,15 @@ class PGAdapter
     query(sql, staff_id)
   end
 
+  def update_staff_member(user_id, biography)
+    sql = <<~SQL
+      UPDATE staff
+      SET biography = $2
+      WHERE user_id = $1;
+    SQL
+
+    query(sql, user_id, biography)
+  end
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
   # Formatting Methods (PG::Result -> Application Format) #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

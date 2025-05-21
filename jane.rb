@@ -165,6 +165,8 @@ post '/admin/staff/:staff_id/edit' do
     @storage.update_staff_profile(staff_id, first_name, last_name, 
                                   email: email, phone: phone, biography: biography,
                                   discipline_ids: discipline_ids)
+                                  binding.pry
+    # Redirect to staff profile again
   end
 end
 
