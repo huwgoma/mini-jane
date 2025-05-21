@@ -146,6 +146,7 @@ get '/admin/staff/:staff_id/edit/?' do
   render_with_layout(:edit_staff)
 end
 
+# Edit a specific staff member
 post '/admin/staff/:staff_id/edit' do
   staff_id = params[:staff_id]
   redirect_if_missing_id('staff', staff_id, '/admin/staff/')
