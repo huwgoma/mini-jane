@@ -182,7 +182,7 @@ class TestJane < Minitest::Test
                                      email: 'hu_annie06@gmail.com',
                                      phone: 6476089210))
     create_staff_member(user_id, biography: 'Annie!')
-    create_staff_discipline_association(user_id, discipline_id)
+    create_staff_discipline_associations(user_id, discipline_id)
 
     get "/admin/staff/#{user_id}"
     doc = Nokogiri::HTML(last_response.body)
@@ -210,8 +210,7 @@ class TestJane < Minitest::Test
                                      email: 'quinn@gmail.com',
                                      phone: 4167891234))
     create_staff_member(user_id, biography: "Hi I'm Quinn I'm a physio and chiro nice to meet you!")
-    create_staff_discipline_association(user_id, physio_id)
-    create_staff_discipline_association(user_id, chiro_id)
+    create_staff_discipline_associations(user_id, physio_id, chiro_id)
 
     get "/admin/staff/#{user_id}"
     doc = Nokogiri::HTML(last_response.body)
@@ -377,6 +376,30 @@ class TestJane < Minitest::Test
     assert_equal('New biography!', updated_staff['biography'])
   end
 
+  def test_admin_edit_staff_overwrites_staff_disciplines_records
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT')).to_s
+    mt_id = return_id(create_discipline('Massage Therapy', 'MT')).to_s
+    dc_id = return_id(create_discipline('Chiropractic', 'DC')).to_s
+    user_id = return_id(create_user('Annie Hu'))
+    create_staff_member(user_id)
+    create_staff_discipline_associations(user_id, pt_id, dc_id)
+
+    sd = @storage.query("SELECT * FROM staff_disciplines WHERE staff_id = $1", user_id)
+    discipline_ids = sd.map { |row| row['discipline_id'] }
+    
+    assert_equal(2, discipline_ids.size)
+    assert_equal([pt_id, dc_id].sort, discipline_ids.sort)
+
+    post "/admin/staff/#{user_id}/edit", first_name: 'Annie', last_name: 'Hu',
+      discipline_ids: [pt_id, mt_id]
+
+    sd = @storage.query("SELECT * FROM staff_disciplines WHERE staff_id = $1", user_id)
+    new_discipline_ids = sd.map { |row| row['discipline_id'] }
+
+    assert_equal(2, new_discipline_ids.size)
+    assert_equal([pt_id, mt_id].sort, new_discipline_ids.sort)
+  end
+
   private
 
   #################################################
@@ -392,7 +415,7 @@ class TestJane < Minitest::Test
 
     discipline_id = discipline[:id] || return_id(create_discipline(discipline[:name], discipline[:title]))
   
-    create_staff_discipline_association(staff_id, discipline_id) unless staff[:id] && discipline[:id]
+    create_staff_discipline_associations(staff_id, discipline_id) unless staff[:id] && discipline[:id]
     
     treatment_id = treatment[:id]   || return_id(create_treatment(treatment[:name], discipline_id, 
                                                                   treatment[:length], treatment[:price]))
@@ -450,7 +473,7 @@ class TestJane < Minitest::Test
   end
 
   # Create a staff-discipline M-M association
-  def create_staff_discipline_association(staff_id, *discipline_ids)
+  def create_staff_discipline_associations(staff_id, *discipline_ids)
     placeholders = discipline_ids.map.with_index do |id, index|
       "($1, $#{index + 2})"
     end.join(', ')
