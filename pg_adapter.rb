@@ -44,6 +44,8 @@ class PGAdapter
 
   # # # # #
   # Staff #
+  # - Member: Refers to the actual staff table
+  # - Profile: Refers to a staff member + related users/disciplines
   def create_staff_member(user_id, biography)
     sql = "INSERT INTO staff(user_id, biography)
            VALUES($1, $2);"
@@ -80,6 +82,27 @@ class PGAdapter
            VALUES #{placeholders};"
     
     query(sql, staff_id, *discipline_ids)
+  end
+
+  def update_staff_profile(id, first_name, last_name, 
+                           email, phone, biography, discipline_ids)
+    update_user(id, first_name, last_name, email, phone)
+    
+    update_staff_member(id, biography)
+    
+    # update staff disciplines for the given staff
+  end
+
+  # private
+  def update_user(id, first_name, last_name, email, phone)
+    sql = <<~SQL
+      UPDATE users
+      SET first_name = $2, last_name = $3,
+          email = $4, phone = $5
+      WHERE id = $1;
+    SQL
+
+    query(sql, id, first_name, last_name, email, phone)
   end
 
   # # # # # # # #

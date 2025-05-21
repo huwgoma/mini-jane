@@ -159,21 +159,26 @@ post '/admin/staff/:staff_id/edit' do
 
     render_with_layout(:edit_staff)
   else
-    # Update
+    email, phone, biography = params[:email], params[:phone], params[:biography]
+    discipline_ids = params[:discipline_ids].to_a
+    
+    # Update staff/user fields
+    # Add/remove records from staff_disciplines appropriately
+    @storage.update_staff_profile(staff_id, first_name, last_name, 
+                                  email, phone, biography, discipline_ids)
   end
 end
 
+
+# # # # # #  
+# Helpers #
+# # # # # #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)
     session[:errors] << "Hmm..that #{type} (id = #{id}) could not be found."
     redirect path
   end
 end
-
-# # # # # #  
-# Helpers #
-# # # # # #
-
 # # # # # # # # # # # # # 
 # Error Message Setting #
 # - Errors for inserting a new staff member
