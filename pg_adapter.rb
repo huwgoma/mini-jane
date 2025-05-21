@@ -87,9 +87,8 @@ class PGAdapter
   def update_staff_profile(id, first_name, last_name, 
                            email, phone, biography, discipline_ids)
     update_user(id, first_name, last_name, email, phone)
-    
-    update_staff_member(id, biography)
-    
+    #update_staff_member(id, biography)
+
     # update staff disciplines for the given staff
   end
 
@@ -104,6 +103,7 @@ class PGAdapter
 
     query(sql, id, first_name, last_name, email, phone)
   end
+
 
   # # # # # # # #
   # Disciplines #

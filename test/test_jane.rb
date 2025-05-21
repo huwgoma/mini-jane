@@ -172,7 +172,7 @@ class TestJane < Minitest::Test
     staff_listings = doc.css('ul.staff-list > li').map(&:text)
 
     # Assert there is an <li> element for each name in /staff
-    assert_equal(staff_names.size, staff_listings.size)
+    assert_equal(staff_listings.size, staff_names.size)
     staff_names.each { |name| staff_listings.join.include?(name) }
   end
 
@@ -344,12 +344,29 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, "(id = #{bad_user_id}) could not be found.")
   end
 
+  def test_admin_edit_staff_updates_users
+    user_id = return_id(create_user('Anie H', email: 'hu_annie@gmail.com'))
+    create_staff_member(user_id)
+    user = @storage.query("SELECT * FROM users WHERE id = $1", user_id).first
+    
+    assert_equal('Anie', user['first_name'])
+    assert_equal('H', user['last_name'])
+    assert_equal('hu_annie@gmail.com', user['email'])
+    
+    post "/admin/staff/#{user_id}/edit", first_name: 'Annie', last_name: 'Hu', email: 'hu_annie06@gmail.com'
+    
+    updated_user = @storage.query("SELECT * FROM users WHERE id = $1", user_id).first
+
+    assert_equal('Annie', updated_user['first_name'])
+    assert_equal('Hu', updated_user['last_name'])
+    assert_equal('hu_annie06@gmail.com', updated_user['email'])
+  end
+
   private
 
   #################################################
   # Helpers for generating test data before tests #
   #################################################
-  
   # Create an appointment along with any necessary join data
   def create_appointment_cascade(staff:, patient:, discipline:, treatment:, datetime:)
     staff_id = staff[:id]     || return_id(create_user(staff[:name]))

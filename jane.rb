@@ -161,7 +161,6 @@ post '/admin/staff/:staff_id/edit' do
   else
     email, phone, biography = params[:email], params[:phone], params[:biography]
     discipline_ids = params[:discipline_ids].to_a
-    
     # Update staff/user fields
     # Add/remove records from staff_disciplines appropriately
     @storage.update_staff_profile(staff_id, first_name, last_name, 
