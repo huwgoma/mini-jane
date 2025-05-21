@@ -435,6 +435,16 @@ class TestJane < Minitest::Test
     assert_nil(sd)
   end
 
+  def test_admin_delete_staff_redirects_to_staff
+    user_id = return_id(create_user('Phil Genesis'))
+    create_staff_member(user_id)
+
+    post "/admin/staff/#{user_id}/delete"
+    
+    assert_equal(302, last_response.status)
+    assert_includes(last_response['location'], '/admin/staff')
+  end
+
   private
 
   # Helpers for generating test data before tests #
