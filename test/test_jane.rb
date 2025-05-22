@@ -583,6 +583,13 @@ class TestJane < Minitest::Test
     # Redirects to patient page  
   end
 
+  def test_admin_create_patient_empty_or_missing_name_error
+    post '/admin/patients/new', first_name: ' '
+
+    assert_includes(last_response.body, 'Please enter a first name.')
+    assert_includes(last_response.body, 'Please enter a last name.')
+  end
+
   private
 
   # Helpers for generating test data before tests #
