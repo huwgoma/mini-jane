@@ -578,6 +578,11 @@ class TestJane < Minitest::Test
     assert_nil(age_field)
   end
 
+  def test_admin_create_patient_success
+    # Creates a user and patient record in DB
+    # Redirects to patient page  
+  end
+
   private
 
   # Helpers for generating test data before tests #

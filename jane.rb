@@ -193,6 +193,18 @@ get '/admin/patients/new' do
   render_with_layout(:new_patient)
 end
 
+# Create a new patient.
+post '/admin/patients/new' do
+  first_name, last_name = params[:first_name], params[:last_name]
+  session[:errors].push(*new_staff_errors(first_name, last_name))
+
+  if session[:errors].any?
+    render_with_layout(:new_patient)
+  else
+    # create + redirect
+  end
+end
+
 # View a specific patient profile
 get '/admin/patients/:patient_id' do
   patient_id = params[:patient_id]
@@ -203,6 +215,7 @@ get '/admin/patients/:patient_id' do
   render_with_layout(:patient)
 end
 
+# private
 
 
 # Helpers #
@@ -216,15 +229,20 @@ end
 # Error Message Setting #
 # - Errors for inserting a new staff member
 def new_staff_errors(first_name, last_name)
-  staff_name_errors(first_name, last_name)
+  name_errors(first_name, last_name)
 end
 # - Errors for updating an existing staff member 
 #   (currently identical to new_staff_errors, but may change)
 def edit_staff_errors(first_name, last_name)
-  staff_name_errors(first_name, last_name)
+  name_errors(first_name, last_name)
+end
+# - Errors for creating a new patient
+#   (also currently identical to new_staff_errors)
+def new_patient_errors(first_name, last_name)
+  name_errors(first_name, last_name)
 end
 
-def staff_name_errors(first_name, last_name)
+def name_errors(first_name, last_name)
   errors = []
   errors << 'Please enter a first name.' if empty_string?(first_name)
   errors << 'Please enter a last name.' if empty_string?(last_name)
