@@ -88,7 +88,7 @@ CREATE OR REPLACE TRIGGER verify_staff_member_offers_treatment
   FOR EACH ROW EXECUTE FUNCTION verify_staff_member_offers_treatment();
 
 
--- -- Seed
+---- Seed
 -- INSERT INTO users (first_name, last_name, email, phone)
 -- VALUES ('Hugo',    'Ma',      'huwgoma@gmail.com',      6476758914), 
 --        ('Annie',   'Hu',      'hu.annie06@gmail.com',   6476089210), 
@@ -111,10 +111,10 @@ CREATE OR REPLACE TRIGGER verify_staff_member_offers_treatment
 
 -- INSERT INTO patients (user_id, birthday)
 -- VALUES (1,  '1997-09-14'),  -- Hugo
---        (6,  '1930-05-04'),  -- Hendrik
+--        (6,   NULL),         -- Hendrik
 --        (8,  '1978-03-14'),  -- Carol
 --        (9,  '1990-08-24'),  -- Dan
---        (10, '1975-10-29'); -- Jeff
+--        (10, '1975-10-29');  -- Jeff
 
 -- INSERT INTO disciplines (name, title)
 -- VALUES ('Physiotherapy',   'PT'),

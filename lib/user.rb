@@ -26,6 +26,8 @@ class Patient < User
   end
 
   def age
+    return '' if @age.nil?
+    
     @age.split(/\s(?=\d)/).first
   end
 end

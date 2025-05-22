@@ -9,8 +9,28 @@
 
 <%# Patient Info %>
 <p><strong>Name:</strong> <%= @patient_profile.full_name %></p>
-<p><strong>Phone:</strong> <%= @patient_profile.phone %></p>
-<p><strong>Email:</strong> <%= @patient_profile.email %></p>
 
-<p><strong>Birthday:</strong> <%= @patient_profile.birthday %></p>
-<p><strong>Age:</strong> <%= @patient_profile.age %></p>
+<p>
+  <strong>Phone:</strong> 
+  <%= @patient_profile.phone || 'No phone numbers' %>
+</p>
+
+<p>
+  <strong>Email:</strong> 
+  <%= @patient_profile.email || 'No email address' %>
+</p>
+
+<% if @patient_profile.birthday %>
+  <p>
+    <strong>Birthday:</strong> 
+    <%= @patient_profile.birthday %>
+  </p>
+
+  <p>
+    <strong>Age:</strong> 
+    <%= @patient_profile.age %>
+  </p>
+<% end %>
+
+
+
