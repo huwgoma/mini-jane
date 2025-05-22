@@ -1,8 +1,8 @@
 <h2><%= @patient_profile.full_name %></h2>
 
 <%# Header %>
-<a href="">Profile</a>
-<a href="">Edit</a>
+<a href="/admin/patients/<%= @patient_profile.id %>">Profile</a>
+<a href="/admin/patients/<%= @patient_profile.id %>/edit">Edit</a>
 <a href="">Appointments</a>
 
 <div>Total Appointments: <%= @patient_profile.appt_count %></div>

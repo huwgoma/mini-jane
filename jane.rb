@@ -117,7 +117,6 @@ post '/admin/staff/new/?' do
 
     redirect "/admin/staff/#{staff_id}"
   end
-
 end
 
 # View all staff
@@ -186,18 +185,18 @@ end
 
 # # Admin - Patients # #
 # View all patients
-get '/admin/patients' do
+get '/admin/patients/?' do
   @patients = @storage.load_all_patients
 
   render_with_layout(:all_patients)
 end
 
 # Form: Create a new patient
-get '/admin/patients/new' do
+get '/admin/patients/new/?' do
   render_with_layout(:new_patient)
 end
 
-# Create a new patient.
+# Create a new patient
 post '/admin/patients/new' do
   first_name, last_name = params[:first_name], params[:last_name]
   session[:errors].push(*new_staff_errors(first_name, last_name))
@@ -215,7 +214,7 @@ post '/admin/patients/new' do
 end
 
 # View a specific patient profile
-get '/admin/patients/:patient_id' do
+get '/admin/patients/:patient_id/?' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
 
@@ -224,7 +223,13 @@ get '/admin/patients/:patient_id' do
   render_with_layout(:patient)
 end
 
-# private
+# Form: Edit a patient profile
+get '/admin/patients/:patient_id/edit/?' do
+  patient_id = params[:patient_id]
+  # Validate patient id
+  @patient_profile = @storage.load_patient_profile(patient_id)
+  render_with_layout(:edit_patient)
+end
 
 
 # Helpers #

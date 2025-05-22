@@ -1,0 +1,48 @@
+<h2>Edit Patient - <%= @patient_profile.full_name %></h2>
+
+<form action="/admin/patients/edit" method="post">
+  <%# Name %>
+  <div class="name-form">
+    <div>
+      <label for="first_name">First Name - Required</label>
+      <input type="text" name="first_name" id="first_name"
+        value="<%= prefill(:first_name, params, @patient_profile) %>"> <%#required%>
+    </div>
+    
+    <div>
+      <label for="first_name">Last Name - Required</label>
+      <input type="text" name="last_name" id="last_name"
+        value="<%= prefill(:last_name, params, @patient_profile) %>"> <%#required%>
+    </div>
+  </div>
+
+  <%# Contact %>
+  <div class="contact-form">
+    <h3>Contact Info</h3>
+    <div>
+      <label for="email">Email</label>
+      <input type="text" name="email" id="email" 
+        value="<%= prefill(:email, params, @patient_profile) %>">
+    </div>
+    
+    <div>
+      <label for="phone">Phone Number</label>
+      <input type="tel" name="phone" id="phone" 
+        value="<%= prefill(:phone, params, @patient_profile) %>">
+    </div>
+  </div>
+
+  <%# Birthday %>
+  <div class="birthday-form">
+    <label for="birthday">Birthday</label>
+    <input type="date" name="birthday" id="birthday"
+      value="<%= prefill(:birthday, params, @patient_profile) %>">
+  </div>
+
+  <%# Cancel/Submit  %>
+  <div>
+    <a href="/admin/patients/<%= @patient_profile.id %>"><button type="button">Cancel</button></a>
+
+    <button type="submit">Save</button>
+  </div>
+</form>
