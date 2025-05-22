@@ -1,0 +1,60 @@
+<h2>New Patient</h2>
+
+<form action="/admin/patients/new" method="post">
+  <div class="name-form">
+    <div>
+      <label for="first_name">First Name - Required</label>
+      <input type="text" name="first_name" id="first_name"
+        value="<%= prefill(:first_name, params) %>"> <%#required%>
+    </div>
+    
+    <div>
+      <label for="first_name">Last Name - Required</label>
+      <input type="text" name="last_name" id="last_name"
+        value="<%= prefill(:last_name, params) %>"> <%#required%>
+    </div>
+  </div>
+  
+  <div class="disciplines-form">
+    <h3>Disciplines</h3>
+    <fieldset>
+      <% group_name = 'discipline_ids' %>
+      <% @disciplines.each do |discipline| %>
+        <div>
+          <input type="checkbox" name=<%= "#{group_name}[]" %> id="<%= discipline.name %>"
+            value="<%= discipline.id %>" 
+            <%= 'checked' if prechecked?(group_name, discipline.id, params) %>>
+          <label for="<%= discipline.name %>"><%= discipline.name %></label>
+        </div>
+      <% end %>
+    </fieldset>
+  </div>
+
+  <div class="contact-form">
+    <h3>Contact Info</h3>
+    <div>
+      <label for="email">Email</label>
+      <input type="text" name="email" id="email" 
+        value="<%= prefill(:email, params) %>">
+    </div>
+    
+    <div>
+      <label for="phone">Phone Number</label>
+      <input type="tel" name="phone" id="phone" 
+        value="<%= prefill(:phone, params) %>">
+    </div>
+  </div>
+
+  <div class="bio-form">
+    <h3>Bio</h3>
+    <textarea name="biography" id="biography" 
+      rows="10" cols="50"><%= prefill(:biography, params) %></textarea>
+  </div>
+
+  <%# Cancel/Submit  %>
+  <div>
+    <a href="/admin/staff"><button type="button">Cancel</button></a>
+
+    <button type="submit">Save</button>
+  </div>
+</form>

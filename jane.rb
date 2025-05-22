@@ -188,6 +188,9 @@ get '/admin/patients' do
   render_with_layout(:all_patients)
 end
 
+# Form: Create a new patient
+
+
 # View a specific patient profile
 get '/admin/patients/:patient_id' do
   patient_id = params[:patient_id]
@@ -197,6 +200,8 @@ get '/admin/patients/:patient_id' do
 
   render_with_layout(:patient)
 end
+
+
 
 # Helpers #
 def redirect_if_missing_id(type, id, path)

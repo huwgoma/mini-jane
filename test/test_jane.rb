@@ -470,6 +470,63 @@ class TestJane < Minitest::Test
     end
   end
 
+  def test_admin_view_patient_basic_info_fields
+    name = 'Hugo Ma'
+    phone = '6476758914'
+    email = 'h@gmail.com'
+    birthday = '1997-09-14'
+
+    patient_id = return_id(create_user(name, email: email, phone: phone))
+    create_patient_profile(patient_id, birthday: birthday)
+
+    get "/admin/patients/#{patient_id}"
+    doc = Nokogiri::HTML(last_response.body)
+
+    # Total Appointments: 0
+    appts_field = doc.at_xpath("//div[contains(text(), 'Total Appointments')]")
+    assert_includes(appts_field.text, '0')
+    # Name: Hugo Ma
+    name_field = doc.at_xpath("//p[strong[contains(text(), 'Name')]]")
+    assert_includes(name_field.text, name)
+    # Phone: 6476758914
+    phone_field = doc.at_xpath("//p[strong[contains(text(), 'Phone')]]")
+    assert_includes(phone_field.text, phone)
+    # Email: h@gmail.com
+    email_field = doc.at_xpath("//p[strong[contains(text(), 'Email')]]")
+    assert_includes(email_field.text, email)
+    # Birthday: 1997-09-14
+    bday_field = doc.at_xpath("//p[strong[contains(text(), 'Birthday')]]")
+    assert_includes(bday_field.text, birthday)
+  end
+
+  def test_admin_view_patient_appt_count_increments
+    patient_id = return_id(create_user('Hugo Ma', 
+      email: 'h@gmail.com', phone: '6476758914'))
+    create_patient_profile(patient_id, birthday: '1997-09-14')
+    # Appt 1
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { id: patient_id, create_profile: false },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
+    # Appt 2
+    create_appointment_cascade(
+      staff: { id: context[:staff_id] }, 
+      patient: { id: patient_id, create_profile: false },
+      discipline: { id: context[:discipline_id] },
+      treatment: { name: 'PT - Treatment', length: 30, price: 85.00 }
+    )
+
+    get "/admin/patients/#{patient_id}"
+    doc = Nokogiri::HTML(last_response.body)
+
+    appts_field = doc.at_xpath("//div[contains(text(), 'Total Appointments')]")
+    assert_includes(appts_field.text, '2')
+  end
+
+  
+
   def test_admin_view_patient_redirects_nonexistent_id
     bad_id = 5
     get "/admin/patients/#{bad_id}"
@@ -478,13 +535,15 @@ class TestJane < Minitest::Test
     assert_includes(last_response['location'], '/admin/patients')
   end
 
-  
+  def test_admin_view_patient_hides_birthday_and_age_if_nil
+    
+  end
 
   private
 
   # Helpers for generating test data before tests #
   # Create an appointment along with any necessary join data
-  def create_appointment_cascade(staff:, patient:, discipline:, treatment:, datetime:)
+  def create_appointment_cascade(staff:, patient:, discipline:, treatment:, datetime: DateTime.now)
     staff_id = staff[:id]     || return_id(create_user(staff[:name]))
     create_staff_member(staff_id) if staff[:create_profile]
   
