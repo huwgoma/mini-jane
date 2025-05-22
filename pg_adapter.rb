@@ -111,6 +111,24 @@ class PGAdapter
     result.map { |patient| format_user_listing(patient) }
   end
 
+  def load_patient_profile(patient_id)
+    sql = <<~SQL
+      SELECT users.id, users.first_name, users.last_name, 
+             users.email, users.phone,
+             patients.birthday, 
+             AGE(current_date, patients.birthday) AS age,
+             COUNT(appointments.id) AS total_appts
+      FROM patients
+      LEFT JOIN users        ON patients.user_id = users.id
+      LEFT JOIN appointments ON patients.user_id = appointments.patient_id
+      WHERE patients.user_id = $1
+      GROUP BY patients.user_id, users.id;
+    SQL
+    result = query(sql, patient_id)
+
+    format_patient_profile(result.first)
+  end
+
   # Disciplines #
   def load_disciplines
     sql = "SELECT id, name FROM disciplines;"
@@ -290,6 +308,19 @@ class PGAdapter
     
     Staff.new(id, first_name, last_name, email: email, phone: phone,
               biography: biography, disciplines: disciplines)
+  end
+
+  def format_patient_profile(patient)
+    return if patient.nil?
+
+    id = patient['id'].to_i
+    first_name, last_name = patient['first_name'], patient['last_name']
+    email, phone = patient['email'], patient['phone']
+    birthday, age = patient['birthday'], patient['age']
+    total_appts = patient['total_appts'].to_i
+
+    Patient.new(id, first_name, last_name, email: email, phone: phone,
+                birthday: birthday, age: age, total_appts: total_appts)
   end
 
   def format_discipline(discipline)

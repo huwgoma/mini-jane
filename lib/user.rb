@@ -14,12 +14,15 @@ class User
 end
 
 class Patient < User
+  attr_reader :birthday, :age, :total_appts
+  
   def initialize(id, first_name, last_name, 
-                 email: nil, phone: nil, birthday: nil)
-    super(id, first_name, last_name, 
-          email: email, phone: phone)
+                 email: nil, phone: nil, birthday: nil, age: nil,
+                 total_appts: 0)
+    super(id, first_name, last_name, email: email, phone: phone)
 
-    @birthday = birthday
+    @birthday, @age = birthday, age
+    @total_appts = total_appts
   end
 end
 

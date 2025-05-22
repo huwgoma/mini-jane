@@ -478,6 +478,8 @@ class TestJane < Minitest::Test
     assert_includes(last_response['location'], '/admin/patients')
   end
 
+  
+
   private
 
   # Helpers for generating test data before tests #

@@ -183,10 +183,6 @@ end
 # # Admin - Patients # #
 # View all patients
 get '/admin/patients' do
-  # Commit: 
-  # - Build application route for /admin/patients
-  # - Build PG Adapter load_patients
-  # - Build view for /admin/patients
   @patients = @storage.load_all_patients
 
   render_with_layout(:all_patients)
@@ -196,8 +192,8 @@ end
 get '/admin/patients/:patient_id' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
-  
-  @patient_profile
+
+  @patient_profile = @storage.load_patient_profile(patient_id)
 end
 
 # Helpers #
