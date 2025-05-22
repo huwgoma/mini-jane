@@ -525,7 +525,37 @@ class TestJane < Minitest::Test
     assert_includes(appts_field.text, '2')
   end
 
-  
+  def test_admin_view_patient_calculates_and_formats_age_display
+    today = Date.today
+    three_years_ago = today.prev_year(3).to_s
+    three_months_ago = today.prev_month(3).to_s
+    three_days_ago = today.prev_day(3).to_s
+
+    old_patient_id = return_id(create_user('Hugo Ma'))
+    create_patient_profile(old_patient_id, birthday: three_years_ago)
+
+    baby_patient_id = return_id(create_user('Jonas C'))
+    create_patient_profile(baby_patient_id, birthday: three_months_ago)
+
+    newborn_patient_id = return_id(create_user('Tanya T'))
+    create_patient_profile(newborn_patient_id, birthday: three_days_ago)
+
+    # Years
+    get "/admin/patients/#{old_patient_id}"
+    doc = Nokogiri::HTML(last_response.body)
+    age_field = doc.at_xpath("//p[strong[text()='Age:']]")
+    assert_includes(age_field.text, '3 years')
+    # Months
+    get "/admin/patients/#{baby_patient_id}"
+    doc = Nokogiri::HTML(last_response.body)
+    age_field = doc.at_xpath("//p[strong[text()='Age:']]")
+    assert_includes(age_field.text, '3 months')
+    # Days
+    get "/admin/patients/#{newborn_patient_id}"
+    doc = Nokogiri::HTML(last_response.body)
+    age_field = doc.at_xpath("//p[strong[text()='Age:']]")
+    assert_includes(age_field.text, '3 days')
+  end
 
   def test_admin_view_patient_redirects_nonexistent_id
     bad_id = 5
