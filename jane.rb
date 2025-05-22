@@ -189,7 +189,9 @@ get '/admin/patients' do
 end
 
 # Form: Create a new patient
-
+get '/admin/patients/new' do
+  render_with_layout(:new_patient)
+end
 
 # View a specific patient profile
 get '/admin/patients/:patient_id' do
