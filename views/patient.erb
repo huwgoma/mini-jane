@@ -1,0 +1,16 @@
+<h2><%= @patient_profile.full_name %></h2>
+
+<%# Header %>
+<a href="">Profile</a>
+<a href="">Edit</a>
+<a href="">Appointments</a>
+
+<div>Total Appointments: <%= @patient_profile.appt_count %></div>
+
+<%# Patient Info %>
+<p><strong>Name:</strong> <%= @patient_profile.full_name %></p>
+<p><strong>Phone:</strong> <%= @patient_profile.phone %></p>
+<p><strong>Email:</strong> <%= @patient_profile.email %></p>
+
+<p><strong>Birthday:</strong> <%= @patient_profile.birthday %></p>
+<p><strong>Age:</strong> <%= @patient_profile.age %></p>

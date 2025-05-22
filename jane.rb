@@ -194,6 +194,8 @@ get '/admin/patients/:patient_id' do
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
 
   @patient_profile = @storage.load_patient_profile(patient_id)
+
+  render_with_layout(:patient)
 end
 
 # Helpers #

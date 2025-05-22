@@ -116,8 +116,8 @@ class PGAdapter
       SELECT users.id, users.first_name, users.last_name, 
              users.email, users.phone,
              patients.birthday, 
-             AGE(current_date, patients.birthday) AS age,
-             COUNT(appointments.id) AS total_appts
+             REPLACE(AGE(current_date, patients.birthday)::text, 'mons', 'months') AS age,
+             COUNT(appointments.id) AS appt_count
       FROM patients
       LEFT JOIN users        ON patients.user_id = users.id
       LEFT JOIN appointments ON patients.user_id = appointments.patient_id
@@ -317,10 +317,10 @@ class PGAdapter
     first_name, last_name = patient['first_name'], patient['last_name']
     email, phone = patient['email'], patient['phone']
     birthday, age = patient['birthday'], patient['age']
-    total_appts = patient['total_appts'].to_i
+    appt_count = patient['appt_count'].to_i
 
     Patient.new(id, first_name, last_name, email: email, phone: phone,
-                birthday: birthday, age: age, total_appts: total_appts)
+                birthday: birthday, age: age, appt_count: appt_count)
   end
 
   def format_discipline(discipline)
