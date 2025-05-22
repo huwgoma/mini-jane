@@ -64,6 +64,8 @@ end
 # accordingly.
 # 2) Create helper for extracting params
 # 
+#
+#
 # - Clear DB ONCE before test suite
 # 
 # 
@@ -206,9 +208,11 @@ post '/admin/patients/new' do
     render_with_layout(:new_patient)
   else
     email, phone, birthday = params[:email], params[:phone], params[:birthday]
-    @storage.create_patient(first_name, last_name, email: email, 
-                            phone: phone, birthday: birthday)
-    
+    patient_id = @storage.create_patient_return_user_id(
+                  first_name, last_name, email: email, 
+                  phone: phone, birthday: birthday)
+
+    redirect "/admin/patients/#{patient_id}"
   end
 end
 

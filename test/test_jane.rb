@@ -579,8 +579,23 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_patient_success
-    # Creates a user and patient record in DB
-    # Redirects to patient page  
+    users_count = @storage.query("SELECT * FROM users;").ntuples
+    patients_count = @storage.query("SELECT * FROM patients;").ntuples
+
+    assert_equal(0, users_count)
+    assert_equal(0, patients_count)
+
+    post '/admin/patients/new', first_name: 'Hugo', last_name: 'Ma'
+    users_result = @storage.query("SELECT * FROM users;")
+    user_id = users_result.first['id']
+    patients_result = @storage.query("SELECT * FROM patients;")
+
+    assert_equal(1, users_result.ntuples)
+    assert_equal(1, patients_result.ntuples)
+    assert_equal('Hugo', users_result.first['first_name'])
+    
+    assert_equal(302, last_response.status)
+    assert_includes(last_response['location'], "/admin/patients/#{user_id}")
   end
 
   def test_admin_create_patient_empty_or_missing_name_error

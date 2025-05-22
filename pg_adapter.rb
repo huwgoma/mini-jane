@@ -130,12 +130,14 @@ class PGAdapter
     format_patient_profile(result.first)
   end
 
-  def create_patient(first_name, last_name, user_id: nil, 
+  def create_patient_return_user_id(first_name, last_name, user_id: nil, 
                      email: nil, phone: nil, birthday: nil)
     user_id ||= create_user_return_id(first_name, last_name, email, phone)
     patient_sql = "INSERT INTO patients (user_id, birthday)
-                   VALUES($1, $2);"
-    query(patient_sql, user_id, birthday)
+                   VALUES($1, $2) RETURNING user_id;"
+    result = query(patient_sql, user_id, birthday)
+
+    result.first['user_id'].to_i
   end
 
   # Disciplines #
