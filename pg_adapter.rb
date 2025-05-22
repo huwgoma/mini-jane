@@ -32,21 +32,19 @@ class PGAdapter
   end
 
   # Users #
-  def create_user_return_id(first_name, last_name, email, phone)
-    sql = "INSERT INTO users(first_name, last_name, email, phone)
-           VALUES($1, $2, $3, $4) RETURNING id;"
-    result = query(sql, first_name, last_name, email, phone)
-
-    result.first['id'].to_i
-  end
-
+  
   # Staff #
   # - Member: Refers to the actual staff table
   # - Profile: Refers to a staff member + related users/disciplines
-  def create_staff_member(user_id, biography)
-    sql = "INSERT INTO staff(user_id, biography)
-           VALUES($1, $2);"
-    query(sql, user_id, biography)
+  def create_staff_return_user_id(first_name, last_name, user_id: nil,
+                                  email: nil, phone: nil, biography: nil)
+    user_id ||= create_user_return_id(
+                  first_name, last_name, email: email, phone: phone)
+    staff_sql = "INSERT INTO staff(user_id, biography)
+                 VALUES($1, $2) RETURNING user_id;"
+    result = query(staff_sql, user_id, biography)
+
+    result.first['user_id'].to_i
   end
 
   def load_all_staff
@@ -132,7 +130,8 @@ class PGAdapter
 
   def create_patient_return_user_id(first_name, last_name, user_id: nil, 
                      email: nil, phone: nil, birthday: nil)
-    user_id ||= create_user_return_id(first_name, last_name, email, phone)
+    user_id ||= create_user_return_id(
+                  first_name, last_name, email: email, phone: phone)
     patient_sql = "INSERT INTO patients (user_id, birthday)
                    VALUES($1, $2) RETURNING user_id;"
     result = query(patient_sql, user_id, birthday)
@@ -223,6 +222,14 @@ class PGAdapter
   end
 
   # Users 
+  def create_user_return_id(first_name, last_name, email: nil, phone: nil)
+    sql = "INSERT INTO users(first_name, last_name, email, phone)
+           VALUES($1, $2, $3, $4) RETURNING id;"
+    result = query(sql, first_name, last_name, email, phone)
+
+    result.first['id'].to_i
+  end
+
   def update_user(id, first_name, last_name, email, phone)
     sql = <<~SQL
       UPDATE users

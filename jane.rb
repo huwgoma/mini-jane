@@ -110,14 +110,12 @@ post '/admin/staff/new/?' do
     @disciplines = @storage.load_disciplines
     render_with_layout(:new_staff)
   else
-    user_id = @storage.create_user_return_id(
-                params[:first_name], params[:last_name], 
-                params[:email], params[:phone])
+    email, phone, biography = params[:email], params[:phone], params[:biography]
+    staff_id = @storage.create_staff_return_user_id(
+                first_name, last_name, email: email, phone: phone, biography: biography)
+    @storage.add_staff_disciplines(staff_id, params[:discipline_ids])
 
-    @storage.create_staff_member(user_id, params[:biography])
-    @storage.add_staff_disciplines(user_id, params[:discipline_ids])
-
-    redirect "/admin/staff/#{user_id}"
+    redirect "/admin/staff/#{staff_id}"
   end
 
 end
