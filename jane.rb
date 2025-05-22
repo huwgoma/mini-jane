@@ -226,9 +226,14 @@ end
 # Form: Edit a patient profile
 get '/admin/patients/:patient_id/edit/?' do
   patient_id = params[:patient_id]
-  # Validate patient id
+  redirect_if_missing_id('patients', patient_id, '/admin/patients')
+  
   @patient_profile = @storage.load_patient_profile(patient_id)
   render_with_layout(:edit_patient)
+end
+
+post '/admin/patients/:patient_id/edit' do
+  
 end
 
 
