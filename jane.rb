@@ -59,7 +59,11 @@ end
 ######### 
 # To Do #
 #########
-#  
+# 1) Refactor #create_staff to use same paradigm as #create_patient
+# (create user if user_id is not given); refactor /admin/staff/new 
+# accordingly.
+# 2) Create helper for extracting params
+# 
 # - Clear DB ONCE before test suite
 # 
 # 
@@ -201,7 +205,10 @@ post '/admin/patients/new' do
   if session[:errors].any?
     render_with_layout(:new_patient)
   else
-    # create + redirect
+    email, phone, birthday = params[:email], params[:phone], params[:birthday]
+    @storage.create_patient(first_name, last_name, email: email, 
+                            phone: phone, birthday: birthday)
+    
   end
 end
 
