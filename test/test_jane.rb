@@ -590,6 +590,30 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'Please enter a last name.')
   end
 
+  def test_admin_create_patient_retains_values_on_error
+    first_name = 'Hugo'
+    email = 'hugoma@gmail.com'
+    phone = '6476754903'
+    birthday = '1997-09-14'
+
+    post '/admin/patients/new', first_name: first_name, last_name: '',
+      email: email, phone: phone, birthday: birthday  
+    doc = Nokogiri::HTML(last_response.body)
+    
+    # First Name
+    first_name_input = doc.at_xpath("//input[@id='first_name']")
+    assert_equal(first_name, first_name_input['value'])
+    # Email
+    email_input = doc.at_xpath("//input[@id='email']")
+    assert_equal(email, email_input['value'])
+    # Phone
+    phone_input = doc.at_xpath("//input[@id='phone']")
+    assert_equal(phone, phone_input['value'])
+    # Birthday
+    birthday_input = doc.at_xpath("//input[@id='birthday']")
+    assert_equal(birthday, birthday_input['value'])
+  end
+
   private
 
   # Helpers for generating test data before tests #
