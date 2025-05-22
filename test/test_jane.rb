@@ -165,11 +165,15 @@ class TestJane < Minitest::Test
 
     get '/admin/staff'
     doc = Nokogiri::HTML(last_response.body)    
-    staff_listings = doc.css('ul.staff-list > li').map(&:text)
+    staff_listings = doc.css('ul.staff-list > li')
 
     # Assert there is an <li> element for each name in /staff
     assert_equal(staff_listings.size, staff_names.size)
-    staff_names.each { |name| staff_listings.join.include?(name) }
+
+    staff_names.each do |name|
+      staff_li = staff_listings.find { |li| li.text.include?(name) }
+      refute_nil(staff_li)
+    end
   end
 
   def test_admin_view_staff_member_all_fields
@@ -446,6 +450,26 @@ class TestJane < Minitest::Test
   end
 
   # # Patients CRUD # # 
+  def test_admin_view_all_patients
+    patient_names = ['Hugo Ma', 'Hendrik Swart']
+
+    patient_names.each do |name|
+      user_id = return_id(create_user(name))
+      create_patient_profile(user_id)
+    end
+
+    get '/admin/patients'
+    doc = Nokogiri::HTML(last_response.body)
+    patients_listings = doc.css('ul.patients-list > li')
+
+    assert_equal(patient_names.size, patients_listings.size)
+
+    patient_names.each do |name|
+      patient_li = patients_listings.find { |li| li.text.include?(name) }
+      refute_nil(patient_li)
+    end
+  end
+
   def test_admin_view_patient_redirects_nonexistent_id
     bad_id = 5
     get "/admin/patients/#{bad_id}"
