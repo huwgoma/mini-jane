@@ -566,7 +566,16 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_view_patient_hides_birthday_and_age_if_nil
-    
+    patient_id = return_id(create_user('Hugo Ma'))
+    create_patient_profile(patient_id, birthday: nil)
+
+    get "/admin/patients/#{patient_id}"
+    doc = Nokogiri::HTML(last_response.body)
+    birthday_field = doc.at_xpath("//p[strong[text()='Birthday:']]")
+    age_field = doc.at_xpath("//p[strong[text()='Age:']]")
+
+    assert_nil(birthday_field)
+    assert_nil(age_field)
   end
 
   private
