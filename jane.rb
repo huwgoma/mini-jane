@@ -59,15 +59,11 @@ end
 ######### 
 # To Do #
 #########
-# 1) Finish Patient CRUD
-# 
 # 2) Create helper for extracting params
 #
 #
 # - Clear DB ONCE before test suite
-# 
-# 
-# - CRUD for patients
+
 # - CRUD for appointments
 # - CRUD for disciplines
 # - CRUD for treatments
@@ -189,12 +185,12 @@ get '/admin/patients/?' do
   render_with_layout(:all_patients)
 end
 
-# Form: Create a new patient
+# - Form: Create a new patient
 get '/admin/patients/new/?' do
   render_with_layout(:new_patient)
 end
 
-# Create a new patient
+# - Create a new patient
 post '/admin/patients/new' do
   first_name, last_name = params[:first_name], params[:last_name]
   session[:errors].push(*new_staff_errors(first_name, last_name))
@@ -213,7 +209,7 @@ post '/admin/patients/new' do
   end
 end
 
-# View a specific patient profile
+# - View a specific patient profile
 get '/admin/patients/:patient_id/?' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
@@ -226,7 +222,7 @@ get '/admin/patients/:patient_id/?' do
   render_with_layout(:patient)
 end
 
-# Form: Edit a patient
+# - Form: Edit a patient
 get '/admin/patients/:patient_id/edit/?' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
@@ -235,7 +231,7 @@ get '/admin/patients/:patient_id/edit/?' do
   render_with_layout(:edit_patient)
 end
 
-# Edit a patient
+# - Edit a patient
 post '/admin/patients/:patient_id/edit' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
@@ -257,7 +253,7 @@ post '/admin/patients/:patient_id/edit' do
   end
 end
 
-# Delete a patient
+# - Delete a patient
 post '/admin/patients/:patient_id/delete' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
@@ -270,6 +266,7 @@ post '/admin/patients/:patient_id/delete' do
   redirect '/admin/patients'
 end
 
+# # 
 # Helpers #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)
