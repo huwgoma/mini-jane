@@ -13,24 +13,7 @@ class User
   end
 end
 
-class Patient < User
-  attr_reader :birthday, :appt_count
 
-  def initialize(id, first_name, last_name, 
-                 email: nil, phone: nil, birthday: nil, age: nil,
-                 appt_count: 0)
-    super(id, first_name, last_name, email: email, phone: phone)
-
-    @birthday, @age = birthday, age
-    @appt_count = appt_count
-  end
-
-  def age
-    return '' if @age.nil?
-    
-    @age.split(/\s(?=\d)/).first
-  end
-end
 
 class Staff < User
   attr_reader :disciplines 

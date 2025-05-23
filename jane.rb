@@ -59,11 +59,9 @@ end
 ######### 
 # To Do #
 #########
-# 1) Refactor #create_staff to use same paradigm as #create_patient
-# (create user if user_id is not given); refactor /admin/staff/new 
-# accordingly.
-# 2) Create helper for extracting params
 # 
+# 2) Create helper for extracting params
+# 3)Refactor Staff Profile same as Patient Profile
 #
 #
 # - Clear DB ONCE before test suite
@@ -218,22 +216,37 @@ get '/admin/patients/:patient_id/?' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
 
-  @patient_profile = @storage.load_patient_profile(patient_id)
+  patient = @storage.load_patient(patient_id)
+  stats = @storage.load_patient_stats(patient_id)
+
+  @profile = PatientProfile.new(patient, total_appts: stats[:total_appts]) 
 
   render_with_layout(:patient)
 end
 
-# Form: Edit a patient profile
+# revisit
+# Form: Edit a patient
 get '/admin/patients/:patient_id/edit/?' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
   
-  @patient_profile = @storage.load_patient_profile(patient_id)
+  @patient = @storage.load_patient(patient_id)
   render_with_layout(:edit_patient)
 end
 
+# revisit
+# Edit a patient
 post '/admin/patients/:patient_id/edit' do
-  
+  patient_id = params[:patient_id]
+  redirect_if_missing_id('patients', patient_id, '/admin/patients')
+
+  first_name, last_name = params[:first_name], params[:last_name]
+  session[:errors].push(*edit_patient_errors(first_name, last_name))
+  if session[:errors].any?
+    @patient_profile = @storage.load_patient_profile
+  else
+
+  end
 end
 
 
@@ -251,13 +264,15 @@ def new_staff_errors(first_name, last_name)
   name_errors(first_name, last_name)
 end
 # - Errors for updating an existing staff member 
-#   (currently identical to new_staff_errors, but may change)
 def edit_staff_errors(first_name, last_name)
   name_errors(first_name, last_name)
 end
 # - Errors for creating a new patient
-#   (also currently identical to new_staff_errors)
 def new_patient_errors(first_name, last_name)
+  name_errors(first_name, last_name)
+end
+# - Errors for updating an existing patient
+def edit_patient_errors(first_name, last_name)
   name_errors(first_name, last_name)
 end
 

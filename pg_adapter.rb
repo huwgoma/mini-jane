@@ -101,6 +101,8 @@ class PGAdapter
   end
   
   # Patients # 
+  # - Patient: The 'core' patient info (Name, Birthday, Email, etc.)
+  # - Patient Stats: Auxiliary patient info (Appointment/Billing Stats)
   def load_all_patients
     sql = "SELECT users.id, users.first_name, users.last_name 
            FROM users JOIN patients ON users.id = patients.user_id
@@ -110,22 +112,27 @@ class PGAdapter
     result.map { |patient| format_user_listing(patient) }
   end
 
-  def load_patient_profile(patient_id)
-    sql = <<~SQL
-      SELECT users.id, users.first_name, users.last_name, 
-             users.email, users.phone,
-             patients.birthday, 
-             REPLACE(AGE(current_date, patients.birthday)::text, 'mons', 'months') AS age,
-             COUNT(appointments.id) AS appt_count
-      FROM patients
-      LEFT JOIN users        ON patients.user_id = users.id
-      LEFT JOIN appointments ON patients.user_id = appointments.patient_id
-      WHERE patients.user_id = $1
-      GROUP BY patients.user_id, users.id;
-    SQL
+  def load_patient(patient_id)
+    sql = "SELECT users.id, users.first_name, users.last_name,
+           users.email, users.phone, patients.birthday,
+           REPLACE(AGE(current_date, patients.birthday)::text, 'mons', 'months') AS age
+           FROM users JOIN patients ON users.id = patients.user_id
+           WHERE patients.user_id = $1;"
     result = query(sql, patient_id)
 
-    format_patient_profile(result.first)
+    format_patient(result.first)
+  end
+
+  # Total Appts, Upcoming Appts, No Shows, Time since Last Visit,
+  # Claims Outstanding, Private Outstanding, Credit, etc.
+  def load_patient_stats(patient_id)
+    sql = "SELECT COUNT(appointments.id) AS total_appts
+           FROM patients
+           JOIN appointments ON patients.user_id = appointments.patient_id
+           WHERE patients.user_id = $1;"
+    result = query(sql, patient_id)
+
+    format_patient_stats(result.first)
   end
 
   def create_patient_return_user_id(first_name, last_name, user_id: nil, 
@@ -328,17 +335,20 @@ class PGAdapter
               biography: biography, disciplines: disciplines)
   end
 
-  def format_patient_profile(patient)
-    return if patient.nil?
-
+  def format_patient(patient)
     id = patient['id'].to_i
     first_name, last_name = patient['first_name'], patient['last_name']
     email, phone = patient['email'], patient['phone']
     birthday, age = patient['birthday'], patient['age']
-    appt_count = patient['appt_count'].to_i
+    
+    Patient.new(id, first_name, last_name, email: email, 
+                phone: phone, birthday: birthday, age: age)
+  end
 
-    Patient.new(id, first_name, last_name, email: email, phone: phone,
-                birthday: birthday, age: age, appt_count: appt_count)
+  def format_patient_stats(stats)
+    total_appts = stats['total_appts'].to_i
+
+    { total_appts: total_appts }
   end
 
   def format_discipline(discipline)
