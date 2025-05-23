@@ -266,7 +266,12 @@ post '/admin/patients/:patient_id/delete' do
   redirect '/admin/patients'
 end
 
-# # 
+# # Admin - Settings # # 
+# - Settings Dashboard
+get '/admin/settings' do
+  render_with_layout(:settings)
+end
+
 # Helpers #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)
