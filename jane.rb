@@ -281,6 +281,16 @@ get '/admin/disciplines/?' do
   render_with_layout(:disciplines)
 end
 
+# Form - Edit a specific discipline
+get '/admin/disciplines/:discipline_id/edit' do
+  discipline_id = params[:discipline_id]
+  redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
+
+  @discipline = @storage.load_discipline(discipline_id)
+  binding.pry
+  render_with_layout(:edit_discipline)
+end
+
 # Helpers #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)

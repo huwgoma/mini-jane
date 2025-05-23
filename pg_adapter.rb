@@ -168,6 +168,13 @@ class PGAdapter
     result.map { |discipline| format_discipline(discipline) }
   end
 
+  def load_discipline(discipline_id)
+    sql = "SELECT * FROM disciplines WHERE id = $1;"
+    result = query(sql, discipline_id)
+
+    format_discipline(result.first)
+  end
+
   def count_practitioners_by_disciplines
     sql = "SELECT disciplines.id, COUNT(staff_disciplines.staff_id) 
            FROM disciplines 

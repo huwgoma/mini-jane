@@ -6,6 +6,7 @@
     <h4><%= discipline.name %></h4>
     <p>Title: <%= discipline.title %></p>
     <p><%= @counts[discipline.id] %> Staff Members</p>
+    <a href="/admin/disciplines/<%= discipline.id %>/edit">Edit</a>
   </li>
 <% end %>
 </ol>
