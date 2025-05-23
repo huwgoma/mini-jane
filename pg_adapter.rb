@@ -163,9 +163,18 @@ class PGAdapter
 
   # Disciplines #
   def load_disciplines
-    sql = "SELECT id, name FROM disciplines;"
+    sql = "SELECT * FROM disciplines ORDER BY id;"
     result = query(sql)
     result.map { |discipline| format_discipline(discipline) }
+  end
+
+  def count_practitioners_by_disciplines
+    sql = "SELECT disciplines.id, COUNT(staff_disciplines.staff_id) 
+           FROM disciplines JOIN staff_disciplines ON disciplines.id = discipline_id
+           GROUP BY disciplines.id ORDER BY disciplines.id;"
+    result = query(sql)
+
+    result.map { |row| [ row['id'].to_i, row['count'].to_i ] }.to_h
   end
 
   private
@@ -208,9 +217,7 @@ class PGAdapter
     result.first['column_name']
   end
 
-  # # # # # # # # # # # 
-  # Private DB Methods #
-  # 
+  # Private DB Methods # 
   # Schedule # 
   def load_scheduled_practitioners
     sql = <<~SQL
@@ -375,7 +382,8 @@ class PGAdapter
   def format_discipline(discipline)
     id = discipline['id'].to_i
     name = discipline['name']
+    title = discipline['title']
 
-    Discipline.new(id, name)
+    Discipline.new(id, name, title)
   end
 end

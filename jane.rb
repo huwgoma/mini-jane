@@ -268,8 +268,17 @@ end
 
 # # Admin - Settings # # 
 # - Settings Dashboard
-get '/admin/settings' do
+get '/admin/settings/?' do
   render_with_layout(:settings)
+end
+
+# # Settings - Disciplines # #
+# - View all disciplines
+get '/admin/disciplines/?' do
+  @disciplines = @storage.load_disciplines
+  @counts = @storage.count_practitioners_by_disciplines
+  
+  render_with_layout(:disciplines)
 end
 
 # Helpers #

@@ -1,0 +1,11 @@
+<h2>Disciplines</h2>
+
+<ol>
+<% @disciplines.each do |discipline| %>
+  <li>
+    <h4><%= discipline.name %></h4>
+    <p>Title: <%= discipline.title %></p>
+    <p><%= @counts[discipline.id] %> Staff Members</p>
+  </li>
+<% end %>
+</ol>

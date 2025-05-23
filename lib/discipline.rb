@@ -1,8 +1,8 @@
 class Discipline
-  attr_reader :id, :name
+  attr_reader :id, :name, :title
   
-  def initialize(id, name)
-    @id, @name = id, name
+  def initialize(id, name, title)
+    @id, @name, @title = id, name, title
   end
 
   def to_s
