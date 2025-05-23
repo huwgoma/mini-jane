@@ -1,3 +1,5 @@
+require_relative 'user'
+
 class Patient < User
   attr_reader :birthday, :appt_count
 

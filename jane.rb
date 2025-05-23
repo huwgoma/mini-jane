@@ -216,10 +216,10 @@ get '/admin/patients/:patient_id/?' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
 
-  patient = @storage.load_patient(patient_id)
+  @patient = @storage.load_patient(patient_id)
   stats = @storage.load_patient_stats(patient_id)
 
-  @profile = PatientProfile.new(patient, total_appts: stats[:total_appts]) 
+  @profile = PatientProfile.new(@patient, total_appts: stats[:total_appts]) 
 
   render_with_layout(:patient)
 end
