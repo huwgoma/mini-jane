@@ -253,6 +253,19 @@ post '/admin/patients/:patient_id/edit' do
   end
 end
 
+# Delete a patient
+post '/admin/patients/:patient_id/delete' do
+  patient_id = params[:patient_id]
+  redirect_if_missing_id('patients', patient_id, '/admin/patients')
+
+  deleted = @storage.delete_patient(patient_id).first
+  # Validate from DB (appts)
+  name = "#{deleted['first_name']} #{deleted['last_name']}"
+  session[:success] = "Patient #{name} successfully deleted."
+
+  redirect '/admin/patients'
+end
+
 # Helpers #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)

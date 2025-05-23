@@ -697,6 +697,14 @@ class TestJane < Minitest::Test
     assert_equal(birthday, birthday_input['value'])
   end
 
+  def test_admin_delete_patient_success_delete_cascades
+    
+  end
+
+  def test_admin_delete_patient_success_redirects_to_patients
+    
+  end
+
   private
 
   # Helpers for generating test data before tests #

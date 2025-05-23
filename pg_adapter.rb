@@ -88,9 +88,8 @@ class PGAdapter
   end
 
   def delete_staff_member(staff_id)
-    # Cascades to staff -> staff_disciplines & appointments
-    sql = "DELETE FROM users WHERE id = $1 RETURNING *;"
-    query(sql, staff_id)
+    # Do not allow deletion if staff has any appointments.
+    delete_user(staff_id)
   end
 
   def overwrite_staff_disciplines(staff_id, discipline_ids)
@@ -154,6 +153,11 @@ class PGAdapter
            SET birthday = $2
            WHERE user_id = $1;"
     query(sql, id, birthday)
+  end
+
+  def delete_patient(patient_id)
+    # Do not allow deletion if patient has any appointments.
+    delete_user(patient_id)
   end
 
   # Disciplines #
@@ -256,6 +260,12 @@ class PGAdapter
     SQL
 
     query(sql, id, first_name, last_name, email, phone)
+  end
+
+  def delete_user(id)
+    # Cascades to either Staff or Patients
+    sql = "DELETE FROM users WHERE id = $1 RETURNING *;"
+    query(sql, id)
   end
 
   # Staff Profile
