@@ -730,11 +730,34 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_delete_patient_success_delete_cascades
-    
+    # Verifies delete of both user and patient
+    user_id = return_id(create_user('Hugo Ma'))
+    create_patient_profile(user_id)
+
+    users_count = @storage.query("SELECT 1 FROM users WHERE id = $1", user_id).ntuples
+    patients_count = @storage.query("SELECT 1 FROM patients WHERE user_id = $1", user_id).ntuples
+
+    assert_equal(1, users_count)
+    assert_equal(1, patients_count)
+
+    post "/admin/patients/#{user_id}/delete"
+
+    users_count = @storage.query("SELECT 1 FROM users WHERE id = $1", user_id).ntuples
+    patients_count = @storage.query("SELECT 1 FROM patients WHERE user_id = $1", user_id).ntuples
+
+    assert_equal(0, users_count)
+    assert_equal(0, patients_count)
   end
 
   def test_admin_delete_patient_success_redirects_to_patients
-    
+    user_id = return_id(create_user('Hugo Ma'))
+    create_patient_profile(user_id)
+
+    post "/admin/patients/#{user_id}/delete"
+
+    assert_equal(302, last_response.status)
+    get last_response['location']
+    assert_includes(last_response.body, 'successfully deleted.')
   end
 
   private
