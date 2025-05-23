@@ -772,6 +772,7 @@ class TestJane < Minitest::Test
 
     pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
     dc_id = return_id(create_discipline('Chiropractic', 'DC'))
+    create_discipline('Massage Therapy', 'MT')
 
     create_staff_discipline_associations(annie_id, pt_id)
     create_staff_discipline_associations(kevin_id, pt_id)
@@ -781,9 +782,11 @@ class TestJane < Minitest::Test
     doc = Nokogiri::HTML(last_response.body)
     pt_listing = doc.at_xpath("//li[h4[text()='Physiotherapy']]")
     dc_listing = doc.at_xpath("//li[h4[text()='Chiropractic']]")
+    mt_listing = doc.at_xpath("//li[h4[text()='Massage Therapy']]")
     
     assert_includes(pt_listing.text, '2 Staff Members')
     assert_includes(dc_listing.text, '1 Staff Members')
+    assert_includes(mt_listing.text, '0 Staff Members')
   end
 
   private

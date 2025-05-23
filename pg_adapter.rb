@@ -170,7 +170,8 @@ class PGAdapter
 
   def count_practitioners_by_disciplines
     sql = "SELECT disciplines.id, COUNT(staff_disciplines.staff_id) 
-           FROM disciplines JOIN staff_disciplines ON disciplines.id = discipline_id
+           FROM disciplines 
+           LEFT JOIN staff_disciplines ON disciplines.id = discipline_id
            GROUP BY disciplines.id ORDER BY disciplines.id;"
     result = query(sql)
 
