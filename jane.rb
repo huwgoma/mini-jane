@@ -249,11 +249,6 @@ post '/admin/patients/:patient_id/edit' do
   end
 end
 
-# Commit:
-# Add #test_admin_edit_patient_empty_missing_name_error - Asserts
-# that error message(s) are corectly displayed on unsuccessful 
-# patient edit submission
-
 # Helpers #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)
