@@ -598,6 +598,23 @@ class TestJane < Minitest::Test
     assert_includes(last_response['location'], "/admin/patients/#{user_id}")
   end
 
+  def test_admin_create_patient_handles_empty_birthday
+    users_count = @storage.query("SELECT * FROM users;").ntuples
+    patients_count = @storage.query("SELECT * FROM patients;").ntuples
+
+    assert_equal(0, users_count)
+    assert_equal(0, patients_count)
+
+    post '/admin/patients/new', first_name: 'Hugo', last_name: 'Ma',
+      birthday: '' # Empty Birthday Input
+    
+    users_count = @storage.query("SELECT * FROM users;").ntuples
+    patients_count = @storage.query("SELECT * FROM patients;").ntuples
+
+    assert_equal(1, users_count)
+    assert_equal(1, patients_count)
+  end
+
   def test_admin_create_patient_empty_missing_name_error
     post '/admin/patients/new', first_name: ' '
 
@@ -659,6 +676,21 @@ class TestJane < Minitest::Test
    
     assert_equal(302, last_response.status)
     assert_includes(last_response['location'], "/admin/patients/#{user_id}")
+  end
+
+  def test_admin_edit_patient_handles_empty_birthday
+    user_id = return_id(create_user('Huugo Ma', 
+                         email: 'hgm@gmail.com', phone: '6476758913'))
+    create_patient_profile(user_id, birthday: '1997-09-15')
+
+    patient = @storage.query("SELECT * FROM patients WHERE user_id = $1", user_id).first
+    assert_equal('1997-09-15', patient['birthday'])
+
+    post "/admin/patients/#{user_id}/edit", first_name: 'Hugo', last_name: 'Ma',
+      birthday: '' # Empty Birthday
+    
+    patient = @storage.query("SELECT * FROM patients WHERE user_id = $1", user_id).first
+    assert_nil(patient['birthday'])
   end
 
   def test_admin_edit_patient_empty_missing_name_error

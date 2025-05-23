@@ -202,7 +202,9 @@ post '/admin/patients/new' do
   if session[:errors].any?
     render_with_layout(:new_patient)
   else
-    email, phone, birthday = params[:email], params[:phone], params[:birthday]
+    email, phone = params[:email], params[:phone] 
+    birthday = normalize_date_input(params[:birthday])
+
     patient_id = @storage.create_patient_return_user_id(
                   first_name, last_name, email: email, 
                   phone: phone, birthday: birthday)
@@ -245,7 +247,9 @@ post '/admin/patients/:patient_id/edit' do
 
     render_with_layout(:edit_patient)
   else
-    email, phone, birthday = params[:email], params[:phone], params[:birthday]
+    email, phone = params[:email], params[:phone] 
+    birthday = normalize_date_input(params[:birthday])
+
     @storage.update_patient(patient_id, first_name, last_name,
                             email: email, phone: phone, birthday: birthday)
     
@@ -272,6 +276,10 @@ def redirect_if_missing_id(type, id, path)
     session[:errors] << "Hmm..that #{type} (id = #{id}) could not be found."
     redirect path
   end
+end
+
+def normalize_date_input(date_string)
+  date_string.to_s.strip.empty? ? nil : date_string
 end
 
 # Error Message Setting #

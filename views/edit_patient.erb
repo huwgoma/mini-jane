@@ -1,5 +1,9 @@
 <h2>Edit Patient - <%= @patient.full_name %></h2>
 
+<form class="delete-form" action="/admin/patients/<%= @patient.id %>/delete" method="post">
+  <button type="submit">Delete Patient</button>
+</form>
+
 <form action="/admin/patients/<%= @patient.id %>/edit" method="post">
   <%# Name %>
   <div class="name-form">

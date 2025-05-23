@@ -140,6 +140,7 @@ class PGAdapter
                   first_name, last_name, email: email, phone: phone)
     patient_sql = "INSERT INTO patients (user_id, birthday)
                    VALUES($1, $2) RETURNING user_id;"
+                   
     result = query(patient_sql, user_id, birthday)
 
     result.first['user_id'].to_i
