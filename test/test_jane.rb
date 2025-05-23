@@ -760,6 +760,32 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'successfully deleted.')
   end
 
+  # # SETTINGS # # 
+  # - Disciplines
+  def test_admin_view_disciplines_practitioner_counts
+    annie_id = return_id(create_user('Annie Hu'))
+    create_staff_member(annie_id)
+    kevin_id = return_id(create_user('Kevin Ho'))
+    create_staff_member(kevin_id)
+    alexis_id = return_id(create_user('Alexis Butler'))
+    create_staff_member(alexis_id)
+
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    dc_id = return_id(create_discipline('Chiropractic', 'DC'))
+
+    create_staff_discipline_associations(annie_id, pt_id)
+    create_staff_discipline_associations(kevin_id, pt_id)
+    create_staff_discipline_associations(alexis_id, dc_id)
+
+    get '/admin/disciplines'
+    doc = Nokogiri::HTML(last_response.body)
+    pt_listing = doc.at_xpath("//li[h4[text()='Physiotherapy']]")
+    dc_listing = doc.at_xpath("//li[h4[text()='Chiropractic']]")
+    
+    assert_includes(pt_listing.text, '2 Staff Members')
+    assert_includes(dc_listing.text, '1 Staff Members')
+  end
+
   private
 
   # Helpers for generating test data before tests #
