@@ -59,9 +59,9 @@ end
 ######### 
 # To Do #
 #########
+# 1) Finish Patient CRUD
 # 
 # 2) Create helper for extracting params
-# 3)Refactor Staff Profile same as Patient Profile
 #
 #
 # - Clear DB ONCE before test suite
@@ -224,12 +224,11 @@ get '/admin/patients/:patient_id/?' do
   render_with_layout(:patient)
 end
 
-# revisit
 # Form: Edit a patient
 get '/admin/patients/:patient_id/edit/?' do
   patient_id = params[:patient_id]
   redirect_if_missing_id('patients', patient_id, '/admin/patients')
-  
+
   @patient = @storage.load_patient(patient_id)
   render_with_layout(:edit_patient)
 end
@@ -243,9 +242,11 @@ post '/admin/patients/:patient_id/edit' do
   first_name, last_name = params[:first_name], params[:last_name]
   session[:errors].push(*edit_patient_errors(first_name, last_name))
   if session[:errors].any?
-    @patient_profile = @storage.load_patient_profile
-  else
+    @patient = @storage.load_patient(patient_id)
 
+    render_with_layout(:edit_patient)
+  else
+    # 
   end
 end
 

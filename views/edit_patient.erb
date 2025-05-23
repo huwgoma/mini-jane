@@ -1,18 +1,18 @@
-<h2>Edit Patient - <%= @patient_profile.full_name %></h2>
+<h2>Edit Patient - <%= @patient.full_name %></h2>
 
-<form action="/admin/patients/edit" method="post">
+<form action="/admin/patients/<%= @patient.id %>/edit" method="post">
   <%# Name %>
   <div class="name-form">
     <div>
       <label for="first_name">First Name - Required</label>
       <input type="text" name="first_name" id="first_name"
-        value="<%= prefill(:first_name, params, @patient_profile) %>"> <%#required%>
+        value="<%= prefill(:first_name, params, @patient) %>"> <%#required%>
     </div>
     
     <div>
       <label for="first_name">Last Name - Required</label>
       <input type="text" name="last_name" id="last_name"
-        value="<%= prefill(:last_name, params, @patient_profile) %>"> <%#required%>
+        value="<%= prefill(:last_name, params, @patient) %>"> <%#required%>
     </div>
   </div>
 
@@ -22,13 +22,13 @@
     <div>
       <label for="email">Email</label>
       <input type="text" name="email" id="email" 
-        value="<%= prefill(:email, params, @patient_profile) %>">
+        value="<%= prefill(:email, params, @patient) %>">
     </div>
     
     <div>
       <label for="phone">Phone Number</label>
       <input type="tel" name="phone" id="phone" 
-        value="<%= prefill(:phone, params, @patient_profile) %>">
+        value="<%= prefill(:phone, params, @patient) %>">
     </div>
   </div>
 
@@ -36,12 +36,12 @@
   <div class="birthday-form">
     <label for="birthday">Birthday</label>
     <input type="date" name="birthday" id="birthday"
-      value="<%= prefill(:birthday, params, @patient_profile) %>">
+      value="<%= prefill(:birthday, params, @patient) %>">
   </div>
 
   <%# Cancel/Submit  %>
   <div>
-    <a href="/admin/patients/<%= @patient_profile.id %>"><button type="button">Cancel</button></a>
+    <a href="/admin/patients/<%= @patient.id %>"><button type="button">Cancel</button></a>
 
     <button type="submit">Save</button>
   </div>

@@ -136,7 +136,7 @@ class PGAdapter
   end
 
   def create_patient_return_user_id(first_name, last_name, user_id: nil, 
-                     email: nil, phone: nil, birthday: nil)
+                                    email: nil, phone: nil, birthday: nil)
     user_id ||= create_user_return_id(
                   first_name, last_name, email: email, phone: phone)
     patient_sql = "INSERT INTO patients (user_id, birthday)
