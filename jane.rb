@@ -245,7 +245,11 @@ post '/admin/patients/:patient_id/edit' do
 
     render_with_layout(:edit_patient)
   else
-    # 
+    email, phone, birthday = params[:email], params[:phone], params[:birthday]
+    @storage.update_patient(patient_id, first_name, last_name,
+                            email: email, phone: phone, birthday: birthday)
+    
+    redirect "/admin/patients/#{patient_id}"
   end
 end
 

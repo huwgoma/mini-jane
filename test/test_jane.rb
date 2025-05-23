@@ -629,6 +629,38 @@ class TestJane < Minitest::Test
     assert_equal(birthday, birthday_input['value'])
   end
 
+  def test_admin_edit_patient_success
+    user_id = return_id(create_user('Huugo Ma', 
+                         email: 'hgm@gmail.com', phone: '6476758913'))
+    create_patient_profile(user_id, birthday: '1997-09-15')
+
+    user_patient = @storage.query(
+      "SELECT * FROM users 
+       JOIN patients ON users.id = patients.user_id
+       WHERE users.id = $1", user_id).first
+
+    assert_equal('Huugo', user_patient['first_name'])
+    assert_equal('hgm@gmail.com', user_patient['email'])
+    assert_equal('6476758913', user_patient['phone'])
+    assert_equal('1997-09-15', user_patient['birthday'])
+
+    post "/admin/patients/#{user_id}/edit", first_name: 'Hugo', last_name: 'Ma', 
+      email: 'huwgoma@gmail.com', phone: '6476758914', birthday: '1997-09-14'
+    
+    user_patient = @storage.query(
+      "SELECT * FROM users 
+       JOIN patients ON users.id = patients.user_id
+       WHERE users.id = $1", user_id).first
+
+    assert_equal('Hugo', user_patient['first_name'])
+    assert_equal('huwgoma@gmail.com', user_patient['email'])
+    assert_equal('6476758914', user_patient['phone'])
+    assert_equal('1997-09-14', user_patient['birthday'])
+   
+    assert_equal(302, last_response.status)
+    assert_includes(last_response['location'], "/admin/patients/#{user_id}")
+  end
+
   def test_admin_edit_patient_empty_missing_name_error
     user_id = return_id(create_user('Hugo Ma'))
     create_patient_profile(user_id)

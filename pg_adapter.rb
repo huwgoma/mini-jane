@@ -82,8 +82,8 @@ class PGAdapter
   def update_staff_profile(staff_id, first_name, last_name, 
                            email: nil, phone: nil, biography: nil, 
                            discipline_ids: [])
-    update_user(staff_id, first_name, last_name, email, phone)
-    update_staff_member(staff_id, biography)
+    update_user(staff_id, first_name, last_name, email: email, phone: phone)
+    update_staff_member(staff_id, biography: biography)
     overwrite_staff_disciplines(staff_id, discipline_ids)
   end
 
@@ -144,6 +144,16 @@ class PGAdapter
     result = query(patient_sql, user_id, birthday)
 
     result.first['user_id'].to_i
+  end
+
+  def update_patient(id, first_name, last_name, 
+                     email: nil, phone: nil, birthday: nil)
+    update_user(id, first_name, last_name, email: email, phone: phone)
+    
+    sql = "UPDATE patients 
+           SET birthday = $2
+           WHERE user_id = $1;"
+    query(sql, id, birthday)
   end
 
   # Disciplines #
@@ -237,7 +247,7 @@ class PGAdapter
     result.first['id'].to_i
   end
 
-  def update_user(id, first_name, last_name, email, phone)
+  def update_user(id, first_name, last_name, email: nil, phone: nil)
     sql = <<~SQL
       UPDATE users
       SET first_name = $2, last_name = $3,
@@ -267,7 +277,7 @@ class PGAdapter
     query(sql, staff_id)
   end
 
-  def update_staff_member(user_id, biography)
+  def update_staff_member(user_id, biography: nil)
     sql = <<~SQL
       UPDATE staff
       SET biography = $2
