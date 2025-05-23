@@ -287,8 +287,13 @@ get '/admin/disciplines/:discipline_id/edit' do
   redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
 
   @discipline = @storage.load_discipline(discipline_id)
-  binding.pry
+  
   render_with_layout(:edit_discipline)
+end
+
+# Edit a specific discipline
+post '/admin/disciplines/:discipline_id/edit' do
+  
 end
 
 # Helpers #
