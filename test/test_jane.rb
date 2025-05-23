@@ -598,7 +598,7 @@ class TestJane < Minitest::Test
     assert_includes(last_response['location'], "/admin/patients/#{user_id}")
   end
 
-  def test_admin_create_patient_empty_or_missing_name_error
+  def test_admin_create_patient_empty_missing_name_error
     post '/admin/patients/new', first_name: ' '
 
     assert_includes(last_response.body, 'Please enter a first name.')
@@ -627,6 +627,16 @@ class TestJane < Minitest::Test
     # Birthday
     birthday_input = doc.at_xpath("//input[@id='birthday']")
     assert_equal(birthday, birthday_input['value'])
+  end
+
+  def test_admin_edit_patient_empty_missing_name_error
+    user_id = return_id(create_user('Hugo Ma'))
+    create_patient_profile(user_id)
+
+    post "/admin/patients/#{user_id}/edit", first_name: ' '
+
+    assert_includes(last_response.body, 'Please enter a first name.')
+    assert_includes(last_response.body, 'Please enter a last name.')
   end
 
   private
