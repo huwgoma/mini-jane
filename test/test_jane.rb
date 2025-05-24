@@ -789,6 +789,27 @@ class TestJane < Minitest::Test
     assert_includes(mt_listing.text, '0 Staff Members')
   end
 
+  def test_admin_edit_discipline_success
+    # It: 
+    # - Changes the values in the disciplines table
+    # - Redirects to the view page
+  end
+
+  def test_admin_edit_discipline_redirects_missing_or_nil_id
+    bad_id = 5
+    post "/admin/disciplines/#{bad_id}/edit"
+
+    assert_equal(302, last_response.status)
+    assert_includes(last_response['location'], '/admin/disciplines')
+    
+    get last_response['location']
+    assert_includes(last_response.body, 'could not be found')
+  end
+
+  def test_admin_edit_discipline_retains_values_on_error
+    
+  end
+
   private
 
   # Helpers for generating test data before tests #

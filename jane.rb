@@ -293,6 +293,9 @@ end
 
 # Edit a specific discipline
 post '/admin/disciplines/:discipline_id/edit' do
+  discipline_id = params[:discipline_id]
+  redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
+
   
 end
 
