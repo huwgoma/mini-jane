@@ -284,6 +284,11 @@ end
 
 # Form - Create a new discipline
 get '/admin/disciplines/new/?' do
+  render_with_layout(:new_discipline)
+end
+
+# - Create a new discipline
+post '/admin/disciplines/new' do
   
 end
 
