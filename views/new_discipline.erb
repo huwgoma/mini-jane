@@ -1,0 +1,20 @@
+<h2>Edit Discipline - <%= @discipline.name %></h2>
+
+<form action="/admin/disciplines/<%= @discipline.id %>/edit" method="post">
+  <div>
+    <label for="name">Name - Required</label>
+    <input type="text" name="name" id="name"
+      value="<%= prefill(:name, params, @discipline) %>"> <%# required %>
+  </div>
+
+  <div>
+    <label for="title">Title - Required</label>
+    <input type="text" name="title" id="title"
+      value=<%= prefill(:title, params, @discipline) %>> <%# required %>
+  </div>
+
+  <div>
+    <a href="/admin/disciplines">Cancel</a>
+    <button type="submit">Update Discipline</button>
+  </div>
+</form>

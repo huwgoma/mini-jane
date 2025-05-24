@@ -69,6 +69,7 @@ end
 # - CRUD for treatments
 # - Flesh out schedule 
 # - Delete cascade - appointments
+# 
 
 
 # # Admin - Schedule # #
@@ -281,8 +282,13 @@ get '/admin/disciplines/?' do
   render_with_layout(:disciplines)
 end
 
+# Form - Create a new discipline
+get '/admin/disciplines/new/?' do
+  
+end
+
 # Form - Edit a specific discipline
-get '/admin/disciplines/:discipline_id/edit' do
+get '/admin/disciplines/:discipline_id/edit/?' do
   discipline_id = params[:discipline_id]
   redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
 
@@ -306,7 +312,7 @@ post '/admin/disciplines/:discipline_id/edit' do
   else
     @storage.update_discipline(discipline_id, name, title)
     session[:success] = 'Discipline successfully updated.'
-    
+
     redirect "/admin/disciplines"
   end
 end

@@ -789,6 +789,24 @@ class TestJane < Minitest::Test
     assert_includes(mt_listing.text, '0 Staff Members')
   end
 
+  def test_admin_create_discipline_success
+    
+  end
+
+  def test_admin_create_discipline_error_empty_name_or_title
+    
+  end
+
+  def test_admin_create_discipline_error_duplicate_name
+    
+  end
+
+  def test_admin_create_discipline_retains_values_on_error
+    
+  end
+
+
+
   def test_admin_edit_discipline_success
     pt_id = return_id(create_discipline('Physio', 'pt'))
     record = @storage.query("SELECT * FROM disciplines WHERE id = $1", pt_id).first
@@ -845,6 +863,8 @@ class TestJane < Minitest::Test
     title_input = doc.at_xpath("//input[@id='title']")
     assert_equal('PT', title_input['value'])
   end
+
+
 
   private
 

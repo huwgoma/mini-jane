@@ -34,7 +34,7 @@ CREATE TABLE staff (
 CREATE TABLE disciplines (
   id       serial       PRIMARY KEY,
   name     varchar(255) NOT NULL UNIQUE,
-  title    varchar(2)
+  title    varchar(10)
 );
 
 CREATE TABLE staff_disciplines (
