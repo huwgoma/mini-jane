@@ -3,6 +3,8 @@
 require 'sinatra'
 require 'sinatra/contrib'
 require 'date_core'
+require 'active_support/inflector'
+
 require_relative 'pg_adapter'
 Dir.glob('lib/*.rb').each { |file| require_relative file }
 
@@ -289,8 +291,32 @@ end
 
 # - Create a new discipline
 post '/admin/disciplines/new' do
+  name, title = params[:name], params[:title]
+
+  session[:errors].push(*new_discipline_errors())
   
 end
+
+def new_discipline_errors(name, title)
+  
+end
+
+def edit_discipline_errors(name, title, id: nil)
+  errors = []
+  errors.push(empty_field_error(:name, name), empty_field_error(:title, title),
+    name_collision_error(table_name: 'disciplines', column_name: 'name', 
+      column_value: name, id: id))
+
+  errors
+end
+
+def name_collision_error(table_name:, column_name:, column_value: , id:)
+  if @storage.record_collision?(table_name: table_name, column_name: column_name,
+                       column_value: column_value, id: id)
+    "Another #{table_name.singularize} named #{column_value} already exists."
+  end
+end
+
 
 # Form - Edit a specific discipline
 get '/admin/disciplines/:discipline_id/edit/?' do
@@ -308,7 +334,7 @@ post '/admin/disciplines/:discipline_id/edit' do
   redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
 
   name, title = params[:name], params[:title]
-  session[:errors].push(*edit_discipline_errors(name, title))
+  session[:errors].push(*edit_discipline_errors(name, title, id: discipline_id))
 
   if session[:errors].any?
     @discipline = @storage.load_discipline(discipline_id)
@@ -360,11 +386,6 @@ def user_name_errors(first_name, last_name)
   errors
 end
 
-def edit_discipline_errors(name, title)
-  errors = []
-  errors.push(empty_field_error(:name, name), empty_field_error(:title, title))
-  errors
-end
   
 # Validations #
 def empty_field_error(attr_name, attr_value)

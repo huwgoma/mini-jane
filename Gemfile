@@ -6,6 +6,7 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'puma'
 gem 'pg'
+gem 'activesupport'
 
 group :development do
   gem 'pry'
