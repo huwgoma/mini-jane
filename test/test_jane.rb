@@ -790,9 +790,6 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_edit_discipline_success
-    # It: 
-    # - Changes the values in the disciplines table
-    # - Redirects to the view page
     pt_id = return_id(create_discipline('Physio', 'pt'))
     record = @storage.query("SELECT * FROM disciplines WHERE id = $1", pt_id).first
 
@@ -806,7 +803,10 @@ class TestJane < Minitest::Test
     assert_equal('PT', updated_record['title'])
 
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], "/admin/disciplines/#{pt_id}")
+    assert_includes(last_response['location'], "/admin/disciplines")
+
+    get last_response['location']
+    assert_includes(last_response.body, 'Discipline successfully updated.')
   end
 
   def test_admin_edit_discipline_redirects_missing_or_nil_id
