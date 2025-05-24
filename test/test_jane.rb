@@ -797,10 +797,13 @@ class TestJane < Minitest::Test
 
     disciplines_result = @storage.query("SELECT * FROM disciplines;")
     discipline = disciplines_result.first
-    
+
     assert_equal(1, disciplines_result.ntuples)
     assert_equal('Physiotherapy', discipline['name'])
     assert_equal('PT', discipline['title'])
+
+    assert_equal(302, last_response.status)
+    assert_includes(last_response['location'], '/admin/disciplines')
   end
 
   def test_admin_create_discipline_error_empty_name_or_title

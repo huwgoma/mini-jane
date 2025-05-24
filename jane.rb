@@ -299,8 +299,8 @@ post '/admin/disciplines/new' do
     render_with_layout(:new_discipline)
   else
     @storage.create_discipline(name, title)
-    # Create
-    # Redirect to/disciplines
+    
+    redirect '/admin/disciplines'
   end
 end
 
