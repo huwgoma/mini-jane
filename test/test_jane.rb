@@ -817,7 +817,19 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_edit_discipline_retains_values_on_error
-    
+    pt_id = return_id(create_discipline('Physio', 'P'))
+
+    post "/admin/disciplines/#{pt_id}/edit", name: 'Physiotherapy', title: ''
+    doc = Nokogiri::HTML(last_response.body)
+
+    name_input = doc.at_xpath("//input[@id='name']")
+    assert_equal('Physiotherapy', name_input['value'])
+
+    post "/admin/disciplines/#{pt_id}/edit", name: '', title: 'PT'
+    doc = Nokogiri::HTML(last_response.body)
+
+    title_input = doc.at_xpath("//input[@id='title']")
+    assert_equal('PT', title_input['value'])
   end
 
   private
