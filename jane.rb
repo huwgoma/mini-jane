@@ -308,15 +308,6 @@ post '/admin/disciplines/:discipline_id/edit' do
   end
 end
 
-def edit_discipline_errors(name, title)
-  errors = []
-  errors.push(empty_field_error(:name, name), empty_field_error(:title, title))
-  errors
-end
-
-def empty_field_error(attr_name, attr_value)
-  "Please enter a #{attr_name}." if empty_string?(attr_value)
-end
 
 # Helpers #
 def redirect_if_missing_id(type, id, path)
@@ -350,12 +341,24 @@ end
 
 def user_name_errors(first_name, last_name)
   errors = []
-  errors << 'Please enter a first name.' if empty_string?(first_name)
-  errors << 'Please enter a last name.' if empty_string?(last_name)
+  errors.push(empty_field_error(:first_name, first_name),
+              empty_field_error(:last_name, last_name))
+  errors
+end
+
+def edit_discipline_errors(name, title)
+  errors = []
+  errors.push(empty_field_error(:name, name), empty_field_error(:title, title))
   errors
 end
   
 # Validations #
+def empty_field_error(attr_name, attr_value)
+  attr_name = attr_name.to_s.gsub('_', ' ')
+
+  "Please enter a #{attr_name}." if empty_string?(attr_value)
+end
+
 def empty_string?(string)
   string.to_s.strip.empty?
 end
