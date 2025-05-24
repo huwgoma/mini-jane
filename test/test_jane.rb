@@ -794,18 +794,34 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_discipline_error_empty_name_or_title
-    
+    post '/admin/disciplines/new', name: '' # Missing Title
+
+    assert_includes(last_response.body, 'Please enter a name.')
+    assert_includes(last_response.body, 'Please enter a title.')
   end
 
   def test_admin_create_discipline_error_duplicate_name
-    
+    create_discipline('Physiotherapy', 'PT')
+
+    post '/admin/disciplines/new', name: 'Physiotherapy', title: 'PT'
+
+    assert_includes(last_response.body, 
+      'Another discipline named Physiotherapy already exists.')
   end
 
   def test_admin_create_discipline_retains_values_on_error
+    post "/admin/disciplines/new", name: 'Physiotherapy', title: ''
+    doc = Nokogiri::HTML(last_response.body)
+    name_input = doc.at_xpath("//input[@id='name']")
     
+    assert_equal('Physiotherapy', name_input['value'])
+   
+    post "/admin/disciplines/new", name: '', title: 'PT'
+    doc = Nokogiri::HTML(last_response.body)
+    title_input = doc.at_xpath("//input[@id='title']")
+    
+    assert_equal('PT', title_input['value'])
   end
-
-
 
   def test_admin_edit_discipline_success
     pt_id = return_id(create_discipline('Physio', 'pt'))

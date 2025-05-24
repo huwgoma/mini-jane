@@ -295,29 +295,14 @@ post '/admin/disciplines/new' do
 
   session[:errors].push(*new_discipline_errors(name, title))
   
-end
+  if session[:errors].any?
+    render_with_layout(:new_discipline)
+    # Commit:
+    # - Add error path to CREATE discipline route;
+    # add test_admin_create_discipline_error_empty_name_or_title,
+    # test_admin_c
+  else
 
-def new_discipline_errors(name, title)
-  discipline_errors(name, title)
-end
-
-def edit_discipline_errors(name, title, id)
-  discipline_errors(name, title, id: id)
-end
-
-def discipline_errors(name, title, id: nil)
-  errors = []
-  errors.push(empty_field_error(:name, name), empty_field_error(:title, title),
-    name_collision_error(table_name: 'disciplines', column_name: 'name', 
-      column_value: name, id: id))
-
-  errors
-end 
-
-def name_collision_error(table_name:, column_name:, column_value: , id:)
-  if @storage.record_collision?(table_name: table_name, column_name: column_name,
-                       column_value: column_value, id: id)
-    "Another #{table_name.singularize} named #{column_value} already exists."
   end
 end
 
@@ -382,7 +367,7 @@ end
 def edit_patient_errors(first_name, last_name)
   user_name_errors(first_name, last_name)
 end
-
+# - Errors for user (Patient/Staff) names
 def user_name_errors(first_name, last_name)
   errors = []
   errors.push(empty_field_error(:first_name, first_name),
@@ -390,8 +375,34 @@ def user_name_errors(first_name, last_name)
   errors
 end
 
+# - Errors for creating a new discipline
+def new_discipline_errors(name, title)
+  discipline_errors(name, title)
+end
+
+# - Errors for editing an existing discipline
+def edit_discipline_errors(name, title, id)
+  discipline_errors(name, title, id: id)
+end
+
+# - Errors for creating/editing disciplines
+def discipline_errors(name, title, id: nil)
+  errors = []
+  errors.push(empty_field_error(:name, name), empty_field_error(:title, title),
+    name_collision_error(table_name: 'disciplines', column_name: 'name', 
+      column_value: name, id: id))
+
+  errors
+end 
   
 # Validations #
+def name_collision_error(table_name:, column_name:, column_value: , id:)
+  if @storage.record_collision?(table_name: table_name, column_name: column_name,
+                       column_value: column_value, id: id)
+    "Another #{table_name.singularize} named #{column_value} already exists."
+  end
+end
+
 def empty_field_error(attr_name, attr_value)
   attr_name = attr_name.to_s.gsub('_', ' ')
 
