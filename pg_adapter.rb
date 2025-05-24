@@ -17,10 +17,24 @@ class PGAdapter
     return unless table_whitelist.include?(table_name)
 
     pk_column_name = schema_primary_key_column_name(table_name)
-    sql = "SELECT * FROM #{table_name} 
+    sql = "SELECT 1 FROM #{table_name} 
            WHERE #{pk_column_name} = $1;"
 
     query(sql, id).ntuples.positive?
+  end
+
+  def record_collision?(table_name:, column_name:, column_value:, id: nil)
+    table_whitelist = schema_table_names
+    return unless table_whitelist.include?(table_name)
+
+    column_whitelist = schema_column_names(table_name)
+    return unless column_whitelist.include?(column_name)
+
+    sql = "SELECT 1 FROM #{table_name} 
+           WHERE #{column_name} = $2
+           AND ($1::integer IS NULL OR id <> $1);"
+
+    query(sql, id, column_value).ntuples.positive?
   end
 
   # Schedule # 
@@ -214,6 +228,15 @@ class PGAdapter
     result = query(sql)
 
     result.map { |row| row['table_name'] }
+  end
+
+  # Query the names of all columns in the specified table
+  def schema_column_names(table_name)
+    sql = "SELECT column_name FROM information_schema.columns
+           WHERE table_schema = 'public' AND table_name = $1;"
+    result = query(sql, table_name)
+
+    result.map { |row| row['column_name'] }
   end
 
   # Query the name of the PRIMARY KEY column 
