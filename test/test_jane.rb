@@ -848,6 +848,16 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'Please enter a title.')
   end
 
+  def test_admin_edit_discipline_error_duplicate_name
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    create_discipline('Chiropractic', 'DC')
+
+    post "/admin/disciplines/#{pt_id}/edit", name: 'Chiropractic', title: 'DC'
+
+    assert_includes(last_response.body,
+      "Another discipline named Chiropractic already exists.")
+  end
+
   def test_admin_edit_discipline_retains_values_on_error
     pt_id = return_id(create_discipline('Physio', 'P'))
 
@@ -863,7 +873,6 @@ class TestJane < Minitest::Test
     title_input = doc.at_xpath("//input[@id='title']")
     assert_equal('PT', title_input['value'])
   end
-
 
 
   private
