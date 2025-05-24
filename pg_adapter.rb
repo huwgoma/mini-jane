@@ -199,6 +199,13 @@ class PGAdapter
     result.map { |row| [ row['id'].to_i, row['count'].to_i ] }.to_h
   end
 
+  def create_discipline(name, title)
+    sql = "INSERT INTO disciplines (name, title)
+           VALUES ($1, $2);"
+
+    query(sql, name, title)
+  end
+
   def update_discipline(discipline_id, name, title)
     sql = "UPDATE disciplines
            SET name = $2, title = $3

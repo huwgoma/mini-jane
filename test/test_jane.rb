@@ -790,7 +790,17 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_discipline_success
+    disciplines_result = @storage.query("SELECT * FROM disciplines;")
+    assert_equal(0, disciplines_result.ntuples)
+
+    post '/admin/disciplines/new', name: 'Physiotherapy', title: 'PT'
+
+    disciplines_result = @storage.query("SELECT * FROM disciplines;")
+    discipline = disciplines_result.first
     
+    assert_equal(1, disciplines_result.ntuples)
+    assert_equal('Physiotherapy', discipline['name'])
+    assert_equal('PT', discipline['title'])
   end
 
   def test_admin_create_discipline_error_empty_name_or_title

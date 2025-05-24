@@ -297,12 +297,10 @@ post '/admin/disciplines/new' do
   
   if session[:errors].any?
     render_with_layout(:new_discipline)
-    # Commit:
-    # - Add error path to CREATE discipline route;
-    # add test_admin_create_discipline_error_empty_name_or_title,
-    # test_admin_c
   else
-
+    @storage.create_discipline(name, title)
+    # Create
+    # Redirect to/disciplines
   end
 end
 
