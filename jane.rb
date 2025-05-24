@@ -296,7 +296,26 @@ post '/admin/disciplines/:discipline_id/edit' do
   discipline_id = params[:discipline_id]
   redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
 
-  
+  name, title = params[:name], params[:title]
+  session[:errors].push(*edit_discipline_errors(name, title))
+
+  if session[:errors].any?
+    @discipline = @storage.load_discipline(discipline_id)
+
+    render_with_layout(:edit_discipline)
+  else
+
+  end
+end
+
+def edit_discipline_errors(name, title)
+  errors = []
+  errors.push(empty_field_error(:name, name), empty_field_error(:title, title))
+  errors
+end
+
+def empty_field_error(attr_name, attr_value)
+  "Please enter a #{attr_name}." if empty_string?(attr_value)
 end
 
 # Helpers #
@@ -314,22 +333,22 @@ end
 # Error Message Setting #
 # - Errors for inserting a new staff member
 def new_staff_errors(first_name, last_name)
-  name_errors(first_name, last_name)
+  user_name_errors(first_name, last_name)
 end
 # - Errors for updating an existing staff member 
 def edit_staff_errors(first_name, last_name)
-  name_errors(first_name, last_name)
+  user_name_errors(first_name, last_name)
 end
 # - Errors for creating a new patient
 def new_patient_errors(first_name, last_name)
-  name_errors(first_name, last_name)
+  user_name_errors(first_name, last_name)
 end
 # - Errors for updating an existing patient
 def edit_patient_errors(first_name, last_name)
-  name_errors(first_name, last_name)
+  user_name_errors(first_name, last_name)
 end
 
-def name_errors(first_name, last_name)
+def user_name_errors(first_name, last_name)
   errors = []
   errors << 'Please enter a first name.' if empty_string?(first_name)
   errors << 'Please enter a last name.' if empty_string?(last_name)

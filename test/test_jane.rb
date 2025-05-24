@@ -806,6 +806,16 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'could not be found')
   end
 
+  def test_admin_edit_discipline_error_empty_name_or_title
+    pt_id = return_id(create_discipline('Physio', 'Pt'))
+
+    # Empty name, missing title
+    post "/admin/disciplines/#{pt_id}/edit", name: ''
+
+    assert_includes(last_response.body, 'Please enter a name.')
+    assert_includes(last_response.body, 'Please enter a title.')
+  end
+
   def test_admin_edit_discipline_retains_values_on_error
     
   end
