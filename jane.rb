@@ -293,22 +293,26 @@ end
 post '/admin/disciplines/new' do
   name, title = params[:name], params[:title]
 
-  session[:errors].push(*new_discipline_errors())
+  session[:errors].push(*new_discipline_errors(name, title))
   
 end
 
 def new_discipline_errors(name, title)
-  
+  discipline_errors(name, title)
 end
 
-def edit_discipline_errors(name, title, id: nil)
+def edit_discipline_errors(name, title, id)
+  discipline_errors(name, title, id: id)
+end
+
+def discipline_errors(name, title, id: nil)
   errors = []
   errors.push(empty_field_error(:name, name), empty_field_error(:title, title),
     name_collision_error(table_name: 'disciplines', column_name: 'name', 
       column_value: name, id: id))
 
   errors
-end
+end 
 
 def name_collision_error(table_name:, column_name:, column_value: , id:)
   if @storage.record_collision?(table_name: table_name, column_name: column_name,
@@ -334,7 +338,7 @@ post '/admin/disciplines/:discipline_id/edit' do
   redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
 
   name, title = params[:name], params[:title]
-  session[:errors].push(*edit_discipline_errors(name, title, id: discipline_id))
+  session[:errors].push(*edit_discipline_errors(name, title, discipline_id))
 
   if session[:errors].any?
     @discipline = @storage.load_discipline(discipline_id)
