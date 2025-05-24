@@ -304,7 +304,9 @@ post '/admin/disciplines/:discipline_id/edit' do
 
     render_with_layout(:edit_discipline)
   else
+    @storage.update_discipline(discipline_id, name, title)
 
+    redirect "/admin/disciplines/#{discipline_id}"
   end
 end
 

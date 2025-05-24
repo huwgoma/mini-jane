@@ -793,6 +793,20 @@ class TestJane < Minitest::Test
     # It: 
     # - Changes the values in the disciplines table
     # - Redirects to the view page
+    pt_id = return_id(create_discipline('Physio', 'pt'))
+    record = @storage.query("SELECT * FROM disciplines WHERE id = $1", pt_id).first
+
+    assert_equal('Physio', record['name'])
+    assert_equal('pt', record['title'])
+
+    post "/admin/disciplines/#{pt_id}/edit", name: 'Physiotherapy', title: 'PT'
+    updated_record = @storage.query("SELECT * FROM disciplines WHERE id = $1", pt_id).first
+
+    assert_equal('Physiotherapy', updated_record['name'])
+    assert_equal('PT', updated_record['title'])
+
+    assert_equal(302, last_response.status)
+    assert_includes(last_response['location'], "/admin/disciplines/#{pt_id}")
   end
 
   def test_admin_edit_discipline_redirects_missing_or_nil_id
