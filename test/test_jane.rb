@@ -923,6 +923,14 @@ class TestJane < Minitest::Test
     assert_includes(mt_ol.text, 'MT - 30 Minutes')
   end
 
+  def test_admin_create_treatment_success
+    
+  end
+
+  def test_admin_create_treatment_error_
+    # 
+  end
+
 
   private
 

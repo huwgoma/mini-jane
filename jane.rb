@@ -41,6 +41,15 @@ helpers do
     params[attribute] || 
     (object.method(attribute).call if object.respond_to?(attribute))
   end
+
+  def pretty_duration(duration_in_minutes)
+    hours, minutes = duration_in_minutes.divmod(60)
+
+    hours_string = hours.zero? ? '' : "#{hours} #{'hour'.pluralize(hours)}"
+    minutes_string = minutes.zero? ? '' : "#{minutes} #{'minute'.pluralize(minutes)}"
+
+    "#{hours_string} #{minutes_string}"
+  end
 end
 
 # Routes
@@ -331,12 +340,30 @@ post '/admin/disciplines/:discipline_id/edit' do
 end
 
 # # Settings - Treatments # # 
+# - View all treatments, ordered by discipline
 get '/admin/treatments/?' do
   @disciplines = @storage.load_disciplines
   @treatments_by_discipline_id = group_treatments_by_discipline_id(@storage.load_treatments)
 
   render_with_layout(:treatments)
 end
+
+# Form - Create a new treatment
+get '/admin/treatments/new/?' do
+  @disciplines = @storage.load_disciplines
+  @tx_lengths = Treatment.lengths
+
+  render_with_layout(:new_treatment)
+end
+
+# - Create a new treatment
+post '/admin/treatments/new/?' do
+  binding.pry
+  # Validations: 
+  # - Name is required
+  # - Discipline is required; discipline ID must correspond
+end
+
 
 # Helpers #
 def redirect_if_missing_id(type, id, path)

@@ -6,4 +6,9 @@ class Treatment
     @name = name
     @length, @price = length, price
   end
+
+  def self.lengths
+    # 5min - 3hr, 5-minute intervals
+    (5..180).step(5).to_a
+  end
 end

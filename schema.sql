@@ -48,7 +48,7 @@ CREATE TABLE treatments (
   id            serial       PRIMARY KEY,
   name          varchar(255) NOT NULL,
   discipline_id integer      REFERENCES disciplines ON DELETE CASCADE NOT NULL,
-  length      integer        NOT NULL CHECK((length BETWEEN 5 AND 180) AND (length % 5 = 0)),
+  length        integer      NOT NULL CHECK((length BETWEEN 5 AND 180) AND (length % 5 = 0)),
                              -- Only 5-minute intervals, up to 3 hours
   price         money        NOT NULL CHECK(price::numeric >= 0.00) DEFAULT 0.00,
   UNIQUE(discipline_id, name)

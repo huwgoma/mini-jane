@@ -1,0 +1,38 @@
+<h2>New Treatment</h2>
+
+<form action="/admin/treatments/new" method="post">
+  <div>
+    <label for="disciplines">Discipline - Required</label>
+      <select name="discipline_id" id="disciplines"> <%# required %>
+      <% @disciplines.each do |discipline| %>
+        <option value="<%= discipline.id %>"> <%# pre-select from params %>
+          <%= discipline.name %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+
+  <div>
+    <label for="name">Treatment Name - Required</label>
+    <input type="text" name="name" id="name"
+      value="<%= prefill(:name, params) %>"> <%# required %>
+  </div>
+
+  <div>
+    <label for="length">Length - Required</label>
+    <select name="length" id="length">
+      <% @tx_lengths.each do |length| %>
+        <option value="<%= length %>">
+          <%= pretty_duration(length) %>
+        </option>
+      <% end %>
+    </select>
+
+
+  </div>
+
+  <div>
+    <a href="/admin/disciplines">Cancel</a>
+    <button type="submit">Create Discipline</button>
+  </div>
+</form>
