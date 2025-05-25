@@ -213,6 +213,14 @@ class PGAdapter
     query(sql, discipline_id, name, title)
   end
 
+  # Treatments # 
+  def load_treatments
+    sql = "SELECT * FROM treatments;"
+    result = query(sql)
+
+    result.map { |treatment| format_treatment(treatment) }
+  end
+
   private
 
   attr_reader :logger
@@ -430,5 +438,14 @@ class PGAdapter
     title = discipline['title']
 
     Discipline.new(id, name, title)
+  end
+
+  def format_treatment(treatment)
+    id, discipline_id = treatment['id'].to_i, treatment['discipline_id'].to_i
+    name = treatment['name']
+    length, price = treatment['length'], treatment['price']
+
+    Treatment.new(id, name, discipline_id: discipline_id, 
+      length: length, price: price)
   end
 end

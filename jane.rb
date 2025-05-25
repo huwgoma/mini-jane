@@ -332,7 +332,11 @@ end
 
 # # Settings - Treatments # # 
 get '/admin/treatments/?' do
-  
+  @disciplines = @storage.load_disciplines
+  @treatments_by_discipline_id = group_treatments_by_discipline_id(@storage.load_treatments)
+
+  # load disciplines
+  # load treatments (with discipline id)
 end
 
 # Helpers #
@@ -343,8 +347,13 @@ def redirect_if_missing_id(type, id, path)
   end
 end
 
+# Formatting # 
 def normalize_date_input(date_string)
   date_string.to_s.strip.empty? ? nil : date_string
+end
+
+def group_treatments_by_discipline_id(treatments)
+  treatments.group_by(&:discipline_id)
 end
 
 # Error Message Setting #
