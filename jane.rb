@@ -42,6 +42,11 @@ helpers do
     (object.method(attribute).call if object.respond_to?(attribute))
   end
 
+  # Check if a given <option> should be pre-selected.
+  def preselected?(select_name, option_value, params)
+    params[select_name] == option_value.to_s
+  end
+
   def pretty_duration(duration_in_minutes)
     hours, minutes = duration_in_minutes.divmod(60)
 
