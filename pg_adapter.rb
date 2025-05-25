@@ -215,7 +215,7 @@ class PGAdapter
 
   # Treatments # 
   def load_treatments
-    sql = "SELECT * FROM treatments;"
+    sql = "SELECT * FROM treatments ORDER BY discipline_id, id;"
     result = query(sql)
 
     result.map { |treatment| format_treatment(treatment) }

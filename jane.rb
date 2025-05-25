@@ -336,8 +336,6 @@ get '/admin/treatments/?' do
   @treatments_by_discipline_id = group_treatments_by_discipline_id(@storage.load_treatments)
 
   render_with_layout(:treatments)
-  # load disciplines
-  # load treatments (with discipline id)
 end
 
 # Helpers #

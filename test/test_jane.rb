@@ -905,7 +905,22 @@ class TestJane < Minitest::Test
 
   # - Treatments
   def test_admin_view_treatments_ordered_by_discipline
-    
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    mt_id = return_id(create_discipline('Massage Therapy', 'MT'))
+
+    create_treatment('PT - Initial', pt_id, 45, 100.00)
+    create_treatment('PT - Treatment', pt_id, 30, 85.00)
+    create_treatment('MT - 30 Minutes', mt_id, 30, 75.00)
+
+    get '/admin/treatments'
+    doc = Nokogiri::HTML(last_response.body)
+
+    pt_ol = doc.at_xpath("//h4[text()='Physiotherapy']/following-sibling::ol")
+    mt_ol = doc.at_xpath("//h4[text()='Massage Therapy']/following-sibling::ol")
+
+    assert_includes(pt_ol.text, 'PT - Initial')
+    assert_includes(pt_ol.text, 'PT - Treatment')
+    assert_includes(mt_ol.text, 'MT - 30 Minutes')
   end
 
 
