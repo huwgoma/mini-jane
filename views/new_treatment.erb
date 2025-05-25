@@ -15,7 +15,7 @@
   <div>
     <label for="name">Treatment Name - Required</label>
     <input type="text" name="name" id="name"
-      value="<%= prefill(:name, params) %>"> <%# required %>
+      value="<%= prefill(:name, params) %>" required>
   </div>
 
   <div>
@@ -27,12 +27,16 @@
         </option>
       <% end %>
     </select>
-
-
   </div>
 
   <div>
-    <a href="/admin/disciplines">Cancel</a>
+    <label for="price">Price - Required</label>
+    <input type="number" name="price" id="price"
+      min="0.00" step="0.01" required>
+  </div>
+
+  <div>
+    <a href="/admin/treatments">Cancel</a>
     <button type="submit">Create Discipline</button>
   </div>
 </form>
