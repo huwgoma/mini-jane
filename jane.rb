@@ -358,7 +358,11 @@ end
 
 # - Create a new treatment
 post '/admin/treatments/new/?' do
-  binding.pry
+  @disciplines = @storage.load_disciplines
+  @tx_lengths = Treatment.lengths
+
+  render_with_layout(:new_treatment)
+  
   # Validations: 
   # - Name is required
   # - Discipline is required; discipline ID must correspond
