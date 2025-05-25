@@ -927,8 +927,14 @@ class TestJane < Minitest::Test
     
   end
 
-  def test_admin_create_treatment_error_
-    # 
+  def test_admin_create_treatment_error_all_fields_required
+    post '/admin/treatments/new', discipline_id: '', name: '',
+      length: '', price: ''
+
+    assert_includes(last_response.body, 'Please enter a name.')
+    assert_includes(last_response.body, 'Please enter a price.')
+    assert_includes(last_response.body, 'Please select a length.')
+    assert_includes(last_response.body, 'does not match any existing disciplines.')
   end
 
 

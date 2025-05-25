@@ -363,14 +363,17 @@ end
 
 # - Create a new treatment
 post '/admin/treatments/new/?' do
+  discipline_id = params[:discipline_id].to_i
+  name = params[:name]
+  length, price = params[:length], params[:price]
+
+  session[:errors].push(*new_treatment_errors(discipline_id, name, length, price))
+
   @disciplines = @storage.load_disciplines
   @tx_lengths = Treatment.lengths
 
   render_with_layout(:new_treatment)
   
-  # Validations: 
-  # - Name is required
-  # - Discipline is required; discipline ID must correspond
 end
 
 
@@ -435,6 +438,23 @@ def discipline_errors(name, title, id: nil)
 
   errors
 end 
+
+# - Errors for creating new treatments
+def new_treatment_errors(discipline_id, name, length, price)
+  errors = []
+  errors.push(empty_field_error(:name,  name), empty_field_error(:price, price))
+  errors.push(invalid_select_error('length', length, Treatment.lengths))
+  errors.push(invalid_treatment_discipline_id_error(discipline_id))
+
+  errors
+end
+
+# - Error if a treatment's discipline ID does not exist
+def invalid_treatment_discipline_id_error(discipline_id)
+  unless @storage.record_exists?('disciplines', discipline_id)
+    "Discipline ID (#{discipline_id}) does not match any existing disciplines."
+  end
+end
   
 # Validations #
 def name_collision_error(table_name:, column_name:, column_value: , id:)
@@ -448,6 +468,13 @@ def empty_field_error(attr_name, attr_value)
   attr_name = attr_name.to_s.gsub('_', ' ')
 
   "Please enter a #{attr_name}." if empty_string?(attr_value)
+end
+
+def invalid_select_error(attr_name, option_value, options)
+  option_value = option_value.to_s
+  options = options.map(&:to_s)
+
+  "Please select a #{attr_name}." unless options.include?(option_value)
 end
 
 def empty_string?(string)

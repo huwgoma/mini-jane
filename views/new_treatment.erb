@@ -24,12 +24,14 @@
   <div>
     <label for="length">Length - Required</label>
     <select name="length" id="length">
+
       <% @tx_lengths.each do |length| %>
         <option value="<%= length %>"
           <%= 'selected' if preselected?('length', length, params) %>>
           <%= pretty_duration(length) %>
         </option>
       <% end %>
+      
     </select>
   </div>
 
