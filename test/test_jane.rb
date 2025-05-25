@@ -903,6 +903,11 @@ class TestJane < Minitest::Test
     assert_equal('PT', title_input['value'])
   end
 
+  # - Treatments
+  def test_admin_view_treatments_ordered_by_discipline
+    
+  end
+
 
   private
 

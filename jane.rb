@@ -55,10 +55,7 @@ not_found do
   redirect '/admin/schedule/'
 end
 
-# Commit
-#
-#
-######### 
+
 # To Do #
 #########
 # 2) Create helper for extracting params
@@ -67,11 +64,10 @@ end
 # - Clear DB ONCE before test suite
 
 # - CRUD for appointments
-# - CRUD for disciplines
 # - CRUD for treatments
 # - Flesh out schedule 
-# - Delete cascade - appointments
 # 
+# Revisit DELETEs: cascade vs. restrict
 
 
 # # Admin - Schedule # #
@@ -304,7 +300,6 @@ post '/admin/disciplines/new' do
   end
 end
 
-
 # Form - Edit a specific discipline
 get '/admin/disciplines/:discipline_id/edit/?' do
   discipline_id = params[:discipline_id]
@@ -335,6 +330,10 @@ post '/admin/disciplines/:discipline_id/edit' do
   end
 end
 
+# # Settings - Treatments # # 
+get '/admin/treatments/?' do
+  
+end
 
 # Helpers #
 def redirect_if_missing_id(type, id, path)
