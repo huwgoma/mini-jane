@@ -43,8 +43,9 @@ helpers do
   end
 
   # Check if a given <option> should be pre-selected.
-  def preselected?(select_name, option_value, params)
-    params[select_name] == option_value.to_s
+  def preselected?(select_name, option_value, params, obj=nil)
+    params[select_name] == option_value.to_s ||
+      (obj.method(select_name).call == option_value if obj.respond_to?(select_name))
   end
 
   def pretty_duration(duration_in_minutes)

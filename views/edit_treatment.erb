@@ -7,7 +7,7 @@
       
       <% @disciplines.each do |discipline| %>
         <option value="<%= discipline.id %>" 
-          <%= 'selected' if preselected?('discipline_id', discipline.id, params) %>>
+          <%= 'selected' if preselected?('discipline_id', discipline.id, params, @treatment) %>>
           <%= discipline.name %>
         </option>
       <% end %>

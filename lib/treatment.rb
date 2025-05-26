@@ -12,8 +12,4 @@ class Treatment
     # 5min - 3hr, 5-minute intervals
     (5..180).step(5).to_a
   end
-
-  def pretty_price
-    "$#{price}"
-  end
 end
