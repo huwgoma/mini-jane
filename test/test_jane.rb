@@ -997,6 +997,27 @@ class TestJane < Minitest::Test
     assert_equal(0, treatments_count)
   end
 
+  def test_admin_create_treatment_retains_values_on_error
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    create_discipline('Massage Therapy', 'MT')
+    create_discipline('Chiropractic', 'DC')
+
+    post "/admin/treatments/new", name: '', discipline_id: pt_id,
+      length: '30', price: '85.00'
+    doc = Nokogiri::HTML(last_response.body)
+
+    # PT <option> is selected
+    pt_option = doc.at_xpath("//option[contains(text(), 'Physiotherapy')]")
+    refute_nil(pt_option['selected'])
+    
+    # 30 minute <option> is selected
+    length_option = doc.at_xpath("//option[@value='30']")
+    refute_nil(length_option['selected'])
+
+    # Price value is retained
+    assert_includes(last_response.body, '85.00')
+  end
+
   def test_admin_edit_treatment_success
     # Doesnt change the number of treatment rcords
     # Edits the fields of the target treatment correctly
