@@ -1041,23 +1041,64 @@ class TestJane < Minitest::Test
     post "/admin/treatments/#{tx_id}/edit", discipline_id: '', 
       name: '', length: '', price: ''
     
-    # assert_includes(last_response.body, 'Please enter a name.')
-    # assert_includes(last_response.body, 'Please enter a price.')
-    # assert_includes(last_response.body, 'Please select a valid length.')
-    # assert_includes(last_response.body, 'does not match any existing disciplines.')
-    
+    assert_includes(last_response.body, 'Please enter a name.')
+    assert_includes(last_response.body, 'Please enter a price.')
+    assert_includes(last_response.body, 'Please select a valid length.')
+    assert_includes(last_response.body, 'does not match any existing disciplines.')
+  end
+
+  def test_admin_edit_treatment_error_negative_price
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    tx_id = return_id(create_treatment('PT Tx', pt_id, 30, 85))
+
+    post "/admin/treatments/#{tx_id}/edit", name: 'PT Tx', 
+      discipline_id: pt_id, length: 30, price: -10
+
+    assert_includes(last_response.body, 'Please enter a non-negative price.')
   end
 
   def test_admin_edit_treatment_error_discipline_id_must_exist
-    
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    tx_id = return_id(create_treatment('PT Tx', pt_id, 30, 85))
+
+    bad_id = pt_id + 1
+
+    post "/admin/treatments/#{tx_id}/edit", discipline_id: bad_id, 
+      name: 'PT - Treatment', length: '30', price: '85'
+
+    assert_includes(last_response.body, 'does not match any existing disciplines.')
   end
 
-  def test_admin_create_treatment_invalid_length_select
-    
+  def test_admin_edit_treatment_invalid_length_select
+    pt_id = return_id(create_discipline('Physio', 'PT'))
+    tx_id = return_id(create_treatment('PT - Tx', pt_id, 30, 85))
+
+    post "admin/treatments/#{tx_id}/edit", name: 'PT - Tx', 
+      discipline_id: pt_id, length: 3, price: 100.00
+
+    assert_includes(last_response.body, 'Please select a valid length.')
   end
 
   def test_admin_edit_treatment_retains_values_on_error
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    mt_id = return_id(create_discipline('Massage Therapy', 'MT'))
+
+    tx_id = return_id(create_treatment('PT - Tx', pt_id, 30, 85))
+
+    post "/admin/treatments/#{tx_id}/edit", name: '', 
+      discipline_id: mt_id, length: '60', price: '120.00'
+    doc = Nokogiri::HTML(last_response.body)
+
+    # MT <option> is selected
+    mt_option = doc.at_xpath("//option[contains(text(), 'Massage Therapy')]")
+    refute_nil(mt_option['selected'])
     
+    # 60 minute <option> is selected
+    length_option = doc.at_xpath("//option[@value='60']")
+    refute_nil(length_option['selected'])
+
+    # Price value is retained
+    assert_includes(last_response.body, '120.00')
   end
 
 
