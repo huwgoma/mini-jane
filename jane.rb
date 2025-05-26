@@ -450,10 +450,16 @@ end
 def new_treatment_errors(discipline_id, name, length, price)
   errors = []
   errors.push(empty_field_error(:name,  name), empty_field_error(:price, price))
+  errors.push(negative_price_error(price))
   errors.push(invalid_select_error('length', length, Treatment.lengths))
   errors.push(invalid_treatment_discipline_id_error(discipline_id))
 
   errors
+end
+
+# - Error if a given price value is negative.
+def negative_price_error(price)
+  'Please enter a non-negative price.' if price.to_f.negative?
 end
 
 # - Error if a treatment's discipline ID does not exist
@@ -462,6 +468,8 @@ def invalid_treatment_discipline_id_error(discipline_id)
     "Discipline ID (#{discipline_id}) does not match any existing disciplines."
   end
 end
+
+
   
 # Validations #
 def name_collision_error(table_name:, column_name:, column_value: , id:)

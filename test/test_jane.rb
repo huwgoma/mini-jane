@@ -952,6 +952,19 @@ class TestJane < Minitest::Test
 
   end
 
+  def test_admin_create_treatment_error_negative_price
+    pt_id = return_id(create_discipline('Physio', 'PT'))  
+
+    treatments_count = @storage.query("SELECT * FROM treatments;").ntuples
+
+    post '/admin/treatments/new', name: 'Test', discipline_id: pt_id,
+      length: 30, price: -10
+
+    new_treatments_count = @storage.query("SELECT * FROM treatments;").ntuples
+    assert_equal(new_treatments_count, treatments_count)
+    assert_includes(last_response.body, 'Please enter a non-negative price.')
+  end
+
   def test_admin_create_treatment_discipline_id_must_exist
     pt_id = return_id(create_discipline('Physio', 'PT'))
     bad_discipline_id = pt_id + 1
