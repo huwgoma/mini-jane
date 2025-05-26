@@ -58,7 +58,7 @@ helpers do
   end
 
   def pretty_price(price, currency: '$')
-    return '' if price.nil?
+    return '' if empty_string?(price.to_s)
 
     format("#{currency}%.2f", price)
   end
@@ -392,6 +392,7 @@ end
 # Form - Edit a treatment
 get '/admin/treatments/:treatment_id/edit/?' do
   treatment_id = params[:treatment_id]
+  redirect_if_missing_id('treatments', treatment_id, '/admin/treatments')
 
   @treatment = @storage.load_treatment(treatment_id)
   @disciplines = @storage.load_disciplines
@@ -402,7 +403,23 @@ end
 
 # - Edit a treatment
 post '/admin/treatments/:treatment_id/edit' do
-  
+  treatment_id = params[:treatment_id]
+  redirect_if_missing_id('treatments', treatment_id, '/admin/treatments')
+
+  discipline_id = params[:discipline_id]
+  name, length, price = params.values_at(:name, :length, :price)
+
+  session[:errors].push(*edit_treatment_errors(discipline_id, name, length, price))
+
+  if session[:errors].any?
+    @treatment = @storage.load_treatment(treatment_id)
+    @disciplines = @storage.load_disciplines
+    @tx_lengths = Treatment.lengths
+    
+    render_with_layout(:edit_treatment)
+  else
+
+  end
 end
 
 
@@ -470,6 +487,16 @@ end
 
 # - Errors for creating new treatments
 def new_treatment_errors(discipline_id, name, length, price)
+  treatment_errors(discipline_id, name, length, price)
+end
+
+# - Errors for editing existing treatments
+def edit_treatment_errors(discipline_id, name, length, price)
+  treatment_errors(discipline_id, name, length, price)
+end
+
+# - Errors for creating/editing treatments
+def treatment_errors(discipline_id, name, length, price)
   errors = []
   errors.push(empty_field_error(:name,  name), empty_field_error(:price, price))
   errors.push(negative_price_error(price))
