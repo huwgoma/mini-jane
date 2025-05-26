@@ -380,7 +380,15 @@ post '/admin/treatments/new/?' do
     
     redirect '/admin/treatments'
   end
-  
+end
+
+# Form - Edit a treatment
+get '/admin/treatments/:treatment_id/edit/?' do
+  treatment_id = params[:treatment_id]
+
+  @treatment = @storage.load_treatment(treatment_id)
+  binding.pry
+  render_with_layout(:edit_treatment)
 end
 
 

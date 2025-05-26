@@ -221,6 +221,12 @@ class PGAdapter
     result.map { |treatment| format_treatment(treatment) }
   end
 
+  def load_treatment(id)
+    sql = "SELECT * FROM treatments WHERE id = $1;"
+
+    format_treatment(query(sql, id).first)
+  end
+
   def create_treatment(name, discipline_id, length, price)
     sql = "INSERT INTO treatments (name, discipline_id, length, price)
            VALUES ($1, $2, $3, $4);"

@@ -11,6 +11,7 @@
       <p><%= treatment.name %></p>
       <p>Treatment Length: <%= treatment.length %> minutes</p>
       <p>Price: <%= treatment.price %></p>
+      <a href="/admin/treatments/<%= treatment.id %>/edit">Edit Treatment</a>
     </li>
   <% end %>
   </ol>

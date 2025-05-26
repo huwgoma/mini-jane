@@ -997,6 +997,25 @@ class TestJane < Minitest::Test
     assert_equal(0, treatments_count)
   end
 
+  def test_admin_edit_treatment_success
+    # Doesnt change the number of treatment rcords
+    # Edits the fields of the target treatment correctly
+    # Redirects
+  end
+
+  def test_admin_edit_treatment_error_all_fields_required
+    
+  end
+
+  def test_admin_edit_treatmmnt_error_discipline_id_must_exist
+    
+  end
+
+  def test_admin_create_treatment_invalid_length_select
+    
+  end
+
+
 
   private
 
