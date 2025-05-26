@@ -478,7 +478,7 @@ def invalid_select_error(attr_name, option_value, options)
   option_value = option_value.to_s
   options = options.map(&:to_s)
 
-  "Please select a #{attr_name}." unless options.include?(option_value)
+  "Please select a valid #{attr_name}." unless options.include?(option_value)
 end
 
 def empty_string?(string)

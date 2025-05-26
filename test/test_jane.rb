@@ -933,8 +933,27 @@ class TestJane < Minitest::Test
 
     assert_includes(last_response.body, 'Please enter a name.')
     assert_includes(last_response.body, 'Please enter a price.')
-    assert_includes(last_response.body, 'Please select a length.')
+    assert_includes(last_response.body, 'Please select a valid length.')
     assert_includes(last_response.body, 'does not match any existing disciplines.')
+  end
+
+  def test_admin_create_treatment_discipline_id_must_exist
+    pt_id = return_id(create_discipline('Physio', 'PT'))
+    bad_discipline_id = pt_id + 1
+
+    post 'admin/treatments/new', name: 'Test', discipline_id: bad_discipline_id,
+      length: 45, price: 100.00
+
+    assert_includes(last_response.body, 'does not match any existing disciplines.')
+  end
+
+  def test_admin_create_treatment_invalid_length_select
+    pt_id = return_id(create_discipline('Physio', 'PT'))
+
+    post 'admin/treatments/new', name: 'Test', discipline_id: pt_id,
+      length: 3, price: 100.00
+
+    assert_includes(last_response.body, 'Please select a valid length.')
   end
 
 
