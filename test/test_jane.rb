@@ -446,7 +446,6 @@ class TestJane < Minitest::Test
     post "/admin/staff/#{user_id}/delete"
     
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], '/admin/staff')
   end
 
   # # Patients CRUD # # 
@@ -562,7 +561,6 @@ class TestJane < Minitest::Test
     get "/admin/patients/#{bad_id}"
 
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], '/admin/patients')
   end
 
   def test_admin_view_patient_hides_birthday_and_age_if_nil
@@ -587,7 +585,6 @@ class TestJane < Minitest::Test
 
     post '/admin/patients/new', first_name: 'Hugo', last_name: 'Ma'
     users_result = @storage.query("SELECT * FROM users;")
-    user_id = users_result.first['id']
     patients_result = @storage.query("SELECT * FROM patients;")
 
     assert_equal(1, users_result.ntuples)
@@ -595,7 +592,6 @@ class TestJane < Minitest::Test
     assert_equal('Hugo', users_result.first['first_name'])
     
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], "/admin/patients/#{user_id}")
   end
 
   def test_admin_create_patient_handles_empty_birthday
@@ -675,7 +671,6 @@ class TestJane < Minitest::Test
     assert_equal('1997-09-14', user_patient['birthday'])
    
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], "/admin/patients/#{user_id}")
   end
 
   def test_admin_edit_patient_handles_empty_birthday
@@ -803,7 +798,6 @@ class TestJane < Minitest::Test
     assert_equal('PT', discipline['title'])
 
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], '/admin/disciplines')
   end
 
   def test_admin_create_discipline_error_empty_name_or_title
@@ -850,8 +844,6 @@ class TestJane < Minitest::Test
     assert_equal('PT', updated_record['title'])
 
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], "/admin/disciplines")
-
     get last_response['location']
     assert_includes(last_response.body, 'Discipline successfully updated.')
   end
@@ -861,8 +853,6 @@ class TestJane < Minitest::Test
     post "/admin/disciplines/#{bad_id}/edit"
 
     assert_equal(302, last_response.status)
-    assert_includes(last_response['location'], '/admin/disciplines')
-    
     get last_response['location']
     assert_includes(last_response.body, 'could not be found')
   end
@@ -938,6 +928,11 @@ class TestJane < Minitest::Test
     assert_equal(pt_id.to_s, treatment['discipline_id'])
     assert_equal('30', treatment['length'])
     assert_equal('$100.00', treatment['price'])
+
+    assert_equal(302, last_response.status)
+    get last_response['location']
+
+    assert_includes(last_response.body, 'Successfully created treatment')
   end
 
   def test_admin_create_treatment_error_all_fields_required

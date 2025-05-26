@@ -376,9 +376,9 @@ post '/admin/treatments/new/?' do
     render_with_layout(:new_treatment)
   else
     @storage.create_treatment(name, discipline_id, length, price)
-    # Insert
-    # Success
-    # Redirect
+    session[:success] = 'Successfully created treatment.'
+    
+    redirect '/admin/treatments'
   end
   
 end
