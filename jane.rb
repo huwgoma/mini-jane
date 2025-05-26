@@ -55,6 +55,10 @@ helpers do
 
     "#{hours_string} #{minutes_string}"
   end
+
+  def pretty_price(price)
+    format('$%.2f', price)
+  end
 end
 
 # Routes
@@ -387,7 +391,9 @@ get '/admin/treatments/:treatment_id/edit/?' do
   treatment_id = params[:treatment_id]
 
   @treatment = @storage.load_treatment(treatment_id)
-  binding.pry
+  @disciplines = @storage.load_disciplines
+  @tx_lengths = Treatment.lengths
+  
   render_with_layout(:edit_treatment)
 end
 

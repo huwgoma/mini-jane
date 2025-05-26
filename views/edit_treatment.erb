@@ -1,4 +1,4 @@
-<h2>New Treatment</h2>
+<h2>Edit Treatment - <%= @treatment.name %></h2>
 
 <form action="/admin/treatments/new" method="post">
   <div>
@@ -18,7 +18,7 @@
   <div>
     <label for="name">Treatment Name - Required</label>
     <input type="text" name="name" id="name"
-      value="<%= prefill(:name, params) %>" required>
+      value="<%= prefill(:name, params, @treatment) %>" required>
   </div>
 
   <div>
@@ -38,11 +38,11 @@
   <div>
     <label for="price">Price - Required</label>
     <input type="number" name="price" id="price" min="0.00" step="0.01"
-      value="<%= prefill(:price, params) %>" required>
+      value="<%= prefill(:price, params, @treatment) %>" required>
   </div>
 
   <div>
     <a href="/admin/treatments">Cancel</a>
-    <button type="submit">Create Discipline</button>
+    <button type="submit">Update Discipline</button>
   </div>
 </form>
