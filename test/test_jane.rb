@@ -924,7 +924,20 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_treatment_success
-    
+    pt_id = return_id(create_discipline('Physio', 'PT'))
+    treatments_count = @storage.query("SELECT * FROM treatments;").ntuples
+    assert_equal(0, treatments_count)
+
+    post '/admin/treatments/new', name: 'PT - Tx', discipline_id: pt_id,
+      length: 30, price: 100.00
+
+    treatments_result = @storage.query("SELECT * FROM treatments;")
+    treatment = treatments_result.first
+    assert_equal(1, treatments_result.ntuples)
+    assert_equal('PT - Tx', treatment['name'])
+    assert_equal(pt_id.to_s, treatment['discipline_id'])
+    assert_equal('30', treatment['length'])
+    assert_equal('$100.00', treatment['price'])
   end
 
   def test_admin_create_treatment_error_all_fields_required
