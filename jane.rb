@@ -369,10 +369,14 @@ post '/admin/treatments/new/?' do
 
   session[:errors].push(*new_treatment_errors(discipline_id, name, length, price))
 
-  @disciplines = @storage.load_disciplines
-  @tx_lengths = Treatment.lengths
+  if session[:errors].any? 
+    @disciplines = @storage.load_disciplines
+    @tx_lengths = Treatment.lengths
 
-  render_with_layout(:new_treatment)
+    render_with_layout(:new_treatment)
+  else
+
+  end
   
 end
 
