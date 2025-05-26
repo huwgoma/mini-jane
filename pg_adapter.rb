@@ -221,6 +221,12 @@ class PGAdapter
     result.map { |treatment| format_treatment(treatment) }
   end
 
+  def create_treatment(name, discipline_id, length, price)
+    sql = "INSERT INTO treatments (name, discipline_id, length, price)
+           VALUES ($1, $2, $3, $4);"
+    query(sql, name, discipline_id, length, price)
+  end
+
   private
 
   attr_reader :logger
