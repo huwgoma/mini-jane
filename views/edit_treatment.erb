@@ -27,7 +27,7 @@
 
       <% @tx_lengths.each do |length| %>
         <option value="<%= length %>"
-          <%= 'selected' if preselected?('length', length, params) %>>
+          <%= 'selected' if preselected?('length', length, params, @treatment) %>>
           <%= pretty_duration(length) %>
         </option>
       <% end %>

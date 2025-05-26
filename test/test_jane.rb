@@ -1007,7 +1007,7 @@ class TestJane < Minitest::Test
     
   end
 
-  def test_admin_edit_treatmmnt_error_discipline_id_must_exist
+  def test_admin_edit_treatment_error_discipline_id_must_exist
     
   end
 

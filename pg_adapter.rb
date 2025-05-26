@@ -455,7 +455,7 @@ class PGAdapter
   def format_treatment(treatment)
     id, discipline_id = treatment['id'].to_i, treatment['discipline_id'].to_i
     name = treatment['name']
-    length = treatment['length']
+    length = treatment['length'].to_i
     price = treatment['price'].sub(/\$/, '').to_f
 
     Treatment.new(id, name, discipline_id: discipline_id, 
