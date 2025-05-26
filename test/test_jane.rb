@@ -1024,7 +1024,27 @@ class TestJane < Minitest::Test
     # Redirects
   end
 
+  def test_admin_edit_treatment_redirects_bad_id
+    bad_id = 10
+
+    post "/admin/treatments/#{bad_id}/edit"
+    assert_equal(302, last_response.status)
+
+    get last_response['location']
+    assert_includes(last_response.body, 'could not be found')
+  end
+
   def test_admin_edit_treatment_error_all_fields_required
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    tx_id = return_id(create_treatment('PT Tx', pt_id, 30, 85))
+
+    post "/admin/treatments/#{tx_id}/edit", discipline_id: '', 
+      name: '', length: '', price: ''
+    
+    # assert_includes(last_response.body, 'Please enter a name.')
+    # assert_includes(last_response.body, 'Please enter a price.')
+    # assert_includes(last_response.body, 'Please select a valid length.')
+    # assert_includes(last_response.body, 'does not match any existing disciplines.')
     
   end
 

@@ -16,10 +16,13 @@ class PGAdapter
     table_whitelist = schema_table_names
     return unless table_whitelist.include?(table_name)
 
-    pk_column_name = schema_primary_key_column_name(table_name)
-    sql = "SELECT 1 FROM #{table_name} 
-           WHERE #{pk_column_name} = $1;"
+    return false if id.to_s.strip.empty?
 
+    pk_column_name = schema_primary_key_column_name(table_name)
+
+    sql = "SELECT 1 FROM #{table_name} 
+           WHERE #{pk_column_name} = $1"
+    
     query(sql, id).ntuples.positive?
   end
 
