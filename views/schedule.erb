@@ -32,7 +32,9 @@
             <% practitioner.schedule.each do |appointment| %>
               <li>
                 <%# Appointments %>
-                <%= appointment %>
+                <a href="/admin/appointments/<%= appointment.id %>">
+                  <%= appointment %>
+                </a>
               </li>
             <% end %>
           </ul>

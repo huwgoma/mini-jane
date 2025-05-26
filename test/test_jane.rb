@@ -155,6 +155,9 @@ class TestJane < Minitest::Test
     end
   end
 
+  # Appointments CRUD #
+  
+
   # Staff CRUD #
   def test_admin_view_all_staff
     staff_names = ['Annie Hu', 'Hugo Ma', 'Kevin Ho', 'Alan Mitri']

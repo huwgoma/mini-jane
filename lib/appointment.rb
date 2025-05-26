@@ -1,5 +1,5 @@
 class Appointment
-  attr_reader :pt_name, :tx_name, :datetime
+  attr_reader :id, :pt_name, :tx_name, :datetime
   
   def initialize(id, pt_name, tx_name, tx_length, datetime)
     @id = id

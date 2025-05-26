@@ -106,6 +106,14 @@ get '/admin/schedule/?:date?/?' do
   render_with_layout(:schedule)
 end
 
+# # Admin - Appointments # # 
+# - View a specific appointment
+get '/admin/appointments/:appointment_id/?' do
+  # @appointment = @storage.load_appointment 
+  render_with_layout(:appointment)
+end
+
+
 # # Admin - Staff # #
 # Form - Create new staff member
 get '/admin/staff/new/?' do
