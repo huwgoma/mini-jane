@@ -418,7 +418,9 @@ post '/admin/treatments/:treatment_id/edit' do
     
     render_with_layout(:edit_treatment)
   else
-
+    @storage.update_treatment(treatment_id, name, discipline_id, length, price)
+    session[:success] = 'Treatment successfully updated.'
+    redirect '/admin/treatments'
   end
 end
 

@@ -236,6 +236,14 @@ class PGAdapter
     query(sql, name, discipline_id, length, price)
   end
 
+  def update_treatment(id, name, discipline_id, length, price)
+    sql = "UPDATE treatments 
+           SET name = $2, discipline_id = $3,
+               length = $4, price = $5
+           WHERE id = $1;"
+    query(sql, id, name, discipline_id, length, price)
+  end
+
   private
 
   attr_reader :logger

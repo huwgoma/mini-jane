@@ -1019,9 +1019,26 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_edit_treatment_success
-    # Doesnt change the number of treatment rcords
-    # Edits the fields of the target treatment correctly
-    # Redirects
+    pt_id = return_id(create_discipline('Physio', 'PT'))
+    mt_id = return_id(create_discipline('Massage Therapy', 'MT'))
+    tx_id = return_id(create_treatment('PT - Tx', pt_id, 30, 85))
+
+    treatments_count = @storage.query("SELECT * FROM treatments;").ntuples
+    assert_equal(1, treatments_count)
+
+    post "/admin/treatments/#{tx_id}/edit", name: 'MT - 45 minutes',
+      discipline_id: mt_id, length: '45', price: '100.00'
+    
+    treatments = @storage.query("SELECT * FROM treatments;")
+    treatment = treatments.first
+    assert_equal(1, treatments.ntuples)
+
+    assert_equal('MT - 45 minutes', treatment['name'])
+    assert_equal(mt_id.to_s, treatment['discipline_id'])
+    assert_equal('45', treatment['length'])
+    assert_equal('$100.00', treatment['price'])
+
+    assert_equal(302, last_response.status)
   end
 
   def test_admin_edit_treatment_redirects_bad_id
