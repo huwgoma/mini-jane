@@ -400,6 +400,11 @@ get '/admin/treatments/:treatment_id/edit/?' do
   render_with_layout(:edit_treatment)
 end
 
+# - Edit a treatment
+post '/admin/treatments/:treatment_id/edit' do
+  
+end
+
 
 # Helpers #
 def redirect_if_missing_id(type, id, path)

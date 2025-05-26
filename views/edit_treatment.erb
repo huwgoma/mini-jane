@@ -1,6 +1,6 @@
 <h2>Edit Treatment - <%= @treatment.name %></h2>
 
-<form action="/admin/treatments/new" method="post">
+<form action="/admin/treatments/<%= @treatment.id %>/edit" method="post">
   <div>
     <label for="disciplines">Discipline - Required</label>
       <select name="discipline_id" id="disciplines"> <%# required %>
