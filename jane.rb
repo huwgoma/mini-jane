@@ -426,7 +426,7 @@ end
 # Helpers #
 def redirect_if_missing_id(type, id, path)
   unless @storage.record_exists?(type, id)
-    session[:errors] << "Hmm..that #{type} (id = #{id}) could not be found."
+    session[:errors] << "Hmm..that #{type.singularize} (id = #{id}) could not be found."
     redirect path
   end
 end

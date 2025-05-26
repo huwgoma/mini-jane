@@ -22,7 +22,7 @@ class PGAdapter
 
     sql = "SELECT 1 FROM #{table_name} 
            WHERE #{pk_column_name} = $1"
-    
+
     query(sql, id).ntuples.positive?
   end
 
@@ -275,13 +275,14 @@ class PGAdapter
       SELECT DISTINCT ccu.column_name
       FROM  information_schema.constraint_column_usage ccu
       JOIN  information_schema.table_constraints       tc
-      ON    ccu.table_schema = tc.table_schema AND ccu.table_name = tc.table_name
+      ON    ccu.table_schema = tc.table_schema 
+        AND ccu.table_name = tc.table_name
+        AND ccu.constraint_name = tc.constraint_name
       WHERE ccu.table_schema   = 'public' AND
             ccu.table_name     = $1       AND
             tc.constraint_type = 'PRIMARY KEY';
     SQL
     result = query(sql, table_name)
-
     result.first['column_name']
   end
 
