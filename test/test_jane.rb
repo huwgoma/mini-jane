@@ -1036,6 +1036,9 @@ class TestJane < Minitest::Test
     
   end
 
+  def test_admin_edit_treatment_retains_values_on_error
+    
+  end
 
 
   private

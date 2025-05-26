@@ -57,8 +57,10 @@ helpers do
     "#{hours_string} #{minutes_string}"
   end
 
-  def pretty_price(price)
-    format('$%.2f', price)
+  def pretty_price(price, currency: '$')
+    return '' if price.nil?
+
+    format("#{currency}%.2f", price)
   end
 end
 
