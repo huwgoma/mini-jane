@@ -8,7 +8,7 @@ class Treatment
     @price = price
   end
 
-  def self.from_summary(id, name, discipline_id: nil, length: nil, price: nil)
+  def self.from_partial_data(name, id: nil, discipline_id: nil, length: nil, price: nil)
     self.new(id, name, discipline_id: discipline_id, 
              length: length, price: price)
   end

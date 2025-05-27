@@ -10,6 +10,12 @@ class Patient < User
     @birthday, @age = birthday, age
   end
 
+  def self.from_partial_data(first_name, last_name, id: nil, email: nil,
+                   phone: nil, birthday: nil, age: nil)
+    self.new(id, first_name, last_name, email: email, phone: phone, 
+             birthday: birthday, age: age)
+  end
+
   def age
     return '' if @age.nil?
 
