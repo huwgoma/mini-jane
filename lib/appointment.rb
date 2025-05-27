@@ -16,12 +16,16 @@ class Appointment
       staff: staff, treatment: treatment)
   end
 
-  def time
-    datetime.strftime('%l:%M%p')    
+  def end_time
+    datetime.to_time + (treatment.length.to_i * 60)
+  end
+
+  def start_time
+    datetime.to_time
   end
 
   def date
-    datetime.strftime('%A %B %-d, %Y')
+    datetime.to_date
   end
 
   def to_s

@@ -14,8 +14,11 @@
 
 <%# Appointment Info %>
 <div>
-  <p><%= @appointment.date %></p>
-  <p><%= @appointment.time %></p>
+  <p><%= pretty_date(@appointment.date) %></p>
+  <p>
+    <%= pretty_time(@appointment.start_time) %> - 
+    <%= pretty_time(@appointment.end_time) %>
+  </p>
 
   <p>
     <%= @appointment.treatment.name %>

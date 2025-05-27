@@ -62,6 +62,14 @@ helpers do
 
     format("#{currency}%.2f", price)
   end
+
+  def pretty_date(date)
+    date.strftime('%A %B %-d, %Y')
+  end
+
+  def pretty_time(time)
+    time.strftime('%l:%M%p')
+  end
 end
 
 # Routes
