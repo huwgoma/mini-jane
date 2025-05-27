@@ -156,7 +156,6 @@ class TestJane < Minitest::Test
   end
 
   # Appointments CRUD #
-  
 
   # Staff CRUD #
   def test_admin_view_all_staff

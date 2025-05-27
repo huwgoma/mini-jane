@@ -51,11 +51,12 @@ class PGAdapter
   # Appointments #
   def load_appointment_info(id)
     sql = <<~SQL
-      SELECT pu.first_name AS pt_first_name, pu.last_name AS pt_last_name, 
-             patients.user_id AS patient_id,
-             su.first_name AS staff_first_name, su.last_name AS staff_last_name,
-             treatments.name AS tx_name, treatments.length AS tx_length, 
-             treatments.price AS tx_price, appointments.datetime
+      SELECT appointments.id, patients.user_id AS pt_id, staff.user_id AS staff_id,
+             CONCAT(pu.first_name, ' ', pu.last_name) AS pt_name, 
+             CONCAT(su.first_name, ' ', su.last_name) AS staff_name,
+             treatments.id AS tx_id, treatments.name AS tx_name, 
+             treatments.length AS tx_length, treatments.price AS tx_price, 
+             appointments.datetime
       FROM appointments 
       JOIN staff      ON appointments.staff_id = staff.user_id
       JOIN users su   ON staff.user_id = su.id
@@ -74,7 +75,6 @@ class PGAdapter
     # Time 
     # Treatment Nmae
   end
-
 
   # Users #
   
@@ -448,8 +448,16 @@ class PGAdapter
     end
   end
 
-  def format_appointment(appointment)
-    
+  def format_appointment(appt)
+    id = appt['id']
+
+    patient = Patient.new(appt['pt_id'], *appt['pt_name'].split)
+    staff = Staff.new(appt['staff_id'], *appt['staff_name'].split)
+    treatment = Treatment.from_summary(appt['tx_id'], appt['tx_name'],
+                  length: appt['tx_length'], price: appt['tx_price'])
+    datetime = DateTime.parse(appt['datetime'])
+
+    Appointment.new(id, datetime, patient: patient, staff: staff, treatment: treatment)
   end
 
   def format_user_listing(user, staff: false)

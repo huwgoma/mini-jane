@@ -8,8 +8,13 @@ class Treatment
     @price = price
   end
 
+  def self.from_summary(id, name, discipline_id: nil, length: nil, price: nil)
+    self.new(id, name, discipline_id: discipline_id, 
+             length: length, price: price)
+  end
+
   def self.lengths
     # 5min - 3hr, 5-minute intervals
     (5..180).step(5).to_a
-  end
+  end 
 end
