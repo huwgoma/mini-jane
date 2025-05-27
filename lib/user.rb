@@ -26,6 +26,13 @@ class Staff < User
     @disciplines = disciplines # ADmin if empty
   end
 
+  def self.from_partial_data(id: nil, first_name: nil, last_name: nil,
+    email: nil, phone: nil, biography: nil, disciplines: [])
+    
+    self.new(id, first_name, last_name, 
+      email: email, phone: phone, biography: biography, disciplines: disciplines)
+  end
+
   def biography
     @biography.to_s.strip
   end

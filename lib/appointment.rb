@@ -9,10 +9,11 @@ class Appointment
     @treatment = treatment
   end
 
-  def self.from_partial_data(id, datetime, patient: nil, 
-                             staff_name: nil, treatment: nil)
+  def self.from_partial_data(id: nil, datetime: nil, patient: nil, 
+    staff_name: nil, treatment: nil)
+    
     self.new(id, datetime, patient: patient, 
-             staff_name: staff_name, treatment: treatment)
+      staff_name: staff_name, treatment: treatment)
   end
 
   def time
