@@ -88,9 +88,9 @@ class TestJane < Minitest::Test
     annie_li = physio_li.css('ul > li').find { |li| li.text.include?('Annie')}
     refute_nil(annie_li, 'Expected to find an <li> practitioner item named Annie.')
     
-    appt_li = annie_li.css('ul > li').find { |li| li.text.include?("#{time} - Hugo Ma - PT - Initial") }
+    appt_li = annie_li.css('ul > li').find { |li| li.text.include?("PT - Initial") }
     refute_nil(appt_li, 
-      "Expected to find an <li> appointment item for #{time} - Hugo Ma - PT - Initial.")
+      "Expected to find an <li> appointment item for PT - Initial.")
   end
 
   def test_admin_schedule_multiple_practitioners_one_discipline

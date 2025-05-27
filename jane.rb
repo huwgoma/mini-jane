@@ -86,16 +86,16 @@ end
 
 
 # To Do #
-#########
-# 2) Create helper for extracting params
-#
-#
-# - Clear DB ONCE before test suite
-
-# - CRUD for appointments
-# - CRUD for treatments
-# - Flesh out schedule 
+# 1) Edit Appointment
+# 2) Copy Appointment
+# 3) Move Appointment
+# 4) Delete Appointment (*)
+# 5) Patient Appointments Page
 # 
+# --- 
+# 1) extract_params
+# 2) Clear DB before test suite
+# 3) RESTRICT DELETE operations
 # Revisit DELETEs: cascade vs. restrict
 
 
@@ -121,6 +121,11 @@ get '/admin/appointments/:appointment_id/?' do
 
   @appointment = @storage.load_appointment_info(appointment_id)
   render_with_layout(:appointment)
+end
+
+# Form - Edit an appointment
+get '/admin/appointments/:appointment_id/edit/?' do
+  
 end
 
 

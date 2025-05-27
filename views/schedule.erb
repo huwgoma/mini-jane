@@ -33,7 +33,10 @@
               <li>
                 <%# Appointments %>
                 <a href="/admin/appointments/<%= appointment.id %>">
-                  <%= appointment %>
+                  <%= pretty_time(appointment.start_time) %> -
+                  <%= pretty_time(appointment.end_time) %>:
+                  <%= appointment.patient.full_name %> -
+                  <%= appointment.treatment.name %>
                 </a>
               </li>
             <% end %>

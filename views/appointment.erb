@@ -27,3 +27,8 @@
 
   <p><%= @appointment.staff.full_name %></p>
 </div>
+
+<%# Copy/Move/Edit/Delete %>
+<div>
+  <a href="/admin/appointments/<%= @appointment.id %>/edit">Edit</a>
+</div>

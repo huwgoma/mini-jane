@@ -27,8 +27,4 @@ class Appointment
   def date
     datetime.to_date
   end
-
-  def to_s
-    "#{time} - #{patient.full_name} - #{treatment.name}"
-  end
 end
