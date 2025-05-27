@@ -341,10 +341,10 @@ class PGAdapter
 
   def load_scheduled_appointments(date)
     sql = <<~SQL
-      SELECT appts.id, appts.staff_id, 
+      SELECT appts.id, appts.datetime, appts.staff_id AS staff_id,
+             patients.user_id AS pt_id,
              CONCAT(users.first_name, ' ', users.last_name) AS pt_name,
-             treatments.name AS tx_name, treatments.length AS tx_length,
-             appts.datetime
+             treatments.id AS tx_id, treatments.name AS tx_name, treatments.length AS tx_length
       FROM appointments AS appts
       JOIN patients ON appts.patient_id = patients.user_id
       JOIN users ON patients.user_id = users.id
@@ -412,22 +412,23 @@ class PGAdapter
 
   # Formatting Methods (PG::Result -> Application Format) #
   def format_daily_schedule(practitioners, appointments)
-    appointments_by_staff_id = format_appointments_by_staff_id(appointments)
+    appointments_by_staff_id = format_appointment_listings_by_staff_id(appointments)
     schedule = format_practitioners_by_discipline(practitioners, appointments_by_staff_id)
     
     schedule
   end
 
-  def format_appointments_by_staff_id(appointments)
+  def format_appointment_listings_by_staff_id(appointments)
     appointments.each_with_object({}) do |row, hash|
-      id = row['id'].to_i
+      appt_id = row['id'].to_i
       staff_id = row['staff_id'].to_i
-      pt_name = row['pt_name']
-      tx_name = row['tx_name']
-      tx_length = row['tx_length'].to_i
+
+      patient = Patient.from_partial_data(*row['pt_name'].split)
+      treatment = Treatment.from_partial_data(row['tx_name'], length: row['tx_length'].to_i)
       datetime = DateTime.parse(row['datetime'])
 
-      appointment = Appointment.new(id, pt_name, tx_name, tx_length, datetime)
+      appointment = Appointment.from_partial_data(appt_id, datetime, 
+                      patient: patient, treatment: treatment)
 
       hash[staff_id] ||= []
       hash[staff_id] << appointment
@@ -451,10 +452,13 @@ class PGAdapter
   def format_appointment(appt)
     id = appt['id']
 
-    patient = Patient.new(appt['pt_id'], *appt['pt_name'].split)
+    patient = Patient.partial(*appt['pt_name'].split, id: appt['pt_id'])
+
     staff = Staff.new(appt['staff_id'], *appt['staff_name'].split)
-    treatment = Treatment.from_summary(appt['tx_id'], appt['tx_name'],
+    
+    treatment = Treatment.partial(appt['tx_name'], id: appt['tx_id'],
                   length: appt['tx_length'], price: appt['tx_price'])
+    
     datetime = DateTime.parse(appt['datetime'])
 
     Appointment.new(id, datetime, patient: patient, staff: staff, treatment: treatment)
