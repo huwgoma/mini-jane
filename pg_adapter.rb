@@ -52,8 +52,8 @@ class PGAdapter
   def load_appointment_info(id)
     sql = <<~SQL
       SELECT appointments.id, patients.user_id AS pt_id,
-             CONCAT(pu.first_name, ' ', pu.last_name) AS pt_name, 
-             CONCAT(su.first_name, ' ', su.last_name) AS staff_name,
+             pu.first_name AS pt_first_name, pu.last_name AS pt_last_name,
+             su.first_name AS staff_first_name, su.last_name AS staff_last_name,
              treatments.id AS tx_id, treatments.name AS tx_name, 
              treatments.length AS tx_length, treatments.price AS tx_price, 
              appointments.datetime
@@ -338,7 +338,7 @@ class PGAdapter
     sql = <<~SQL
       SELECT appts.id, appts.datetime, appts.staff_id AS staff_id,
              patients.user_id AS pt_id,
-             CONCAT(users.first_name, ' ', users.last_name) AS pt_name,
+             users.first_name AS pt_first_name, users.last_name AS pt_last_name,
              treatments.id AS tx_id, treatments.name AS tx_name, treatments.length AS tx_length
       FROM appointments AS appts
       JOIN patients ON appts.patient_id = patients.user_id
@@ -418,12 +418,15 @@ class PGAdapter
       appt_id = row['id'].to_i
       staff_id = row['staff_id'].to_i
 
-      patient = Patient.from_partial_data(*row['pt_name'].split)
-      treatment = Treatment.from_partial_data(row['tx_name'], length: row['tx_length'].to_i)
+
+      patient = Patient.from_partial_data(first_name: row['pt_first_name'],
+        last_name: row['pt_last_name'])
+      treatment = Treatment.from_partial_data(name: row['tx_name'],
+        length: row['tx_length'].to_i)
       datetime = DateTime.parse(row['datetime'])
 
-      appointment = Appointment.from_partial_data(appt_id, datetime, 
-                      patient: patient, treatment: treatment)
+      appointment = Appointment.from_partial_data(id: appt_id, 
+        datetime: datetime, patient: patient, treatment: treatment)
 
       hash[staff_id] ||= []
       hash[staff_id] << appointment
@@ -446,8 +449,8 @@ class PGAdapter
 
   def format_appointment(appt)
     appt_id, pt_id = appt.values_at('id', 'pt_id')
-    pt_first_name, pt_last_name = appt['pt_name'].split
-    staff_first_name, staff_last_name = appt['staff_name'].split
+    pt_first_name, pt_last_name = appt.values_at('pt_first_name', 'pt_last_name')
+    staff_first_name, staff_last_name = appt.values_at('staff_first_name', 'staff_last_name')
     tx_id, tx_name = appt.values_at('tx_id', 'tx_name')
     tx_length, tx_price = appt.values_at('tx_length', 'tx_price')
     

@@ -115,7 +115,6 @@ get '/admin/appointments/:appointment_id/?' do
   # Load patient info (Appointment ID -> appointments.patient_id)
   #   - Name, biirthday, phone number
   @appointment = @storage.load_appointment_info(appointment_id)
-  
   render_with_layout(:appointment)
 end
 
