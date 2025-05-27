@@ -48,6 +48,34 @@ class PGAdapter
     format_daily_schedule(practitioners, appointments)
   end
 
+  # Appointments #
+  def load_appointment_info(id)
+    sql = <<~SQL
+      SELECT pu.first_name AS pt_first_name, pu.last_name AS pt_last_name, 
+             patients.user_id AS patient_id,
+             su.first_name AS staff_first_name, su.last_name AS staff_last_name,
+             treatments.name AS tx_name, treatments.length AS tx_length, 
+             treatments.price AS tx_price, appointments.datetime
+      FROM appointments 
+      JOIN staff      ON appointments.staff_id = staff.user_id
+      JOIN users su   ON staff.user_id = su.id
+      JOIN patients   ON appointments.patient_id = patients.user_id
+      JOIN users pu   ON patients.user_id = pu.id
+      JOIN treatments ON appointments.treatment_id = treatments.id
+      WHERE appointments.id = $1
+    SQL
+
+    result = query(sql, id)
+
+    format_appointment(result.first)
+    # Patient Name + ID
+    # Staff Name
+    # Date 
+    # Time 
+    # Treatment Nmae
+  end
+
+
   # Users #
   
   # Staff #
@@ -418,6 +446,10 @@ class PGAdapter
       hash[disciplines] ||= {}
       hash[disciplines][staff_id] = practitioner
     end
+  end
+
+  def format_appointment(appointment)
+    
   end
 
   def format_user_listing(user, staff: false)
