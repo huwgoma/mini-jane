@@ -51,7 +51,7 @@ class PGAdapter
   # Appointments #
   def load_appointment_info(id)
     sql = <<~SQL
-      SELECT appointments.id, patients.user_id AS pt_id, staff.user_id AS staff_id,
+      SELECT appointments.id, patients.user_id AS pt_id,
              CONCAT(pu.first_name, ' ', pu.last_name) AS pt_name, 
              CONCAT(su.first_name, ' ', su.last_name) AS staff_name,
              treatments.id AS tx_id, treatments.name AS tx_name, 
@@ -69,11 +69,6 @@ class PGAdapter
     result = query(sql, id)
 
     format_appointment(result.first)
-    # Patient Name + ID
-    # Staff Name
-    # Date 
-    # Time 
-    # Treatment Nmae
   end
 
   # Users #
@@ -450,18 +445,21 @@ class PGAdapter
   end
 
   def format_appointment(appt)
-    id = appt['id']
-
-    patient = Patient.partial(*appt['pt_name'].split, id: appt['pt_id'])
-
-    staff = Staff.new(appt['staff_id'], *appt['staff_name'].split)
+    appt_id, pt_id = appt.values_at('id', 'pt_id')
+    pt_first_name, pt_last_name = appt['pt_name'].split
+    staff_first_name, staff_last_name = appt['staff_name'].split
+    tx_id, tx_name = appt.values_at('tx_id', 'tx_name')
+    tx_length, tx_price = appt.values_at('tx_length', 'tx_price')
     
-    treatment = Treatment.partial(appt['tx_name'], id: appt['tx_id'],
-                  length: appt['tx_length'], price: appt['tx_price'])
-    
+    patient = Patient.from_partial_data(id: pt_id, 
+      first_name: pt_first_name, last_name: pt_last_name)
+    staff = Staff.from_partial_data(first_name: staff_first_name, last_name: staff_last_name)
+    treatment = Treatment.from_partial_data(id: tx_id, name: tx_name,
+      length: tx_length, price: tx_price)    
     datetime = DateTime.parse(appt['datetime'])
 
-    Appointment.new(id, datetime, patient: patient, staff: staff, treatment: treatment)
+    Appointment.new(appt_id, datetime, 
+      patient: patient, staff: staff, treatment: treatment)
   end
 
   def format_user_listing(user, staff: false)
