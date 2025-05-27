@@ -1,5 +1,5 @@
 class Appointment
-  attr_reader :id, :pt_name, :tx_name, :datetime
+  attr_reader :id, :patient, :treatment, :datetime
   
   def initialize(id, datetime, patient:, staff_name:, treatment:)
     @id = id
@@ -24,6 +24,6 @@ class Appointment
   end
 
   def to_s
-    "#{time} - #{pt_name} - #{tx_name}"
+    "#{time} - #{patient.full_name} - #{treatment.name}"
   end
 end
