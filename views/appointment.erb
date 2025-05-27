@@ -1,1 +1,26 @@
 <h2>Appointment</h2>
+
+<h3>Booking Info</h3>
+  
+<%# Patient Info %>
+<div>
+  <p><%= @appointment.patient.full_name %></p>
+  <a href="/admin/patients/<%= @appointment.patient.id %>">
+    View Patient Profile
+  </a>
+</div>
+
+<hr>
+
+<%# Appointment Info %>
+<div>
+  <p><%= @appointment.date %></p>
+  <p><%= @appointment.time %></p>
+
+  <p>
+    <%= @appointment.treatment.name %>
+    (<%= @appointment.treatment.price%>)
+  </p>
+
+  <p><%= @appointment.staff.full_name %></p>
+</div>

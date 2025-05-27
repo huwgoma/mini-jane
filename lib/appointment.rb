@@ -1,5 +1,5 @@
 class Appointment
-  attr_reader :id, :patient, :treatment, :datetime
+  attr_reader :id, :patient, :staff, :treatment, :datetime
   
   def initialize(id, datetime, patient:, staff:, treatment:)
     @id = id
