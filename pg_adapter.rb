@@ -259,8 +259,9 @@ class PGAdapter
     format_treatment(query(sql, id).first)
   end
   
-  def load_treatments_by_practitioner(practitioner_id)
-    sql = "SELECT disciplines.name, treatments.id, treatments.name
+  def load_treatment_listings_by_practitioner(practitioner_id)
+    sql = "SELECT disciplines.name AS discipline_name, 
+           treatments.id, treatments.name
            FROM treatments
            JOIN disciplines ON treatments.discipline_id = disciplines.id
            JOIN staff_disciplines sd ON disciplines.id = sd.discipline_id
@@ -268,7 +269,7 @@ class PGAdapter
            ORDER BY disciplines.id, treatments.id;"
     result = query(sql, practitioner_id)
 
-
+    result.map { |row| format_treatment_listing(row) }
   end
 
   def create_treatment(name, discipline_id, length, price)
@@ -537,5 +538,13 @@ class PGAdapter
 
     Treatment.new(id, name, discipline: discipline, 
       length: length, price: price)
+  end
+
+  def format_treatment_listing(treatment)
+    id = treatment['id'].to_i
+    name = treatment['name']
+    discipline = Discipline.from_partial_data(name: treatment['discipline_name'])
+
+    Treatment.from_partial_data(id: id, name: name, discipline: discipline)
   end
 end

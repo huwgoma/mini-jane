@@ -119,8 +119,8 @@ end
 get '/admin/appointments/new' do
   practitioner_id = params[:practitioner_id]
   # Treatment #<id, name, discipline, length, price 
-  @practitioner_treatments = @storage.load_treatments_by_practitioner
-
+  @practitioner_treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
+  binding.pry
   render_with_layout(:new_appointment)
 end
 
