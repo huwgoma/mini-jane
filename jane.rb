@@ -110,7 +110,7 @@ get '/admin/schedule/?:date?/?' do
   @date = Date.parse(params[:date] || Date.today.to_s)
   @yesterday, @tomorrow = @date.prev_day, @date.next_day
   @schedule = @storage.load_daily_schedule(@date)
-
+  
   render_with_layout(:schedule)
 end
 
@@ -389,9 +389,6 @@ get '/admin/treatments/?' do
   @disciplines = @storage.load_disciplines
   @treatments_by_discipline = group_treatments_by_discipline(@storage.load_treatments)
 
-  # #@disciplines = @storage.load_disciplines
-  # #@treatments_by_discipline_id = group_treatments_by_discipline_id(@storage.load_treatments)
-  # binding.pry
   render_with_layout(:treatments)
 end
 

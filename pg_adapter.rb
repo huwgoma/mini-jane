@@ -251,7 +251,10 @@ class PGAdapter
   end
 
   def load_treatment(id)
-    sql = "SELECT * FROM treatments WHERE id = $1;"
+    sql = "SELECT treatments.*, disciplines.name AS discipline_name
+           FROM treatments 
+           JOIN disciplines ON treatments.discipline_id = disciplines.id
+           WHERE treatments.id = $1;"
 
     format_treatment(query(sql, id).first)
   end
@@ -432,7 +435,6 @@ class PGAdapter
     appointments.each_with_object({}) do |row, hash|
       appt_id = row['id'].to_i
       staff_id = row['staff_id'].to_i
-
 
       patient = Patient.from_partial_data(first_name: row['pt_first_name'],
         last_name: row['pt_last_name'])
