@@ -118,9 +118,11 @@ end
 # Form: Create new appointment (per-practitioner)
 get '/admin/appointments/new' do
   practitioner_id = params[:practitioner_id]
-  # Treatment #<id, name, discipline, length, price 
+  # redirect bad id
+  @practitioner = @storage.load_staff(practitioner_id, 
+    user_fields: { first_name: true, last_name: true })
   @practitioner_treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
-  binding.pry
+  
   render_with_layout(:new_appointment)
 end
 

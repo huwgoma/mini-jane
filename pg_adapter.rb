@@ -72,10 +72,25 @@ class PGAdapter
   end
 
   # Users #
-  
   # Staff #
   # - Member: Refers to the actual staff table
   # - Profile: Refers to a staff member + related users/disciplines
+  def load_staff(id, 
+    user_fields: { first_name: false, last_name: false, email: false, phone: false },
+    staff_fields: { biography: false })
+    
+    sql_fields = (['users.id'] + 
+      parse_sql_fields('users', user_fields) + 
+      parse_sql_fields('staff', staff_fields)).join(', ')
+
+    sql = "SELECT #{sql_fields}
+           FROM users JOIN staff ON users.id = staff.user_id
+           WHERE users.id = $1;"
+    result = query(sql, id)
+
+    format_staff(result.first)
+  end
+  
   def create_staff_return_user_id(first_name, last_name, user_id: nil,
                                   email: nil, phone: nil, biography: nil)
     user_id ||= create_user_return_id(
@@ -336,6 +351,18 @@ class PGAdapter
     result.first['column_name']
   end
 
+  def parse_sql_fields(table_name, fields)
+    return unless schema_table_names.include?(table_name)
+
+    column_whitelist = schema_column_names(table_name)
+
+    fields.map do |field_name, load|
+      return unless column_whitelist.include?(field_name.to_s)
+
+      "#{table_name}.#{field_name}" if load  
+    end.compact
+  end
+
   # Private DB Methods # 
   # Schedule # 
   def load_scheduled_practitioners
@@ -489,6 +516,16 @@ class PGAdapter
     type = staff ? Staff : Patient
     
     type.new(id, first_name, last_name)
+  end
+
+  def format_staff(staff)
+    id = staff['id'].to_i
+    first_name, last_name = staff.values_at('first_name', 'last_name')
+    email, phone = staff.values_at('email', 'phone')
+    biography = staff['biography']
+
+    Staff.from_partial_data(id: id, first_name: first_name, last_name: last_name,
+      email: email, phone: phone, biography: biography)
   end
 
   def format_staff_profile(staff, disciplines)
