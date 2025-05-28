@@ -41,14 +41,16 @@
               </li>
             <% end %>
           </ul>
+
+          <%# New Appointment (per-practitioner) %>
+          <form action="/admin/appointments/new" method="get">
+            <input type="hidden" name="practitioner_id" 
+              value="<%= practitioner.id %>">
+            <button type="submit">New Appointment</button>
+          </form>
         </li>
 
-        <%# New Appointment (per-practitioner) %>
-        <form action="/admin/appointments/new" method="get">
-          <input type="hidden" name="practitioner_id" 
-            value="<%= practitioner.id %>">
-          <button type="submit">New Appointment</button>
-        </form>
+        
       <% end %>
       </ul>
       <hr>

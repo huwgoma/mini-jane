@@ -115,12 +115,10 @@ class TestJane < Minitest::Test
     get '/admin/schedule/'
     doc = Nokogiri::HTML(last_response.body)
 
-    # Assert that the Physiotherapy Discipline has 2 practitioner <li>s.
-    physio_list = doc.css('ul>li').find { |li| li.text.include?('Physiotherapy') }.at_css('ul')
-    physios = physio_list.css('>li').map(&:text)
+    physio_listings = doc.css('ul.practitioner-list > li')
 
-    assert_equal(2, physios.size)
-    ['Annie Hu', 'Kevin Ho'].each { |name| assert_includes(physios.join, name)}
+    assert_equal(2, physio_listings.size)
+    ['Annie Hu', 'Kevin Ho'].each { |name| assert_includes(physio_listings.text, name)}
   end
 
   def test_admin_schedule_multiple_disciplines
