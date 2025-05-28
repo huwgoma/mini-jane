@@ -117,7 +117,11 @@ end
 # # Admin - Appointments # # 
 # Form: Create new appointment (per-practitioner)
 get '/admin/appointments/new' do
-  binding.pry
+  practitioner_id = params[:practitioner_id]
+  # Treatment #<id, name, discipline, length, price 
+  @practitioner_treatments = @storage.load_treatments_by_practitioner
+
+  render_with_layout(:new_appointment)
 end
 
 # - View a specific appointment
@@ -383,8 +387,11 @@ end
 # - View all treatments, ordered by discipline
 get '/admin/treatments/?' do
   @disciplines = @storage.load_disciplines
-  @treatments_by_discipline_id = group_treatments_by_discipline_id(@storage.load_treatments)
+  @treatments_by_discipline = group_treatments_by_discipline(@storage.load_treatments)
 
+  # #@disciplines = @storage.load_disciplines
+  # #@treatments_by_discipline_id = group_treatments_by_discipline_id(@storage.load_treatments)
+  # binding.pry
   render_with_layout(:treatments)
 end
 
@@ -466,8 +473,8 @@ def normalize_date_input(date_string)
   date_string.to_s.strip.empty? ? nil : date_string
 end
 
-def group_treatments_by_discipline_id(treatments)
-  treatments.group_by(&:discipline_id)
+def group_treatments_by_discipline(treatments)
+  treatments.group_by { |tx| tx.discipline.id }
 end
 
 # Error Message Setting #

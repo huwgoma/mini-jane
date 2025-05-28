@@ -43,8 +43,12 @@
           </ul>
         </li>
 
-        <%# New Appointment Link (per-practitioner) %>
-        <a href="/admin/appointments/new?practitioner_id=<%= practitioner.id %>">New Appointment</a>
+        <%# New Appointment (per-practitioner) %>
+        <form action="/admin/appointments/new" method="get">
+          <input type="hidden" name="practitioner_id" 
+            value="<%= practitioner.id %>">
+          <button type="submit">New Appointment</button>
+        </form>
       <% end %>
       </ul>
       <hr>

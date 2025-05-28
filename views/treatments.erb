@@ -6,7 +6,7 @@
   <h4><%= discipline.name %></h4>
 
   <ol>
-  <% @treatments_by_discipline_id[discipline.id].each do |treatment| %>
+  <% @treatments_by_discipline[discipline.id].each do |treatment| %>
     <li>
       <p><%= treatment.name %></p>
       <p>Treatment Length: <%= treatment.length %> minutes</p>
