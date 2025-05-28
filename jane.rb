@@ -115,6 +115,11 @@ get '/admin/schedule/?:date?/?' do
 end
 
 # # Admin - Appointments # # 
+# Form: Create new appointment (per-practitioner)
+get '/admin/appointments/new' do
+  binding.pry
+end
+
 # - View a specific appointment
 get '/admin/appointments/:appointment_id/?' do
   appointment_id = params[:appointment_id]

@@ -42,8 +42,12 @@
             <% end %>
           </ul>
         </li>
+
+        <%# New Appointment Link (per-practitioner) %>
+        <a href="/admin/appointments/new?practitioner_id=<%= practitioner.id %>">New Appointment</a>
       <% end %>
       </ul>
+      <hr>
     </li>
   <% end %>
   </ul>
