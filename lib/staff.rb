@@ -5,6 +5,14 @@ class StaffRepository
     sql = "SELECT 1 FROM staff_disciplines WHERE staff_id = $1;"
     storage.query(sql, id).ntuples.positive?
   end
+
+  def self.offers_treatment?(staff_id, treatment_id, storage)
+    sql = "SELECT 1 FROM treatments
+           JOIN disciplines ON treatments.discipline_id = disciplines.id
+           JOIN staff_disciplines sd ON disciplines.id = sd.discipline_id
+           WHERE sd.staff_id = $1 AND treatments.id = $2;"
+    storage.query(sql, staff_id, treatment_id).ntuples.positive?
+  end
 end
 
 class Staff < User
@@ -25,12 +33,16 @@ class Staff < User
       email: email, phone: phone, biography: biography, disciplines: disciplines)
   end
 
+  def biography
+    @biography.to_s.strip
+  end
+
   def clinical?(storage)
     StaffRepository.clinical?(@id, storage)
   end
 
-  def biography
-    @biography.to_s.strip
+  def offers_treatment?(treatment_id, storage)
+    StaffRepository.offers_treatment?(@id, treatment_id, storage)
   end
 end
 

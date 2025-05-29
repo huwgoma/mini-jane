@@ -191,7 +191,7 @@ class TestJane < Minitest::Test
     create_staff_member(user_id)
     create_staff_discipline_associations(user_id, pt_id)
     
-    tx_id = create_treatment('DC - Tx', dc_id, 20, 75)
+    tx_id = return_id(create_treatment('DC - Tx', dc_id, 20, 75))
 
     # Annie does not have the DC discipline so should not be able
     # to offer DC - Tx
@@ -199,7 +199,7 @@ class TestJane < Minitest::Test
       treatment_id: tx_id
 
     assert_includes(last_response.body, 
-      'The selected staff member does not offer that treatment.')
+      'Annie Hu does not offer the selected treatment.')
   end
 
 

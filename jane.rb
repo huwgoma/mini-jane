@@ -131,20 +131,19 @@ end
 
 # - Create new appointment
 post '/admin/appointments/new' do
-  practitioner_id = params[:practitioner_id]
+  practitioner_id, treatment_id = params.values_at(:practitioner_id, :treatment_id)
   @date = Date.parse(params[:date] || Date.today.to_s)
-
+  
   redirect_if_bad_id('staff_disciplines', practitioner_id, 
     "/admin/schedule/#{@date}", 'Selected staff member is not a valid practitioner.')
 
-  treatment_id = params[:treatment_id]
+  @practitioner = @storage.load_staff(practitioner_id, 
+      user_fields: { first_name: true, last_name: true })
 
-
-  session[:errors].push(*new_appointment_errors(practitioner_id, treatment_id))
+  session[:errors].push(*new_appointment_errors(@practitioner, treatment_id))
   
   if session[:errors].any?
-    @practitioner = @storage.load_staff(practitioner_id, 
-      user_fields: { first_name: true, last_name: true })
+    
     @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
     @patients = @storage.load_all_patients
 
@@ -156,10 +155,10 @@ post '/admin/appointments/new' do
   
 end
 
-def new_appointment_errors(staff_id, treatment_id)
+def new_appointment_errors(staff, treatment_id)
   errors = []
-  errors.push(non_clinical_staff_id_error(staff_id),
-    treatment_practitioner_mismatch_error(staff_id, treatment_id))
+  errors.push(non_clinical_staff_id_error(staff.id),
+    treatment_practitioner_mismatch_error(staff, treatment_id))
   errors
 end
 
@@ -169,13 +168,10 @@ def non_clinical_staff_id_error(staff_id)
   end
 end
 
-
-
-def treatment_practitioner_mismatch_error(staff_id, treatment_id)
-  # unless 
-  # # unless @storage.staff_member_offers_treatment?(staff_id, treatment_id)
-    # 'The selected staff member does not offer that treatment.'
-  # end
+def treatment_practitioner_mismatch_error(staff, treatment_id)
+  unless Staff.from_partial_data(id: staff.id).offers_treatment?(treatment_id, @storage)
+     "#{staff.full_name} does not offer the selected treatment."  
+  end 
 end
 
 
