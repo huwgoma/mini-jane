@@ -185,8 +185,23 @@ post '/admin/appointments/:appointment_id/edit' do
   appointment_id = params[:appointment_id]
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
   
-  practitioner_id = params[:practitioner_id]
-  redirect_if_bad_id('staff', practitioner_id, "/admin/schedule")
+
+  # Check appointment ID
+  # - If valid that means staff ID must be correct (because of DB)
+  # - Therefore no need to check practitioner ID
+  # -> 
+  # Check appointment ID
+  #   Invalid -> Redirect
+  # - Valid -> check for errors
+  #   - Staff ID and Date cannot be changed so should not be changed
+  #     by DB Adapter
+  #   Check for:
+  #   - Treatment-practitioner mismatch
+  #   - nonexistent patient
+  #   - empty time
+
+  # practitioner_id = params[:practitioner_id]
+  # redirect_if_bad_id('staff', practitioner_id, "/admin/schedule")
 
   @practitioner = @storage.load_staff(practitioner_id, 
     user_fields: { first_name: true, last_name: true })
@@ -551,20 +566,21 @@ end
 # - Errors for creating a new appointment
 def new_appointment_errors(staff, treatment_id, patient_id, time)
   errors = []
-  errors.push(non_clinical_staff_id_error(staff.id),
-    treatment_practitioner_mismatch_error(staff, treatment_id),
-    nonexistent_patient_id_error(patient_id),
-    empty_field_error('time', time))
+  errors.push(*appointment_errors(staff, treatment_id, patient_id, time), 
+    non_clinical_staff_id_error(staff.id))
   errors
 end
 
 def edit_appointment_errors(staff, treatment_id, patient_id, time)
   errors = []
-  errors.push(non_clinical_staff_id_error(staff.id),
-    treatment_practitioner_mismatch_error(staff, treatment_id),
-    nonexistent_patient_id_error(patient_id),
-    empty_field_error('time', time))
+  errors.push(*appointment_errors(staff, treatment_id, patient_id, time))
   errors
+end
+
+def appointment_errors(staff, treatment_id, patient_id, time)
+  [treatment_practitioner_mismatch_error(staff, treatment_id),
+   nonexistent_patient_id_error(patient_id),
+   empty_field_error('time', time)].compact
 end
 
 # - If staff ID is not clinical
