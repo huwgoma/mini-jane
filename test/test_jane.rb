@@ -181,6 +181,28 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'Selected staff member is not a valid practitioner.')
   end
 
+  def test_admin_create_appointment_error_treatment_practitioner_mismatch
+    skip
+    dc_id = return_id(create_discipline('Chiropractic', 'DC'))
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    # Assuming practitioner id is valid:
+    # - If treatment ID is not part of their offerings
+    # - Re-renders form with an error message.
+    user_id = return_id(create_user('Annie Hu'))
+    create_staff_member(user_id)
+    create_staff_discipline_associations(user_id, pt_id)
+    
+    tx_id = create_treatment('DC - Tx', dc_id, 20, 75)
+
+    # Annie does not have the DC discipline so should not be able
+    # to offer DC - Tx
+    post '/admin/appointments/new', practitioner_id: user_id, date: TODAY,
+      treatment_id: tx_id
+
+    assert_includes(last_response.body, 
+      'The selected staff member does not offer that treatment.')
+  end
+
 
   # Staff CRUD #
   def test_admin_view_all_staff

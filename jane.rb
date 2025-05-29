@@ -137,15 +137,18 @@ post '/admin/appointments/new' do
   redirect_if_bad_id('staff_disciplines', practitioner_id, 
     "/admin/schedule/#{@date}", 'Selected staff member is not a valid practitioner.')
 
-  session[:errors].push(*new_appointment_errors(practitioner_id))
+  treatment_id = params[:treatment_id]
 
+
+  session[:errors].push(*new_appointment_errors(practitioner_id, treatment_id))
+  
   if session[:errors].any?
     @practitioner = @storage.load_staff(practitioner_id, 
       user_fields: { first_name: true, last_name: true })
     @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
     @patients = @storage.load_all_patients
 
-  render_with_layout(:new_appointment)
+    render_with_layout(:new_appointment)
   else
 
   end
@@ -153,15 +156,24 @@ post '/admin/appointments/new' do
   
 end
 
-def new_appointment_errors(staff_id)
+def new_appointment_errors(staff_id, treatment_id)
   errors = []
   errors.push(non_clinical_staff_id_error(staff_id))
+#    treatment_practitioner_mismatch_error(staff_id, treatment_id))
   errors
 end
 
 def non_clinical_staff_id_error(staff_id)
-  unless @storage.clinical_staff_id?(staff_id)
+  unless Staff.clinical?(staff_id, @storage)
     'Selected staff member is not a valid practitioner.'
+  end
+end
+
+
+
+def treatment_practitioner_mismatch_error(staff_id, treatment_id)
+  unless @storage.staff_member_offers_treatment?(staff_id, treatment_id)
+    'The selected staff member does not offer that treatment.'
   end
 end
 
