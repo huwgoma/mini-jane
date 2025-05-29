@@ -37,15 +37,14 @@ helpers do
       collection.any? { |obj| obj.id == id if obj.respond_to?(:id) }
   end
 
-  def prefill(attribute, params, object=nil)
-    params[attribute] || 
-    (object.method(attribute).call if object.respond_to?(attribute))
+  def prefill(attribute, params, obj_value=nil)
+    params[attribute] || obj_value
+    #(object.method(attribute).call if object.respond_to?(attribute))
   end
 
   # Check if a given <option> should be pre-selected.
   def preselected?(select_name, option_value, params, obj_value=nil)
     (params[select_name] == option_value.to_s) || (obj_value == option_value)
-    #(obj.method(select_name).call == option_value if obj.respond_to?(select_name))
   end
 
   def pretty_duration(duration_in_minutes)
@@ -67,8 +66,8 @@ helpers do
     date.strftime('%A %B %-d, %Y')
   end
 
-  def pretty_time(time)
-    time.strftime('%l:%M%p')
+  def pretty_time(time, military: false)
+    military ? time.strftime('%H:%M') : time.strftime('%-l:%M%p')
   end
 end
 
@@ -114,8 +113,8 @@ get '/admin/schedule/?:date?/?' do
   render_with_layout(:schedule)
 end
 
-# # Admin - Appointments # # 
-# Form: Create new appointment (per-practitioner)
+# # Admin - Appointments # #  
+# - Form: Create new appointment (per-practitioner)
 get '/admin/appointments/new' do
   practitioner_id = params[:practitioner_id]
   @date = Date.parse(params[:date] || Date.today.to_s)
@@ -174,12 +173,15 @@ end
 # Form - Edit an appointment
 get '/admin/appointments/:appointment_id/edit/?' do
   appointment_id = params[:appointment_id]
-
+  # Redirect bad appt id
   @appointment = @storage.load_appointment_info(appointment_id)
-  binding.pry
+
+  @patients = @storage.load_all_patients
+  @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.staff.id)
+  @date = @appointment.date
   render_with_layout(:edit_appointment)
 end
-# Refactor #preselected to accept an object value directly instead of an object
+
 
 # # Admin - Staff # #
 # Form - Create new staff member

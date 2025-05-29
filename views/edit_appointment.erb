@@ -1,9 +1,9 @@
 <h2>Edit Appointment</h2>
 
 <form action="/admin/appointments/<%= @appointment.id %>/edit" method="post">
-  <input type="hidden" name="practitioner_id" value="<%= @practitioner.id %>">
+  <input type="hidden" name="practitioner_id" value="<%= @appointment.staff.id %>">
 
-  <h4>Booking with <%= @practitioner.full_name %>:</h4>
+  <h4>Booking with <%= @appointment.staff.full_name %>:</h4>
   
   <hr>
 
@@ -12,7 +12,8 @@
     <select name="treatment_id" id="treatment">
       <% @treatments.each do |treatment| %>
         <option value="<%= treatment.id %>" 
-          <%= 'selected' if preselected?('treatment_id', treatment.id, params) %>>
+          <%= 'selected' if preselected?('treatment_id', treatment.id, 
+            params, @appointment.treatment.id) %>>
           <%= treatment.name %>
         </option>
       <% end %>
@@ -26,7 +27,8 @@
     <select name="patient_id" id="patients">
       <% @patients.each do |patient| %>
         <option value="<%= patient.id %>"
-          <%= 'selected' if preselected?('patient_id', patient.id, params) %>>
+          <%= 'selected' if preselected?('patient_id', patient.id, 
+            params, @appointment.patient.id) %>>
           <%= patient.full_name %>
         </option>
       <% end %>
@@ -37,7 +39,9 @@
 
   <div>
     <label for="time">Time</label>
-    <input type="time" name="time" id="time" value="<%= prefill(:time, params) %>">
+    <input type="time" name="time" id="time" 
+      value="<%= prefill(:time, params, 
+        pretty_time(@appointment.start_time, military: true)) %>">
     <input type="hidden" name="date" value="<%= @date %>">
     <p><%= pretty_date(@date) %></p>
   </div>
@@ -45,7 +49,7 @@
   <hr>
 
   <div>
-    <a href="/admin/schedule/<%= @date %>">Cancel</a>
+    <a href="/admin/appointments/<%= @appointment.id %>">Cancel</a>
     <button type="submit">Book Appointment</button>
   </div>
   
