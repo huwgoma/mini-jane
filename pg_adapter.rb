@@ -77,6 +77,12 @@ class PGAdapter
     query(sql, staff_id, patient_id, treatment_id, datetime)
   end
 
+  def update_appointment(id, patient_id, treatment_id, datetime)
+    binding.pry
+    sql = "UPDATE appointments SET
+           "
+  end
+
   # Users #
   # Staff #
   # - Member: Refers to the actual staff table
