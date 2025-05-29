@@ -187,9 +187,25 @@ post '/admin/appointments/:appointment_id/edit' do
   
   practitioner_id = params[:practitioner_id]
   redirect_if_bad_id('staff', practitioner_id, "/admin/schedule")
-  #binding.pry
 
-  #session[:errors].push(*edit_appointment_errors)
+  @practitioner = @storage.load_staff(practitioner_id, 
+    user_fields: { first_name: true, last_name: true })
+  treatment_id, patient_id = params.values_at(:treatment_id, :patient_id)
+  time = params[:time]
+
+  session[:errors].push(*edit_appointment_errors(@practitioner, 
+    treatment_id, patient_id, time))
+
+  if session[:errors].any?
+    @appointment = @storage.load_appointment_info(appointment_id)
+    @patients = @storage.load_all_patients
+    @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.staff.id)
+    @date = @appointment.date
+
+    render_with_layout(:edit_appointment)
+  else
+
+  end
 end
 
 
@@ -530,9 +546,19 @@ def group_treatments_by_discipline(treatments)
   treatments.group_by { |tx| tx.discipline.id }
 end
 
+
 # Error Message Setting #
 # - Errors for creating a new appointment
 def new_appointment_errors(staff, treatment_id, patient_id, time)
+  errors = []
+  errors.push(non_clinical_staff_id_error(staff.id),
+    treatment_practitioner_mismatch_error(staff, treatment_id),
+    nonexistent_patient_id_error(patient_id),
+    empty_field_error('time', time))
+  errors
+end
+
+def edit_appointment_errors(staff, treatment_id, patient_id, time)
   errors = []
   errors.push(non_clinical_staff_id_error(staff.id),
     treatment_practitioner_mismatch_error(staff, treatment_id),
