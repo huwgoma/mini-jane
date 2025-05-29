@@ -185,7 +185,7 @@ post '/admin/appointments/:appointment_id/edit' do
   appointment_id = params[:appointment_id]
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
   
-
+  @appointment = @storage.load_appointment_info(appointment_id)
   # Check appointment ID
   # - If valid that means staff ID must be correct (because of DB)
   # - Therefore no need to check practitioner ID
@@ -203,7 +203,7 @@ post '/admin/appointments/:appointment_id/edit' do
   # practitioner_id = params[:practitioner_id]
   # redirect_if_bad_id('staff', practitioner_id, "/admin/schedule")
 
-  @practitioner = @storage.load_staff(practitioner_id, 
+  @practitioner = @storage.load_staff(@appointment.staff.id,
     user_fields: { first_name: true, last_name: true })
   treatment_id, patient_id = params.values_at(:treatment_id, :patient_id)
   time = params[:time]
@@ -212,14 +212,13 @@ post '/admin/appointments/:appointment_id/edit' do
     treatment_id, patient_id, time))
 
   if session[:errors].any?
-    @appointment = @storage.load_appointment_info(appointment_id)
     @patients = @storage.load_all_patients
     @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.staff.id)
     @date = @appointment.date
 
     render_with_layout(:edit_appointment)
   else
-
+    
   end
 end
 

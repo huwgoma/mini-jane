@@ -42,7 +42,6 @@
     <input type="time" name="time" id="time" 
       value="<%= prefill(:time, params, 
         obj_value: pretty_time(@appointment.start_time, military: true)) %>">
-    <input type="hidden" name="date" value="<%= @date %>">
     <p><%= pretty_date(@date) %></p>
   </div>
 

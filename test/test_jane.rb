@@ -262,26 +262,6 @@ class TestJane < Minitest::Test
     # - Does change the fields in the target appointment
   end
 
-  def test_admin_edit_appointment_error_nonexistent_staff_id  
-    bad_id = 10
-
-    context = create_appointment_cascade(
-      staff: { name: 'Annie Hu', create_profile: true }, 
-      patient: { name: 'Gina P', create_profile: true },
-      discipline: { name: 'Physiotherapy', title: 'PT' },
-      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
-    )
-
-    appt_id = context[:appointment_id]
-
-    post "/admin/appointments/#{appt_id}/edit", 
-      practitioner_id: bad_id
-
-    assert_equal(302, last_response.status)
-    get last_response['location']
-    assert_includes(last_response.body, 'could not be found.')
-  end
-
   def test_admin_edit_appointment_error_treatment_practitioner_mismatch
     context = create_appointment_cascade(
       staff: { name: 'Annie Hu', create_profile: true }, 
@@ -320,17 +300,20 @@ class TestJane < Minitest::Test
       "No patient with that ID (#{bad_patient_id}) was found.")
   end
 
-  def test_admin_create_appointment_error_missing_or_empty_time
-    skip
-    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
-    staff_id = return_id(create_user('Annie Hu'))
-    create_staff_member(staff_id)
-    create_staff_discipline_associations(staff_id, pt_id)
-    tx_id = return_id(create_treatment('PT - Tx', pt_id, 30, 85))
-    patient_id = return_id(create_user('Hugo Ma'))
-    create_patient_profile(patient_id)
+  def test_admin_edit_appointment_error_missing_or_empty_time
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
 
-    post '/admin/appointments/new', practitioner_id: staff_id, date: TODAY, 
+    appt_id = context[:appointment_id]
+    staff_id = context[:staff_id]
+    tx_id = context[:treatment_id]
+    patient_id = context[:patient_id]
+
+    post "/admin/appointments/#{appt_id}/edit", practitioner_id: staff_id, date: TODAY, 
       treatment_id: tx_id, patient_id: patient_id, time: ''
 
     assert_includes(last_response.body, 'Please enter a time.')
