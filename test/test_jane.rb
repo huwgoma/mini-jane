@@ -182,7 +182,6 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_appointment_error_treatment_practitioner_mismatch
-    skip
     dc_id = return_id(create_discipline('Chiropractic', 'DC'))
     pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
     # Assuming practitioner id is valid:

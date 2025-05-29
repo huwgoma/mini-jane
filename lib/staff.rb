@@ -25,8 +25,8 @@ class Staff < User
       email: email, phone: phone, biography: biography, disciplines: disciplines)
   end
 
-  def self.clinical?(id, storage)
-    StaffRepository.clinical?(id, storage)
+  def clinical?(storage)
+    StaffRepository.clinical?(@id, storage)
   end
 
   def biography

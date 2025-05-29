@@ -158,13 +158,13 @@ end
 
 def new_appointment_errors(staff_id, treatment_id)
   errors = []
-  errors.push(non_clinical_staff_id_error(staff_id))
-#    treatment_practitioner_mismatch_error(staff_id, treatment_id))
+  errors.push(non_clinical_staff_id_error(staff_id),
+    treatment_practitioner_mismatch_error(staff_id, treatment_id))
   errors
 end
 
 def non_clinical_staff_id_error(staff_id)
-  unless Staff.clinical?(staff_id, @storage)
+  unless Staff.from_partial_data(id: staff_id).clinical?(@storage)
     'Selected staff member is not a valid practitioner.'
   end
 end
@@ -172,9 +172,10 @@ end
 
 
 def treatment_practitioner_mismatch_error(staff_id, treatment_id)
-  unless @storage.staff_member_offers_treatment?(staff_id, treatment_id)
-    'The selected staff member does not offer that treatment.'
-  end
+  # unless 
+  # # unless @storage.staff_member_offers_treatment?(staff_id, treatment_id)
+    # 'The selected staff member does not offer that treatment.'
+  # end
 end
 
 
