@@ -134,6 +134,8 @@ post '/admin/appointments/new' do
   practitioner_id, treatment_id, patient_id = params.values_at(
     :practitioner_id, :treatment_id, :patient_id)
   @date = Date.parse(params[:date] || Date.today.to_s)
+  time = params[:time]
+  
   
   redirect_if_bad_id('staff_disciplines', practitioner_id, 
     "/admin/schedule/#{@date}", 'Selected staff member is not a valid practitioner.')
@@ -142,7 +144,7 @@ post '/admin/appointments/new' do
       user_fields: { first_name: true, last_name: true })
 
   session[:errors].push(*new_appointment_errors(
-    @practitioner, treatment_id, patient_id))
+    @practitioner, treatment_id, patient_id, time))
   
   if session[:errors].any?
     
@@ -157,11 +159,12 @@ post '/admin/appointments/new' do
   
 end
 
-def new_appointment_errors(staff, treatment_id, patient_id)
+def new_appointment_errors(staff, treatment_id, patient_id, time)
   errors = []
   errors.push(non_clinical_staff_id_error(staff.id),
     treatment_practitioner_mismatch_error(staff, treatment_id),
-    nonexistent_patient_id_error(patient_id))
+    nonexistent_patient_id_error(patient_id),
+    empty_field_error('time', time))
   errors
 end
 
@@ -613,9 +616,6 @@ def invalid_treatment_discipline_id_error(discipline_id)
   end
 end
 
-
-  
-# Validations #
 def name_collision_error(table_name:, column_name:, column_value: , id:)
   if @storage.record_collision?(table_name: table_name, column_name: column_name,
                        column_value: column_value, id: id)
