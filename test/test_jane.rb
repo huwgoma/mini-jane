@@ -166,8 +166,25 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_create_appointment_success
-    # It:
-    # - creates an appointment record
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    staff_id = return_id(create_user('Annie Hu'))
+    create_staff_member(staff_id)
+    create_staff_discipline_associations(staff_id, pt_id)
+    tx_id = return_id(create_treatment('PT - Tx', pt_id, 30, 85))
+    patient_id = return_id(create_user('Hugo Ma'))
+    create_patient_profile(patient_id)
+    time = '12:00 PM'
+
+    appts_count = @storage.query("SELECT * FROM appointments;").ntuples
+    assert_equal(0, appts_count)
+
+    post '/admin/appointments/new', practitioner_id: staff_id,
+      date: TODAY, treatment_id: tx_id, patient_id: patient_id,
+      time: time
+
+    appts_count = @storage.query("SELECT * FROM appointments;").ntuples
+    assert_equal(1, appts_count)
+    assert_equal(302, last_response.status)
   end
 
   def test_admin_create_appointment_error_non_clinical_staff_id_redirects

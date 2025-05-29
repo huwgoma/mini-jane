@@ -136,7 +136,6 @@ post '/admin/appointments/new' do
   @date = Date.parse(params[:date] || Date.today.to_s)
   time = params[:time]
   
-  
   redirect_if_bad_id('staff_disciplines', practitioner_id, 
     "/admin/schedule/#{@date}", 'Selected staff member is not a valid practitioner.')
 
@@ -147,45 +146,22 @@ post '/admin/appointments/new' do
     @practitioner, treatment_id, patient_id, time))
   
   if session[:errors].any?
-    
     @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
     @patients = @storage.load_all_patients
 
     render_with_layout(:new_appointment)
   else
+    datetime = DateTime.parse("#{@date}T#{time}")
+  
+    @storage.create_appointment(staff_id: practitioner_id, patient_id: patient_id,
+      treatment_id: treatment_id, datetime: datetime)
+    session[:success] = 'Appointment successfully created.'
 
+    redirect "/admin/schedule/#{@date}"
   end
 
   
 end
-
-def new_appointment_errors(staff, treatment_id, patient_id, time)
-  errors = []
-  errors.push(non_clinical_staff_id_error(staff.id),
-    treatment_practitioner_mismatch_error(staff, treatment_id),
-    nonexistent_patient_id_error(patient_id),
-    empty_field_error('time', time))
-  errors
-end
-
-def non_clinical_staff_id_error(staff_id)
-  unless Staff.from_partial_data(id: staff_id).clinical?(@storage)
-    'Selected staff member is not a valid practitioner.'
-  end
-end
-
-def treatment_practitioner_mismatch_error(staff, treatment_id)
-  unless Staff.from_partial_data(id: staff.id).offers_treatment?(treatment_id, @storage)
-     "#{staff.full_name} does not offer the selected treatment."  
-  end 
-end
-
-def nonexistent_patient_id_error(patient_id)
-  unless @storage.record_exists?('patients', patient_id)
-    "No patient with that ID (#{patient_id}) was found."
-  end
-end
-
 
 # - View a specific appointment
 get '/admin/appointments/:appointment_id/?' do
@@ -539,6 +515,37 @@ def group_treatments_by_discipline(treatments)
 end
 
 # Error Message Setting #
+# - Errors for creating a new appointment
+def new_appointment_errors(staff, treatment_id, patient_id, time)
+  errors = []
+  errors.push(non_clinical_staff_id_error(staff.id),
+    treatment_practitioner_mismatch_error(staff, treatment_id),
+    nonexistent_patient_id_error(patient_id),
+    empty_field_error('time', time))
+  errors
+end
+
+# - If staff ID is not clinical
+def non_clinical_staff_id_error(staff_id)
+  unless Staff.from_partial_data(id: staff_id).clinical?(@storage)
+    'Selected staff member is not a valid practitioner.'
+  end
+end
+
+# - If staff does not offer selected treatment
+def treatment_practitioner_mismatch_error(staff, treatment_id)
+  unless Staff.from_partial_data(id: staff.id).offers_treatment?(treatment_id, @storage)
+     "#{staff.full_name} does not offer the selected treatment."  
+  end 
+end
+
+# - If patient does not exist.
+def nonexistent_patient_id_error(patient_id)
+  unless @storage.record_exists?('patients', patient_id)
+    "No patient with that ID (#{patient_id}) was found."
+  end
+end
+
 # - Errors for inserting a new staff member
 def new_staff_errors(first_name, last_name)
   user_name_errors(first_name, last_name)

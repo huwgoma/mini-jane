@@ -71,6 +71,12 @@ class PGAdapter
     format_appointment(result.first)
   end
 
+  def create_appointment(staff_id:, patient_id:, treatment_id:, datetime:)
+    sql = "INSERT INTO appointments(staff_id, patient_id, treatment_id, datetime)
+           VALUES ($1, $2, $3, $4);"
+    query(sql, staff_id, patient_id, treatment_id, datetime)
+  end
+
   # Users #
   # Staff #
   # - Member: Refers to the actual staff table
