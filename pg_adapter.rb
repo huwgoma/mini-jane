@@ -153,6 +153,11 @@ class PGAdapter
 
     add_staff_disciplines(staff_id, discipline_ids)
   end
+
+  def clinical_staff_id?(staff_id)
+    sql = "SELECT 1 FROM staff_disciplines WHERE staff_id = $1;"
+    query(sql, staff_id).ntuples.positive?
+  end
   
   # Patients # 
   # - Patient: The 'core' patient info (Name, Birthday, Email, etc.)

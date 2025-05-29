@@ -165,6 +165,22 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, TODAY)
   end
 
+  def test_admin_create_appointment_success
+    # It:
+    # - creates an appointment record
+  end
+
+  def test_admin_create_appointment_error_non_clinical_staff_id_redirects
+    # Non-clinical staff member
+    user_id = return_id(create_user('Hugo Ma'))
+    create_staff_member(user_id)
+
+    post '/admin/appointments/new', practitioner_id: user_id
+    assert_equal(302, last_response.status)
+    get last_response['location']
+    assert_includes(last_response.body, 'Selected staff member is not a valid practitioner.')
+  end
+
 
   # Staff CRUD #
   def test_admin_view_all_staff

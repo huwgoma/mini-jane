@@ -118,10 +118,9 @@ end
 # Form: Create new appointment (per-practitioner)
 get '/admin/appointments/new' do
   practitioner_id = params[:practitioner_id]
-  @date = Date.parse(params[:date])
+  @date = Date.parse(params[:date] || Date.today.to_s)
+  redirect_if_bad_id('staff', practitioner_id, "/admin/schedule/#{@date}")
 
-  redirect_if_missing_id('staff', practitioner_id, "/admin/schedule/#{@date.to_s}")
-  
   @practitioner = @storage.load_staff(practitioner_id, 
     user_fields: { first_name: true, last_name: true })
   @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
@@ -133,13 +132,37 @@ end
 # - Create new appointment
 post '/admin/appointments/new' do
   practitioner_id = params[:practitioner_id]
-  @date = Date.parse(params[:date])
-  @practitioner = @storage.load_staff(practitioner_id, 
-    user_fields: { first_name: true, last_name: true })
-  @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
-  @patients = @storage.load_all_patients
+  @date = Date.parse(params[:date] || Date.today.to_s)
+
+  redirect_if_bad_id('staff_disciplines', practitioner_id, 
+    "/admin/schedule/#{@date}", 'Selected staff member is not a valid practitioner.')
+
+  session[:errors].push(*new_appointment_errors(practitioner_id))
+
+  if session[:errors].any?
+    @practitioner = @storage.load_staff(practitioner_id, 
+      user_fields: { first_name: true, last_name: true })
+    @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
+    @patients = @storage.load_all_patients
 
   render_with_layout(:new_appointment)
+  else
+
+  end
+
+  
+end
+
+def new_appointment_errors(staff_id)
+  errors = []
+  errors.push(non_clinical_staff_id_error(staff_id))
+  errors
+end
+
+def non_clinical_staff_id_error(staff_id)
+  unless @storage.clinical_staff_id?(staff_id)
+    'Selected staff member is not a valid practitioner.'
+  end
 end
 
 
@@ -194,7 +217,7 @@ end
 # View a specific staff profile
 get '/admin/staff/:staff_id/?' do
   staff_id = params[:staff_id].to_i
-  redirect_if_missing_id('staff', staff_id, '/admin/staff')
+  redirect_if_bad_id('staff', staff_id, '/admin/staff')
 
   @staff_profile = @storage.load_staff_profile(staff_id)
 
@@ -213,7 +236,7 @@ end
 # Edit a specific staff member
 post '/admin/staff/:staff_id/edit' do
   staff_id = params[:staff_id]
-  redirect_if_missing_id('staff', staff_id, '/admin/staff/')
+  redirect_if_bad_id('staff', staff_id, '/admin/staff/')
   
   first_name, last_name = params[:first_name], params[:last_name]
   session[:errors].push(*edit_staff_errors(first_name, last_name))
@@ -238,7 +261,7 @@ end
 # Delete a specific staff member
 post '/admin/staff/:staff_id/delete' do
   staff_id = params[:staff_id]
-  redirect_if_missing_id('staff', staff_id, '/admin/staff')
+  redirect_if_bad_id('staff', staff_id, '/admin/staff')
 
   deleted = @storage.delete_staff_member(staff_id).first
   # Validate from DB (appts)
@@ -283,7 +306,7 @@ end
 # - View a specific patient profile
 get '/admin/patients/:patient_id/?' do
   patient_id = params[:patient_id]
-  redirect_if_missing_id('patients', patient_id, '/admin/patients')
+  redirect_if_bad_id('patients', patient_id, '/admin/patients')
 
   @patient = @storage.load_patient(patient_id)
   stats = @storage.load_patient_stats(patient_id)
@@ -296,7 +319,7 @@ end
 # - Form: Edit a patient
 get '/admin/patients/:patient_id/edit/?' do
   patient_id = params[:patient_id]
-  redirect_if_missing_id('patients', patient_id, '/admin/patients')
+  redirect_if_bad_id('patients', patient_id, '/admin/patients')
 
   @patient = @storage.load_patient(patient_id)
   render_with_layout(:edit_patient)
@@ -305,7 +328,7 @@ end
 # - Edit a patient
 post '/admin/patients/:patient_id/edit' do
   patient_id = params[:patient_id]
-  redirect_if_missing_id('patients', patient_id, '/admin/patients')
+  redirect_if_bad_id('patients', patient_id, '/admin/patients')
 
   first_name, last_name = params[:first_name], params[:last_name]
   session[:errors].push(*edit_patient_errors(first_name, last_name))
@@ -327,7 +350,7 @@ end
 # - Delete a patient
 post '/admin/patients/:patient_id/delete' do
   patient_id = params[:patient_id]
-  redirect_if_missing_id('patients', patient_id, '/admin/patients')
+  redirect_if_bad_id('patients', patient_id, '/admin/patients')
 
   deleted = @storage.delete_patient(patient_id).first
   # Validate from DB (appts)
@@ -375,7 +398,7 @@ end
 # Form - Edit a specific discipline
 get '/admin/disciplines/:discipline_id/edit/?' do
   discipline_id = params[:discipline_id]
-  redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
+  redirect_if_bad_id('disciplines', discipline_id, '/admin/disciplines')
 
   @discipline = @storage.load_discipline(discipline_id)
   
@@ -385,7 +408,7 @@ end
 # Edit a specific discipline
 post '/admin/disciplines/:discipline_id/edit' do
   discipline_id = params[:discipline_id]
-  redirect_if_missing_id('disciplines', discipline_id, '/admin/disciplines')
+  redirect_if_bad_id('disciplines', discipline_id, '/admin/disciplines')
 
   name, title = params[:name], params[:title]
   session[:errors].push(*edit_discipline_errors(name, title, discipline_id))
@@ -443,7 +466,7 @@ end
 # Form - Edit a treatment
 get '/admin/treatments/:treatment_id/edit/?' do
   treatment_id = params[:treatment_id]
-  redirect_if_missing_id('treatments', treatment_id, '/admin/treatments')
+  redirect_if_bad_id('treatments', treatment_id, '/admin/treatments')
 
   @treatment = @storage.load_treatment(treatment_id)
   @disciplines = @storage.load_disciplines
@@ -455,7 +478,7 @@ end
 # - Edit a treatment
 post '/admin/treatments/:treatment_id/edit' do
   treatment_id = params[:treatment_id]
-  redirect_if_missing_id('treatments', treatment_id, '/admin/treatments')
+  redirect_if_bad_id('treatments', treatment_id, '/admin/treatments')
 
   discipline_id = params[:discipline_id]
   name, length, price = params.values_at(:name, :length, :price)
@@ -477,9 +500,10 @@ end
 
 
 # Helpers #
-def redirect_if_missing_id(type, id, path)
+def redirect_if_bad_id(type, id, path, message=nil)
   unless @storage.record_exists?(type, id)
-    session[:errors] << "Hmm..that #{type.singularize} (id = #{id}) could not be found."
+    message ||= "Hmm..that #{type.singularize} (id = #{id}) could not be found."
+    session[:errors] << message
     redirect path
   end
 end
