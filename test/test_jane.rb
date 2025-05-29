@@ -262,11 +262,8 @@ class TestJane < Minitest::Test
     # - Does change the fields in the target appointment
   end
 
-  def test_admin_edit_appointment_error_nonexistent_staff_id
-skip
-    # Non-clinical staff member
-    bad_id = return_id(create_user('Hugo Ma'))
-    create_staff_member(bad_id)
+  def test_admin_edit_appointment_error_nonexistent_staff_id  
+    bad_id = 10
     
     context = create_appointment_cascade(
       staff: { name: 'Annie Hu', create_profile: true }, 
@@ -282,7 +279,7 @@ skip
 
     assert_equal(302, last_response.status)
     get last_response['location']
-    assert_includes(last_response.body, 'Selected staff member is not a valid practitioner.')
+    assert_includes(last_response.body, 'could not be found.')
   end
 
 

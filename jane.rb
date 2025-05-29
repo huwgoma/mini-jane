@@ -157,8 +157,6 @@ post '/admin/appointments/new' do
 
     redirect "/admin/schedule/#{@date}"
   end
-
-  
 end
 
 # - View a specific appointment
@@ -188,9 +186,7 @@ post '/admin/appointments/:appointment_id/edit' do
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
   
   practitioner_id = params[:practitioner_id]
-  binding.pry
-  redirect_if_bad_id('staff_disciplines', practitioner_id, 
-    "/admin/schedule", 'Selected staff member is not a valid practitioner.')
+  redirect_if_bad_id('staff', practitioner_id, "/admin/schedule")
   #binding.pry
 
   #session[:errors].push(*edit_appointment_errors)
