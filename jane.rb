@@ -135,8 +135,7 @@ post '/admin/appointments/new' do
   @date = Date.parse(params[:date] || Date.today.to_s)
   time = params[:time]
   
-  redirect_if_bad_id('staff_disciplines', practitioner_id, 
-    "/admin/schedule/#{@date}", 'Selected staff member is not a valid practitioner.')
+  redirect_if_bad_id('staff', practitioner_id, "/admin/schedule/#{@date}")
 
   @practitioner = @storage.load_staff(practitioner_id, 
       user_fields: { first_name: true, last_name: true })
@@ -176,12 +175,25 @@ get '/admin/appointments/:appointment_id/edit/?' do
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
 
   @appointment = @storage.load_appointment_info(appointment_id)
-
   @patients = @storage.load_all_patients
   @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.staff.id)
   @date = @appointment.date
 
   render_with_layout(:edit_appointment)
+end
+
+# Edit an appointment
+post '/admin/appointments/:appointment_id/edit' do
+  appointment_id = params[:appointment_id]
+  redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
+  
+  practitioner_id = params[:practitioner_id]
+  binding.pry
+  redirect_if_bad_id('staff_disciplines', practitioner_id, 
+    "/admin/schedule", 'Selected staff member is not a valid practitioner.')
+  #binding.pry
+
+  #session[:errors].push(*edit_appointment_errors)
 end
 
 

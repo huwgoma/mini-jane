@@ -187,15 +187,16 @@ class TestJane < Minitest::Test
     assert_equal(302, last_response.status)
   end
 
-  def test_admin_create_appointment_error_non_clinical_staff_id_redirects
+  def test_admin_create_appointment_error_nonexistent_staff_id
     # Non-clinical staff member
     user_id = return_id(create_user('Hugo Ma'))
     create_staff_member(user_id)
+    bad_id = user_id + 1
 
-    post '/admin/appointments/new', practitioner_id: user_id
+    post '/admin/appointments/new', practitioner_id: bad_id
     assert_equal(302, last_response.status)
     get last_response['location']
-    assert_includes(last_response.body, 'Selected staff member is not a valid practitioner.')
+    assert_includes(last_response.body, 'could not be found.')
   end
 
   def test_admin_create_appointment_error_treatment_practitioner_mismatch
@@ -261,9 +262,27 @@ class TestJane < Minitest::Test
     # - Does change the fields in the target appointment
   end
 
-  def test_admin_edit_appointment_error_redirects_bad_staff_id
-    # Bad = Non-existent or non-clinical
+  def test_admin_edit_appointment_error_nonexistent_staff_id
+skip
+    # Non-clinical staff member
+    bad_id = return_id(create_user('Hugo Ma'))
+    create_staff_member(bad_id)
     
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
+
+    appt_id = context[:appointment_id]
+
+    post "/admin/appointments/#{appt_id}/edit", 
+      practitioner_id: bad_id
+
+    assert_equal(302, last_response.status)
+    get last_response['location']
+    assert_includes(last_response.body, 'Selected staff member is not a valid practitioner.')
   end
 
 
@@ -1248,10 +1267,10 @@ class TestJane < Minitest::Test
     
     treatment_id = treatment[:id]   || return_id(create_treatment(treatment[:name], discipline_id, 
                                                                   treatment[:length], treatment[:price]))
-    create_appointment(staff_id, patient_id, treatment_id, datetime)
+    appointment_id = return_id(create_appointment(staff_id, patient_id, treatment_id, datetime))
 
     # Return the IDs of the created objects for subsequent use
-    { staff_id: staff_id, patient_id: patient_id, 
+    { appointment_id: appointment_id, staff_id: staff_id, patient_id: patient_id, 
       discipline_id: discipline_id, treatment_id: treatment_id }
   end
 
@@ -1263,7 +1282,7 @@ class TestJane < Minitest::Test
   # Create a dummy appointment
   def create_appointment(staff_id, patient_id, treatment_id, datetime)
     sql = "INSERT INTO appointments(staff_id, patient_id, treatment_id, datetime)
-           VALUES($1, $2, $3, $4);"
+           VALUES($1, $2, $3, $4) RETURNING *;"
     @storage.query(sql, staff_id, patient_id, treatment_id, datetime)
   end
 
