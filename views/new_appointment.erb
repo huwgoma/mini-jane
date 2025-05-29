@@ -1,5 +1,43 @@
 <h2>New Appointment</h2>
 
 <form action="/admin/appointments/new" method="post">
-  <h4>Booking with <%= @practitioner_treatments %></h4>
+  <h4>Booking with <%= @practitioner.full_name %>:</h4>
+  
+  <hr>
+
+  <div>
+    <label for="treatment">Treatment</label>
+    <select name="treatment_id" id="treatment">
+      <% @treatments.each do |treatment| %>
+        <option value="<%= treatment.id %>"><%= treatment.name %></option>
+      <% end %>
+    </select>
+  </div>
+  
+  <hr>
+
+  <div>
+    <label for="patients">Patient</label>
+    <select name="patient_id" id="patients">
+      <% @patients.each do |patient| %>
+        <option value="<%= patient.id %>"><%= patient.full_name %></option>
+      <% end %>
+    </select>
+  </div>
+  
+  <hr>
+
+  <div>
+    <label for="time">Time</label>
+    <input type="time" name="time" id="time">
+    <p><%= pretty_date(@date) %></p>
+  </div>
+
+  <hr>
+  
+  <div>
+    <a href="/admin/schedule/<%= @date %>">Cancel</a>
+    <button type="submit">Book Appointment</button>
+  </div>
+  
 </form>

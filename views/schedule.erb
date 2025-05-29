@@ -46,6 +46,8 @@
           <form action="/admin/appointments/new" method="get">
             <input type="hidden" name="practitioner_id" 
               value="<%= practitioner.id %>">
+            <input type="hidden" name="date"
+              value="<%= @date %>">
             <button type="submit">New Appointment</button>
           </form>
         </li>
