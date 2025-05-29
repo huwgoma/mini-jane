@@ -118,8 +118,11 @@ end
 # Form: Create new appointment (per-practitioner)
 get '/admin/appointments/new' do
   practitioner_id = params[:practitioner_id]
-  # redirect bad id
   @date = Date.parse(params[:date])
+
+  redirect_if_missing_id('staff', practitioner_id, "/admin/schedule/#{@date.to_s}")
+  # redirect bad id
+  
   @practitioner = @storage.load_staff(practitioner_id, 
     user_fields: { first_name: true, last_name: true })
   @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
@@ -127,6 +130,8 @@ get '/admin/appointments/new' do
   
   render_with_layout(:new_appointment)
 end
+
+
 
 # - View a specific appointment
 get '/admin/appointments/:appointment_id/?' do

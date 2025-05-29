@@ -154,6 +154,17 @@ class TestJane < Minitest::Test
   end
 
   # Appointments CRUD #
+  def test_admin_create_appointment_form_redirects_bad_id
+    bad_id = 10
+
+    get '/admin/appointments/new', practitioner_id: bad_id, date: TODAY
+
+    assert_equal(302, last_response.status)
+    get last_response['location']
+    assert_includes(last_response.body, 'could not be found.')
+    assert_includes(last_response.body, TODAY)
+  end
+
 
   # Staff CRUD #
   def test_admin_view_all_staff
