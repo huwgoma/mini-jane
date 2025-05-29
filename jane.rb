@@ -43,9 +43,9 @@ helpers do
   end
 
   # Check if a given <option> should be pre-selected.
-  def preselected?(select_name, option_value, params, obj=nil)
-    params[select_name] == option_value.to_s ||
-      (obj.method(select_name).call == option_value if obj.respond_to?(select_name))
+  def preselected?(select_name, option_value, params, obj_value=nil)
+    (params[select_name] == option_value.to_s) || (obj_value == option_value)
+    #(obj.method(select_name).call == option_value if obj.respond_to?(select_name))
   end
 
   def pretty_duration(duration_in_minutes)
@@ -173,9 +173,13 @@ end
 
 # Form - Edit an appointment
 get '/admin/appointments/:appointment_id/edit/?' do
-  
-end
+  appointment_id = params[:appointment_id]
 
+  @appointment = @storage.load_appointment_info(appointment_id)
+  binding.pry
+  render_with_layout(:edit_appointment)
+end
+# Refactor #preselected to accept an object value directly instead of an object
 
 # # Admin - Staff # #
 # Form - Create new staff member

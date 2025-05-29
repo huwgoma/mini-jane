@@ -7,7 +7,8 @@
       
       <% @disciplines.each do |discipline| %>
         <option value="<%= discipline.id %>" 
-          <%= 'selected' if preselected?('discipline_id', discipline.id, params, @treatment) %>>
+          <%= 'selected' if preselected?('discipline_id', discipline.id, 
+              params, @treatment.discipline.id) %>>
           <%= discipline.name %>
         </option>
       <% end %>
@@ -27,7 +28,8 @@
 
       <% @tx_lengths.each do |length| %>
         <option value="<%= length %>"
-          <%= 'selected' if preselected?('length', length, params, @treatment) %>>
+          <%= 'selected' if preselected?('length', length, 
+            params, @treatment.length) %>>
           <%= pretty_duration(length) %>
         </option>
       <% end %>
