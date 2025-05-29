@@ -121,7 +121,6 @@ get '/admin/appointments/new' do
   @date = Date.parse(params[:date])
 
   redirect_if_missing_id('staff', practitioner_id, "/admin/schedule/#{@date.to_s}")
-  # redirect bad id
   
   @practitioner = @storage.load_staff(practitioner_id, 
     user_fields: { first_name: true, last_name: true })
@@ -131,6 +130,10 @@ get '/admin/appointments/new' do
   render_with_layout(:new_appointment)
 end
 
+# - Create new appointment
+post '/admin/appointments/new' do
+  
+end
 
 
 # - View a specific appointment

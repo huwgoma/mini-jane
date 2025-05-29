@@ -1,6 +1,8 @@
 <h2>New Appointment</h2>
 
 <form action="/admin/appointments/new" method="post">
+  <input type="hidden" name="practitioner_id" value="<%= @practitioner.id %>">
+
   <h4>Booking with <%= @practitioner.full_name %>:</h4>
   
   <hr>
@@ -30,11 +32,12 @@
   <div>
     <label for="time">Time</label>
     <input type="time" name="time" id="time">
+    <input type="hidden" name="date" value="<%= @date %>">
     <p><%= pretty_date(@date) %></p>
   </div>
 
   <hr>
-  
+
   <div>
     <a href="/admin/schedule/<%= @date %>">Cancel</a>
     <button type="submit">Book Appointment</button>
