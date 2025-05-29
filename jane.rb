@@ -131,7 +131,8 @@ end
 
 # - Create new appointment
 post '/admin/appointments/new' do
-  practitioner_id, treatment_id = params.values_at(:practitioner_id, :treatment_id)
+  practitioner_id, treatment_id, patient_id = params.values_at(
+    :practitioner_id, :treatment_id, :patient_id)
   @date = Date.parse(params[:date] || Date.today.to_s)
   
   redirect_if_bad_id('staff_disciplines', practitioner_id, 
@@ -140,7 +141,8 @@ post '/admin/appointments/new' do
   @practitioner = @storage.load_staff(practitioner_id, 
       user_fields: { first_name: true, last_name: true })
 
-  session[:errors].push(*new_appointment_errors(@practitioner, treatment_id))
+  session[:errors].push(*new_appointment_errors(
+    @practitioner, treatment_id, patient_id))
   
   if session[:errors].any?
     
@@ -155,10 +157,11 @@ post '/admin/appointments/new' do
   
 end
 
-def new_appointment_errors(staff, treatment_id)
+def new_appointment_errors(staff, treatment_id, patient_id)
   errors = []
   errors.push(non_clinical_staff_id_error(staff.id),
-    treatment_practitioner_mismatch_error(staff, treatment_id))
+    treatment_practitioner_mismatch_error(staff, treatment_id),
+    nonexistent_patient_id_error(patient_id))
   errors
 end
 
@@ -172,6 +175,12 @@ def treatment_practitioner_mismatch_error(staff, treatment_id)
   unless Staff.from_partial_data(id: staff.id).offers_treatment?(treatment_id, @storage)
      "#{staff.full_name} does not offer the selected treatment."  
   end 
+end
+
+def nonexistent_patient_id_error(patient_id)
+  unless @storage.record_exists?('patients', patient_id)
+    "No patient with that ID (#{patient_id}) was found."
+  end
 end
 
 

@@ -202,6 +202,22 @@ class TestJane < Minitest::Test
       'Annie Hu does not offer the selected treatment.')
   end
 
+  def test_admin_create_appointment_error_nonexistent_patient_id
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    user_id = return_id(create_user('Annie Hu'))
+    create_staff_member(user_id)
+    create_staff_discipline_associations(user_id, pt_id)
+    tx_id = return_id(create_treatment('PT - Tx', pt_id, 30, 85))
+
+    bad_id = 10
+
+    post '/admin/appointments/new', practitioner_id: user_id, date: TODAY,
+      treatment_id: tx_id, patient_id: bad_id
+
+    assert_includes(last_response.body, 
+      "No patient with that ID (#{bad_id}) was found.")
+  end
+
 
   # Staff CRUD #
   def test_admin_view_all_staff
