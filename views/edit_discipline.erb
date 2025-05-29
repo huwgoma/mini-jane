@@ -4,13 +4,13 @@
   <div>
     <label for="name">Name - Required</label>
     <input type="text" name="name" id="name"
-      value="<%= prefill(:name, params, @discipline) %>"> <%# required %>
+      value="<%= prefill(:name, params, obj: @discipline) %>"> <%# required %>
   </div>
 
   <div>
     <label for="title">Title - Required</label>
     <input type="text" name="title" id="title"
-      value=<%= prefill(:title, params, @discipline) %>> <%# required %>
+      value=<%= prefill(:title, params, obj: @discipline) %>> <%# required %>
   </div>
 
   <div>

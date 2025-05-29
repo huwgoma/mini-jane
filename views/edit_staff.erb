@@ -12,13 +12,13 @@
     <div>
       <label for="first_name">First Name - Required</label>
       <input type="text" name="first_name" id="first_name"
-        value="<%= prefill(:first_name, params, @staff_profile) %>"> <%#required%>
+        value="<%= prefill(:first_name, params, obj: @staff_profile) %>"> <%#required%>
     </div>
     
     <div>
       <label for="first_name">Last Name - Required</label>
       <input type="text" name="last_name" id="last_name"
-        value="<%= prefill(:last_name, params, @staff_profile) %>"> <%#required%>
+        value="<%= prefill(:last_name, params, obj: @staff_profile) %>"> <%#required%>
     </div>
   </div>
   
@@ -42,20 +42,20 @@
     <div>
       <label for="email">Email</label>
       <input type="text" name="email" id="email" 
-        value="<%= prefill(:email, params, @staff_profile) %>">
+        value="<%= prefill(:email, params, obj: @staff_profile) %>">
     </div>
     
     <div>
       <label for="phone">Phone Number</label>
       <input type="tel" name="phone" id="phone" 
-        value="<%= prefill(:phone, params, @staff_profile) %>">
+        value="<%= prefill(:phone, params, obj: @staff_profile) %>">
     </div>
   </div>
 
   <div class="bio-form">
     <h3>Bio</h3>
     <textarea name="biography" id="biography" 
-      rows="10" cols="50"><%= prefill(:biography, params, @staff_profile) %></textarea>
+      rows="10" cols="50"><%= prefill(:biography, params, obj: @staff_profile) %></textarea>
   </div>
 
   <%# Cancel/Submit  %>

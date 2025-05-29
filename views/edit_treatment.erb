@@ -19,7 +19,7 @@
   <div>
     <label for="name">Treatment Name - Required</label>
     <input type="text" name="name" id="name"
-      value="<%= prefill(:name, params, @treatment) %>">
+      value="<%= prefill(:name, params, obj: @treatment) %>">
   </div>
 
   <div>
@@ -40,7 +40,7 @@
   <div>
     <label for="price">Price - Required</label>
     <input type="number" name="price" id="price" min="0.00" step="0.01"
-      value="<%= pretty_price(prefill(:price, params, @treatment), currency: nil) %>">
+      value="<%= pretty_price(prefill(:price, params, obj: @treatment), currency: nil) %>">
   </div>
 
   <div>

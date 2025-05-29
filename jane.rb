@@ -37,9 +37,9 @@ helpers do
       collection.any? { |obj| obj.id == id if obj.respond_to?(:id) }
   end
 
-  def prefill(attribute, params, obj_value=nil)
-    params[attribute] || obj_value
-    #(object.method(attribute).call if object.respond_to?(attribute))
+  def prefill(attribute, params, obj_value: nil, obj: nil)
+    params[attribute] || obj_value ||
+      (obj.method(attribute).call if obj.respond_to?(attribute))
   end
 
   # Check if a given <option> should be pre-selected.
