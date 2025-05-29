@@ -173,12 +173,14 @@ end
 # Form - Edit an appointment
 get '/admin/appointments/:appointment_id/edit/?' do
   appointment_id = params[:appointment_id]
-  # Redirect bad appt id
+  redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
+
   @appointment = @storage.load_appointment_info(appointment_id)
 
   @patients = @storage.load_all_patients
   @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.staff.id)
   @date = @appointment.date
+
   render_with_layout(:edit_appointment)
 end
 
