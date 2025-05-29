@@ -255,6 +255,17 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'Please enter a time.')
   end
 
+  def test_admin_edit_appointment_success
+    # It: 
+    # - Doesnt change the number of appointments
+    # - Does change the fields in the target appointment
+  end
+
+  def test_admin_edit_appointment_error_redirects_bad_staff_id
+    # Bad = Non-existent or non-clinical
+    
+  end
+
 
   # Staff CRUD #
   def test_admin_view_all_staff

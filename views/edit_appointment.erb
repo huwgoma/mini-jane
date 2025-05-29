@@ -1,0 +1,52 @@
+<h2>New Appointment</h2>
+
+<form action="/admin/appointments/new" method="post">
+  <input type="hidden" name="practitioner_id" value="<%= @practitioner.id %>">
+
+  <h4>Booking with <%= @practitioner.full_name %>:</h4>
+  
+  <hr>
+
+  <div>
+    <label for="treatment">Treatment</label>
+    <select name="treatment_id" id="treatment">
+      <% @treatments.each do |treatment| %>
+        <option value="<%= treatment.id %>" 
+          <%= 'selected' if preselected?('treatment_id', treatment.id, params) %>>
+          <%= treatment.name %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+  
+  <hr>
+
+  <div>
+    <label for="patients">Patient</label>
+    <select name="patient_id" id="patients">
+      <% @patients.each do |patient| %>
+        <option value="<%= patient.id %>"
+          <%= 'selected' if preselected?('patient_id', patient.id, params) %>>
+          <%= patient.full_name %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+  
+  <hr>
+
+  <div>
+    <label for="time">Time</label>
+    <input type="time" name="time" id="time" value="<%= prefill(:time, params) %>">
+    <input type="hidden" name="date" value="<%= @date %>">
+    <p><%= pretty_date(@date) %></p>
+  </div>
+
+  <hr>
+
+  <div>
+    <a href="/admin/schedule/<%= @date %>">Cancel</a>
+    <button type="submit">Book Appointment</button>
+  </div>
+  
+</form>
