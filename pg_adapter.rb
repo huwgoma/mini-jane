@@ -105,17 +105,6 @@ class PGAdapter
     format_staff(result.first)
   end
   
-  def create_staff_return_user_id(first_name, last_name, user_id: nil,
-                                  email: nil, phone: nil, biography: nil)
-    user_id ||= create_user_return_id(
-                  first_name, last_name, email: email, phone: phone)
-    staff_sql = "INSERT INTO staff(user_id, biography)
-                 VALUES($1, $2) RETURNING user_id;"
-    result = query(staff_sql, user_id, biography)
-
-    result.first['user_id'].to_i
-  end
-
   def load_all_staff
     sql = "SELECT users.id, users.first_name, users.last_name 
            FROM users JOIN staff ON users.id = staff.user_id
@@ -132,6 +121,31 @@ class PGAdapter
     staff_disciplines_result = load_disciplines_by_staff(staff_id)
     
     format_staff_profile(staff, staff_disciplines_result)
+  end
+
+  def load_staff_by_treatment(treatment_id)
+    # Return all staff members that offer the specified treatment
+    sql = "SELECT users.id, users.first_name, users.last_name
+           FROM users
+           JOIN staff ON users.id = staff.user_id
+           JOIN staff_disciplines sd ON staff.user_id = sd.staff_id
+           JOIN disciplines ON sd.discipline_id = disciplines.id
+           JOIN treatments ON disciplines.id = treatments.discipline_id
+           WHERE treatments.id = $1;"
+    result = query(sql, treatment_id)
+
+    result.map { |row| format_staff(row) }
+  end
+
+  def create_staff_return_user_id(first_name, last_name, user_id: nil,
+                                  email: nil, phone: nil, biography: nil)
+    user_id ||= create_user_return_id(
+                  first_name, last_name, email: email, phone: phone)
+    staff_sql = "INSERT INTO staff(user_id, biography)
+                 VALUES($1, $2) RETURNING user_id;"
+    result = query(staff_sql, user_id, biography)
+
+    result.first['user_id'].to_i
   end
 
   def add_staff_disciplines(staff_id, discipline_ids)

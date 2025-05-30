@@ -47,6 +47,15 @@ helpers do
     (params[select_name] == option_value.to_s) || (obj_value == option_value)
   end
 
+  def pretty_appointment(appointment)
+    start_time = pretty_time(appointment.start_time)
+    end_time = pretty_time(appointment.end_time)
+    patient_name = appointment.patient.full_name
+    treatment_name = appointment.treatment.name
+
+    "#{start_time}-#{end_time}: #{patient_name} - #{treatment_name}"
+  end
+
   def pretty_duration(duration_in_minutes)
     hours, minutes = duration_in_minutes.divmod(60)
 
@@ -210,7 +219,14 @@ end
 
 # Form - Copy an appointment
 get '/admin/appointments/:appointment_id/copy' do
+  appointment_id = params[:appointment_id]
+  redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
+
+  @appointment = @storage.load_appointment_info(appointment_id)
+  treatment = @appointment.treatment
+  @practitioners = @storage.load_staff_by_treatment(treatment.id)
   
+  render_with_layout(:copy_appointment)
 end
 
 

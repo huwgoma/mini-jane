@@ -1,0 +1,39 @@
+<h2>Copy Appointment</h2>
+
+<form action="/admin/appointments/<%= @appointment.id %>/copy" method="post">
+  <h4>Copying Appointment for 
+    <%= @appointment.patient.full_name %> -
+    <%= @appointment.treatment.name %>:
+  </h4>
+  
+  <hr>
+
+  <div>
+    <label for="practitioners">Practitioner</label>
+    <select name="practitioner_id" id="practitioners">
+      <% @practitioners.each do |practitioner| %>
+        <option value="<%= practitioner.id %>"
+          <%= 'selected' if preselected?('practitioner_id', practitioner.id, 
+            params, @appointment.staff.id) %>>
+          <%= practitioner.full_name %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+
+  <hr>
+
+  <div>
+    <label for="datetime">Date/Time</label>
+    <input type="datetime-local" name="datetime" id="datetime" 
+      value="<%= prefill(:datetime, params) %>">
+  </div>
+
+  <hr>
+
+  <div>
+    <a href="/admin/appointments/<%= @appointment.id %>">Cancel</a>
+    <button type="submit">Copy Appointment</button>
+  </div>
+  
+</form>
