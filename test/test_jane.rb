@@ -257,6 +257,20 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_edit_appointment_success
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
+
+    appt_id = context[:appointment_id]
+    staff_id = context[:staff_id]
+    tx_id = context[:treatment_id]
+    patient_id = context[:patient_id]
+
+    post "/admin/appointments/#{appt_id}/edit", practitioner_id: staff_id, date: TODAY, 
+      treatment_id: tx_id, patient_id: patient_id, time: ''
     # It: 
     # - Doesnt change the number of appointments
     # - Does change the fields in the target appointment
@@ -274,8 +288,7 @@ class TestJane < Minitest::Test
     dc_id = return_id(create_discipline('Chiro', 'DC'))
     dc_tx_id = return_id(create_treatment('DC - Tx', dc_id, 20, 75))
 
-    post "/admin/appointments/#{appt_id}/edit", practitioner_id: context[:staff_id],
-      treatment_id: dc_tx_id
+    post "/admin/appointments/#{appt_id}/edit", treatment_id: dc_tx_id
 
     assert_includes(last_response.body,
       'Annie Hu does not offer the selected treatment.')
@@ -289,12 +302,12 @@ class TestJane < Minitest::Test
       treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
     )
 
+    appt_id = context[:appointment_id]
     bad_patient_id = 10
-    staff_id = context[:staff_id]
     treatment_id = context[:treatment_id]
 
-    post '/admin/appointments/new', practitioner_id: staff_id, date: TODAY,
-      treatment_id: treatment_id, patient_id: bad_patient_id
+    post "/admin/appointments/#{appt_id}/edit", date: TODAY, treatment_id: treatment_id, 
+      patient_id: bad_patient_id
 
     assert_includes(last_response.body, 
       "No patient with that ID (#{bad_patient_id}) was found.")
@@ -309,16 +322,15 @@ class TestJane < Minitest::Test
     )
 
     appt_id = context[:appointment_id]
-    staff_id = context[:staff_id]
     tx_id = context[:treatment_id]
     patient_id = context[:patient_id]
 
-    post "/admin/appointments/#{appt_id}/edit", practitioner_id: staff_id, date: TODAY, 
+    post "/admin/appointments/#{appt_id}/edit", date: TODAY, 
       treatment_id: tx_id, patient_id: patient_id, time: ''
 
     assert_includes(last_response.body, 'Please enter a time.')
 
-    post '/admin/appointments/new', practitioner_id: staff_id, date: TODAY, 
+    post "/admin/appointments/#{appt_id}/edit", date: TODAY, 
       treatment_id: tx_id, patient_id: patient_id # missing time 
 
     assert_includes(last_response.body, 'Please enter a time.')

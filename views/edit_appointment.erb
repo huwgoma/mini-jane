@@ -1,8 +1,6 @@
 <h2>Edit Appointment</h2>
 
 <form action="/admin/appointments/<%= @appointment.id %>/edit" method="post">
-  <input type="hidden" name="practitioner_id" value="<%= @appointment.staff.id %>">
-
   <h4>Booking with <%= @appointment.staff.full_name %>:</h4>
   
   <hr>
