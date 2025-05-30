@@ -208,6 +208,11 @@ post '/admin/appointments/:appointment_id/edit' do
   end
 end
 
+# Form - Copy an appointment
+get '/admin/appointments/:appointment_id/copy' do
+  
+end
+
 
 # # Admin - Staff # #
 # Form - Create new staff member

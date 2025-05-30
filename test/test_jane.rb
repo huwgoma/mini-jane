@@ -351,6 +351,25 @@ class TestJane < Minitest::Test
     assert_includes(last_response.body, 'Please enter a time.')
   end
 
+  def test_admin_copy_appointment_success
+    
+  end
+
+  def test_admin_copy_appointment_error_empty_date
+    
+  end
+
+  def test_admin_copy_appointment_error_empty_time
+    
+  end
+
+  def test_admin_copy_appointment_error_empty_staff
+    
+  end
+
+  def test_admin_copy_appointment_error_treatment_practitioner_mismatch
+    
+  end
 
   # Staff CRUD #
   def test_admin_view_all_staff
