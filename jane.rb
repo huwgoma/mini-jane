@@ -186,11 +186,6 @@ post '/admin/appointments/:appointment_id/edit' do
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
   
   @appointment = @storage.load_appointment_info(appointment_id)
-
-  # - Valid -> check for errors
-  #   - Staff ID and Date cannot be changed so should not be changed
-  #     by DB Adapter
-
   @practitioner = @storage.load_staff(@appointment.staff.id,
     user_fields: { first_name: true, last_name: true })
   treatment_id, patient_id = params.values_at(:treatment_id, :patient_id)
@@ -208,6 +203,8 @@ post '/admin/appointments/:appointment_id/edit' do
   else
     datetime = DateTime.parse("#{@date}T#{time}")
     @storage.update_appointment(appointment_id, patient_id, treatment_id, datetime)
+
+    redirect "/admin/appointments/#{appointment_id}"
   end
 end
 

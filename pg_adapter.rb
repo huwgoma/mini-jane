@@ -78,9 +78,11 @@ class PGAdapter
   end
 
   def update_appointment(id, patient_id, treatment_id, datetime)
-    binding.pry
     sql = "UPDATE appointments SET
-           "
+           patient_id = $2, treatment_id = $3, datetime = $4
+           WHERE id = $1;"
+
+    query(sql, id, patient_id, treatment_id, datetime)
   end
 
   # Users #

@@ -257,6 +257,9 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_edit_appointment_success
+    appts_count = @storage.query("SELECT * FROM appointments;").ntuples
+    assert_equal(0, appts_count)
+
     context = create_appointment_cascade(
       staff: { name: 'Annie Hu', create_profile: true }, 
       patient: { name: 'Gina P', create_profile: true },
@@ -264,16 +267,28 @@ class TestJane < Minitest::Test
       treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
     )
 
-    appt_id = context[:appointment_id]
-    staff_id = context[:staff_id]
-    tx_id = context[:treatment_id]
-    patient_id = context[:patient_id]
+    appts_count = @storage.query("SELECT * FROM appointments;").ntuples
+    assert_equal(1, appts_count)
 
-    post "/admin/appointments/#{appt_id}/edit", practitioner_id: staff_id, date: TODAY, 
-      treatment_id: tx_id, patient_id: patient_id, time: ''
-    # It: 
-    # - Doesnt change the number of appointments
-    # - Does change the fields in the target appointment
+    appt_id = context[:appointment_id]
+    pt_id = context[:discipline_id]
+    new_tx_id = return_id(create_treatment('PT - Treatment', pt_id, 30, 85))
+    new_pt_id = return_id(create_user('Hendrik S'))
+    create_patient_profile(new_pt_id)
+    new_time = '12:00'
+
+    post "/admin/appointments/#{appt_id}/edit", date: TODAY, 
+      treatment_id: new_tx_id, patient_id: new_pt_id, time: new_time
+
+    appts_result = @storage.query("SELECT * FROM appointments;")
+    assert_equal(1, appts_result.ntuples)
+
+    appt = appts_result.first
+    assert_equal(new_tx_id.to_s, appt['treatment_id'])
+    assert_equal(new_pt_id.to_s, appt['patient_id'])
+    assert_includes(appt['datetime'], new_time)
+
+    assert_equal(302, last_response.status)
   end
 
   def test_admin_edit_appointment_error_treatment_practitioner_mismatch
