@@ -14,7 +14,7 @@
       <% @practitioners.each do |practitioner| %>
         <option value="<%= practitioner.id %>"
           <%= 'selected' if preselected?('practitioner_id', practitioner.id, 
-            params, @appointment.staff.id) %>>
+            params, @appointment.practitioner.id) %>>
           <%= practitioner.full_name %>
         </option>
       <% end %>

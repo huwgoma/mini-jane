@@ -183,7 +183,7 @@ get '/admin/appointments/:appointment_id/edit/?' do
 
   @appointment = @storage.load_appointment_info(appointment_id)
   @patients = @storage.load_all_patients
-  @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.staff.id)
+  @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.practitioner.id)
   @date = @appointment.date
 
   render_with_layout(:edit_appointment)
@@ -195,7 +195,7 @@ post '/admin/appointments/:appointment_id/edit' do
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
   
   @appointment = @storage.load_appointment_info(appointment_id)
-  @practitioner = @storage.load_staff(@appointment.staff.id,
+  @practitioner = @storage.load_staff(@appointment.practitioner.id,
     user_fields: { first_name: true, last_name: true })
   treatment_id, patient_id = params.values_at(:treatment_id, :patient_id)
   @date = @appointment.date
@@ -206,7 +206,7 @@ post '/admin/appointments/:appointment_id/edit' do
 
   if session[:errors].any?
     @patients = @storage.load_all_patients
-    @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.staff.id)
+    @treatments = @storage.load_treatment_listings_by_practitioner(@appointment.practitioner.id)
 
     render_with_layout(:edit_appointment)
   else
