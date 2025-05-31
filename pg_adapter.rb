@@ -134,7 +134,7 @@ class PGAdapter
            WHERE treatments.id = $1;"
     result = query(sql, treatment_id)
 
-    result.map { |row| format_staff(row) }
+    result.map { |row| format_staff(row, practitioner: true) }
   end
 
   def create_staff_return_user_id(first_name, last_name, user_id: nil,
