@@ -1,10 +1,10 @@
 require_relative 'user'
 
 class StaffRepository
-  def self.clinical?(id, storage)
-    sql = "SELECT 1 FROM staff_disciplines WHERE staff_id = $1;"
-    storage.query(sql, id).ntuples.positive?
-  end
+  # def self.clinical?(id, storage)
+  #   sql = "SELECT 1 FROM staff_disciplines WHERE staff_id = $1;"
+  #   storage.query(sql, id).ntuples.positive?
+  # end
 
   def self.offers_treatment?(staff_id, treatment_id, storage)
     sql = "SELECT 1 FROM treatments
@@ -37,9 +37,9 @@ class Staff < User
     @biography.to_s.strip
   end
 
-  def clinical?(storage)
-    StaffRepository.clinical?(@id, storage)
-  end
+  # def clinical?(storage)
+  #   StaffRepository.clinical?(@id, storage)
+  # end
 
   def offers_treatment?(treatment_id, storage)
     StaffRepository.offers_treatment?(@id, treatment_id, storage)

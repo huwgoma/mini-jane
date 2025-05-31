@@ -234,20 +234,24 @@ post '/admin/appointments/:appointment_id/copy' do
   appointment_id = params[:appointment_id]
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
 
-  session[:errors].push(*copy_appointment_errors)
+  staff_id = params[:staff_id]
+  binding.pry
+  redirect_if_bad_id('staff', staff_id, 
+    "/admin/appointments/#{appointment_id}/copy")
+
+  appointment = @storage.load_appointment_info(appointment_id)
+  staff = @storage.load_staff(staff_id,
+    user_fields: { first_name: true, last_name: true })
+  datetime = DateTime.parse(params[:datetime])
+  date, time = datetime.to_date, datetime.to_time
+
+  session[:errors].push(*copy_move_appointment_errors(staff, 
+    appointment.treatment.id, date, time))
+  
+    binding.pry
+  # staff tx id date time
 end
 
-def copy_appointment_errors(staff, treatment_id, patient_id, date, time)
-  errors = []
-  # empty date, empty time, empty staff (ID), treatment/staff mismatch
-  # - patient ID is pulled from @appointment
-  # - treatment ID is also pulled from @appointment
-  # - patient and treatment ID do not change 
-  # - Therefore no need to validate. 
-  errors.push(*appointment_errors(staff, treatment_id, patient_id, time), 
-    non_clinical_staff_id_error(staff.id))
-  errors
-end
 
 # What are the common appointment errors that can be extracted?
 # Create/Edit/Copy/Move
@@ -629,7 +633,8 @@ def edit_appointment_errors(staff, treatment_id, patient_id, time)
 end
 
 def copy_move_appointment_errors(staff, treatment_id, date, time)
-  
+  appointment_errors(staff: staff, treatment_id: treatment_id, 
+    date: date, time: time)
 end
 
 def appointment_errors(staff:, treatment_id:, time:, patient_id: nil, date: nil)
@@ -669,16 +674,16 @@ end
 # - Date/Time empty
 
 # - If staff ID is not clinical
-def non_clinical_staff_id_error(staff_id)
-  unless Staff.from_partial_data(id: staff_id).clinical?(@storage)
-    'Selected staff member is not a valid practitioner.'
-  end
-end
+# def non_clinical_staff_id_error(staff_id)
+#   unless Staff.from_partial_data(id: staff_id).clinical?(@storage)
+#     'Selected staff member is not a valid practitioner.'
+#   end
+# end
 
 # - If staff does not offer selected treatment
 def treatment_practitioner_mismatch_error(staff, treatment_id)
   unless Staff.from_partial_data(id: staff.id).offers_treatment?(treatment_id, @storage)
-     "#{staff.full_name} does not offer the selected treatment."  
+    "#{staff.full_name} does not offer the selected treatment."  
   end 
 end
 

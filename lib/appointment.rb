@@ -1,19 +1,19 @@
 class Appointment
-  attr_reader :id, :patient, :staff, :treatment, :datetime
+  attr_reader :id, :patient, :practitioner, :treatment, :datetime
   
-  def initialize(id, datetime, patient:, staff:, treatment:)
+  def initialize(id, datetime, patient:, practitioner:, treatment:)
     @id = id
     @datetime = datetime
     @patient = patient
-    @staff = staff
+    @practitioner = practitioner
     @treatment = treatment
   end
 
   def self.from_partial_data(id: nil, datetime: nil, patient: nil, 
-    staff: nil, treatment: nil)
+    practitioner: nil, treatment: nil)
     
     self.new(id, datetime, patient: patient, 
-      staff: staff, treatment: treatment)
+      practitioner: practitioner, treatment: treatment)
   end
 
   def end_time
