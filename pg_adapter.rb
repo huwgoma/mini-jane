@@ -529,13 +529,13 @@ class PGAdapter
     
     patient = Patient.from_partial_data(id: pt_id, 
       first_name: pt_first_name, last_name: pt_last_name)
-    staff = Staff.from_partial_data(id: staff_id, first_name: staff_first_name, last_name: staff_last_name)
+    practitioner = Practitioner.from_partial_data(id: staff_id, first_name: staff_first_name, last_name: staff_last_name)
     treatment = Treatment.from_partial_data(id: tx_id, name: tx_name,
       length: tx_length, price: tx_price)    
     datetime = DateTime.parse(appt['datetime'])
 
     Appointment.new(appt_id, datetime, 
-      patient: patient, staff: staff, treatment: treatment)
+      patient: patient, practitioner: practitioner, treatment: treatment)
   end
 
   def format_user_listing(user, staff: false)
