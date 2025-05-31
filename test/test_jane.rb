@@ -236,6 +236,24 @@ class TestJane < Minitest::Test
       "No patient with that ID (#{bad_id}) was found.")
   end
 
+  def test_admin_create_appointment_error_nonexistent_treatment_id
+    pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
+    staff_id = return_id(create_user('Annie Hu'))
+    create_staff_member(staff_id)
+    create_staff_discipline_associations(staff_id, pt_id)
+    tx_id = return_id(create_treatment('PT - Tx', pt_id, 30, 85))
+    patient_id = return_id(create_user('Hugo Ma'))
+    create_patient_profile(patient_id)
+
+    bad_tx_id = tx_id + 1
+
+    post '/admin/appointments/new', practitioner_id: staff_id, date: TODAY,
+      treatment_id: bad_tx_id, patient_id: patient_id
+
+    assert_includes(last_response.body, 
+      "No treatment with that ID (#{bad_tx_id}) was found.")
+  end
+
   def test_admin_create_appointment_error_missing_or_empty_time
     pt_id = return_id(create_discipline('Physiotherapy', 'PT'))
     staff_id = return_id(create_user('Annie Hu'))
@@ -326,6 +344,26 @@ class TestJane < Minitest::Test
 
     assert_includes(last_response.body, 
       "No patient with that ID (#{bad_patient_id}) was found.")
+  end
+
+  def test_admin_edit_appointment_error_nonexistent_treatment_id
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
+
+    appt_id = context[:appointment_id]
+    staff_id = context[:staff_id]
+    patient_id = context[:patient_id]
+    bad_tx_id = context[:treatment_id] + 1
+
+    post "/admin/appointments/#{appt_id}/edit", practitioner_id: staff_id, 
+      date: TODAY, time: "12:00PM", treatment_id: bad_tx_id, patient_id: patient_id
+
+    assert_includes(last_response.body, 
+      "No treatment with that ID (#{bad_tx_id}) was found.")
   end
 
   def test_admin_edit_appointment_error_missing_or_empty_time

@@ -622,7 +622,6 @@ def new_appointment_errors(staff, treatment_id, patient_id, time)
   errors = []
   errors.push(*appointment_errors(staff: staff, treatment_id: treatment_id, 
     patient_id: patient_id, time: time))
-    # non_clinical_staff_id_error(staff.id)
   errors
 end
 
