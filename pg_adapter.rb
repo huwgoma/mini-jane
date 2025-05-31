@@ -89,7 +89,7 @@ class PGAdapter
   # Staff #
   # - Member: Refers to the actual staff table
   # - Profile: Refers to a staff member + related users/disciplines
-  def load_staff(id, 
+  def load_staff(id, practitioner: false,
     user_fields: { first_name: false, last_name: false, email: false, phone: false },
     staff_fields: { biography: false })
     
@@ -102,7 +102,7 @@ class PGAdapter
            WHERE users.id = $1;"
     result = query(sql, id)
 
-    format_staff(result.first)
+    format_staff(result.first, practitioner: practitioner)
   end
   
   def load_all_staff
@@ -546,13 +546,15 @@ class PGAdapter
     type.new(id, first_name, last_name)
   end
 
-  def format_staff(staff)
+  def format_staff(staff, practitioner: false)
     id = staff['id'].to_i
     first_name, last_name = staff.values_at('first_name', 'last_name')
     email, phone = staff.values_at('email', 'phone')
     biography = staff['biography']
 
-    Staff.from_partial_data(id: id, first_name: first_name, last_name: last_name,
+    staff_type = practitioner ? Practitioner : Staff 
+
+    staff_type.from_partial_data(id: id, first_name: first_name, last_name: last_name,
       email: email, phone: phone, biography: biography)
   end
 
