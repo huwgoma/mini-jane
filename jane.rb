@@ -619,42 +619,29 @@ end
 # Error Message Setting #
 # - Errors for creating a new appointment
 def new_appointment_errors(staff, treatment_id, patient_id, time)
-  errors = []
-  errors.push(*appointment_errors(staff: staff, treatment_id: treatment_id, 
-    patient_id: patient_id, time: time))
-  errors
+  appointment_errors(staff: staff, treatment_id: treatment_id, 
+    patient_id: patient_id, time: time)
 end
 
 def edit_appointment_errors(staff, treatment_id, patient_id, time)
-  errors = []
-  errors.push(*appointment_errors(staff: staff, treatment_id: treatment_id, 
-    patient_id: patient_id, time: time))
-  errors
+  appointment_errors(staff: staff, treatment_id: treatment_id, 
+    patient_id: patient_id, time: time)
+end
+
+def copy_move_appointment_errors(staff, treatment_id, date, time)
+  
 end
 
 def appointment_errors(staff:, treatment_id:, time:, patient_id: nil, date: nil)
-    errors = []
+  errors = []
 
-    errors.push(*treatment_practitioner_mismatch_error(staff, treatment_id),
-      empty_field_error('time', time))
-    
-    errors << empty_field_error('date', date) if date
-      
-    errors << missing_record_error('patients', patient_id) if patient_id
-
-    errors << missing_record_error('treatments', treatment_id) if params[:treatment_id]
-  # Treatment/Staff Mismatch Error (staff/treatmentID)
-  # Time Empty Error (time)
-  # Date Empty Error (date) - ONLY if date is given!! (not when editing)
-  # Patient ID not existing error - only if patient id is given (create/edit)
-  # Treatment ID not existing error - only if params [treatment_id] 
-  #   is a thing (create/edit)
+  errors.push(*treatment_practitioner_mismatch_error(staff, treatment_id),
+    empty_field_error('time', time))
+  errors << empty_field_error('date', date) if date
+  errors << missing_record_error('patients', patient_id) if patient_id
+  errors << missing_record_error('treatments', treatment_id) if params[:treatment_id]
 
   errors.compact
-
-  # [treatment_practitioner_mismatch_error(staff, treatment_id),
-  #  nonexistent_patient_id_error(patient_id),
-  #  empty_field_error('time', time)].compact
 end
 
 
