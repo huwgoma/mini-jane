@@ -231,6 +231,7 @@ end
 
 # Copy an appointment
 post '/admin/appointments/:appointment_id/copy' do
+  
   appointment_id = params[:appointment_id]
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
 
@@ -238,51 +239,39 @@ post '/admin/appointments/:appointment_id/copy' do
   redirect_if_bad_id('staff', practitioner_id, 
     "/admin/appointments/#{appointment_id}/copy")
 
-  appointment = @storage.load_appointment_info(appointment_id)
-  staff = @storage.load_staff(staff_id, practitioner: true,
+  @appointment = @storage.load_appointment_info(appointment_id)
+  treatment = @appointment.treatment
+  staff = @storage.load_staff(practitioner_id, practitioner: true,
     user_fields: { first_name: true, last_name: true })
-  datetime = DateTime.parse(params[:datetime])
-  date, time = datetime.to_date, datetime.to_time
-
+  date, time = parse_datetime_string(params[:datetime])
+  
   session[:errors].push(*copy_move_appointment_errors(staff, 
-    appointment.treatment.id, date, time))
-
+    treatment.id, date, time))
+  
   if session[:errors].any?
-    
+    @practitioners = @storage.load_staff_by_treatment(treatment.id)
+
+    render_with_layout(:copy_appointment)
   else
 
   end
 end
 
-
-# What are the common appointment errors that can be extracted?
-# Create/Edit/Copy/Move
-# - Create:
-#   - Treatment ID doesn't exist
-#   - Patient ID doesn't exist
-#   - Treatment and Staff ID mismatch (not offered)
-#   - Date and time are empty
-# - Edit:
-#   - NEW Treatment ID doesn't exist
-#   - NEW Patient ID doesn't exist
-#   - Treatment/Staff ID mismatch
-#   - Time is empty (date cannot be changed)
-# - Copy: 
-#   - New Staff ID doesn't exist -> Treatment/Staff ID mismatch
-#     - Treatment ID is old (cannot be changed on copy)
-#   - NEW Date and Time are empty
-# - Move: 
-#   - Functionally identical to Copy EXCEPT it edits the existing 
-#     appointment instead of creating a new one
-# Commons (#common_appointment_errors)
-# - Treatment and Staff ID mismatch
-# - Date/Time empty
-
-# [treatment_practitioner_mismatch_error(staff, treatment_id),
-  #  nonexistent_patient_id_error(patient_id),
-  #  empty_field_error('date', date),
-  #  empty_field_error('time', time)].compact
-
+# parse_datetime_string(string)
+# - returns [date, time]
+# Input: string representing date (potentially bad format)
+# Output: Array with Date and Time objects, or empty string(s) ['', ''] if invalid
+# 
+# Algorithm:
+# - #parse the string into a DateTime object using DateTime#parse
+#   - Valid: -> DateTime object
+#   - date = DateTime.to_date
+#   - time = DateTime.to_time
+# - If string is invalid, raises Date::Error
+# - Rescue Date::Error. If Date::Error is raised:
+#   - date = ''
+#   - time = ''
+# return [date, time]
 
 # # Admin - Staff # #
 # Form - Create new staff member
@@ -604,14 +593,6 @@ end
 
 
 # Helpers #
-def redirect_if_bad_id(type, id, path, message=nil)
-  unless @storage.record_exists?(type, id)
-    message ||= "Hmm..that #{type.singularize} (id = #{id}) could not be found."
-    session[:errors] << message
-    redirect path
-  end
-end
-
 # Formatting #
 # - Convert strings to nil if empty for 
 def nil_if_empty(string)
@@ -620,6 +601,16 @@ def nil_if_empty(string)
   string
 end
 
+def parse_datetime_string(string)
+  begin
+    datetime = DateTime.parse(string.to_s)
+    [datetime.to_date, datetime.to_time]
+  rescue Date::Error 
+    ['', '']
+  end
+end
+
+# Grouping # 
 def group_treatments_by_discipline(treatments)
   treatments.group_by { |tx| tx.discipline.id }
 end
@@ -765,6 +756,15 @@ end
 def invalid_treatment_discipline_id_error(discipline_id)
   unless @storage.record_exists?('disciplines', discipline_id)
     "Discipline ID (#{discipline_id}) does not match any existing disciplines."
+  end
+end
+
+# Misc Error/Validation #
+def redirect_if_bad_id(type, id, path, message=nil)
+  unless @storage.record_exists?(type, id)
+    message ||= "Hmm..that #{type.singularize} (id = #{id}) could not be found."
+    session[:errors] << message
+    redirect path
   end
 end
 
