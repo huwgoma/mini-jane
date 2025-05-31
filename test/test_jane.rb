@@ -393,13 +393,24 @@ class TestJane < Minitest::Test
     
   end
 
-  def test_admin_copy_appointment_error_empty_date
-    
+  def test_admin_copy_appointment_error_empty_datetime
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
+
+    appt_id = context[:appointment_id]
+    pt_id = context[:staff_id]
+
+    post "/admin/appointments/#{appt_id}/copy", practitioner_id: pt_id,
+      datetime: ''
+
+    assert_includes(last_response.body, 'Please enter a date.')
+    assert_includes(last_response.body, 'Please enter a time.')
   end
 
-  def test_admin_copy_appointment_error_empty_time
-    
-  end
 
   def test_admin_copy_appointment_error_empty_staff
     
