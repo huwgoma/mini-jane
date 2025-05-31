@@ -229,6 +229,54 @@ get '/admin/appointments/:appointment_id/copy' do
   render_with_layout(:copy_appointment)
 end
 
+# Copy an appointment
+post '/admin/appointments/:appointment_id/copy' do
+  appointment_id = params[:appointment_id]
+  redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
+
+  session[:errors].push(*copy_appointment_errors)
+end
+
+def copy_appointment_errors(staff, treatment_id, patient_id, date, time)
+  errors = []
+  # empty date, empty time, empty staff (ID), treatment/staff mismatch
+  # - patient ID is pulled from @appointment
+  # - treatment ID is also pulled from @appointment
+  # - patient and treatment ID do not change 
+  # - Therefore no need to validate. 
+  errors.push(*appointment_errors(staff, treatment_id, patient_id, time), 
+    non_clinical_staff_id_error(staff.id))
+  errors
+end
+
+# What are the common appointment errors that can be extracted?
+# Create/Edit/Copy/Move
+# - Create:
+#   - Treatment ID doesn't exist
+#   - Patient ID doesn't exist
+#   - Treatment and Staff ID mismatch (not offered)
+#   - Date and time are empty
+# - Edit:
+#   - NEW Treatment ID doesn't exist
+#   - NEW Patient ID doesn't exist
+#   - Treatment/Staff ID mismatch
+#   - Time is empty (date cannot be changed)
+# - Copy: 
+#   - New Staff ID doesn't exist -> Treatment/Staff ID mismatch
+#     - Treatment ID is old (cannot be changed on copy)
+#   - NEW Date and Time are empty
+# - Move: 
+#   - Functionally identical to Copy EXCEPT it edits the existing 
+#     appointment instead of creating a new one
+# Commons (#common_appointment_errors)
+# - Treatment and Staff ID mismatch
+# - Date/Time empty
+
+# [treatment_practitioner_mismatch_error(staff, treatment_id),
+  #  nonexistent_patient_id_error(patient_id),
+  #  empty_field_error('date', date),
+  #  empty_field_error('time', time)].compact
+
 
 # # Admin - Staff # #
 # Form - Create new staff member
@@ -572,22 +620,67 @@ end
 # - Errors for creating a new appointment
 def new_appointment_errors(staff, treatment_id, patient_id, time)
   errors = []
-  errors.push(*appointment_errors(staff, treatment_id, patient_id, time), 
-    non_clinical_staff_id_error(staff.id))
+  errors.push(*appointment_errors(staff: staff, treatment_id: treatment_id, 
+    patient_id: patient_id, time: time))
+    # non_clinical_staff_id_error(staff.id)
   errors
 end
 
 def edit_appointment_errors(staff, treatment_id, patient_id, time)
   errors = []
-  errors.push(*appointment_errors(staff, treatment_id, patient_id, time))
+  errors.push(*appointment_errors(staff: staff, treatment_id: treatment_id, 
+    patient_id: patient_id, time: time))
   errors
 end
 
-def appointment_errors(staff, treatment_id, patient_id, time)
-  [treatment_practitioner_mismatch_error(staff, treatment_id),
-   nonexistent_patient_id_error(patient_id),
-   empty_field_error('time', time)].compact
+def appointment_errors(staff:, treatment_id:, time:, patient_id: nil, date: nil)
+    errors = []
+
+    errors.push(*treatment_practitioner_mismatch_error(staff, treatment_id),
+      empty_field_error('time', time))
+    
+    errors << empty_field_error('date', date) if date
+      
+    errors << missing_record_error('patients', patient_id) if patient_id
+
+    errors << missing_record_error('treatments', treatment_id) if params[:treatment_id]
+  # Treatment/Staff Mismatch Error (staff/treatmentID)
+  # Time Empty Error (time)
+  # Date Empty Error (date) - ONLY if date is given!! (not when editing)
+  # Patient ID not existing error - only if patient id is given (create/edit)
+  # Treatment ID not existing error - only if params [treatment_id] 
+  #   is a thing (create/edit)
+
+  errors.compact
+
+  # [treatment_practitioner_mismatch_error(staff, treatment_id),
+  #  nonexistent_patient_id_error(patient_id),
+  #  empty_field_error('time', time)].compact
 end
+
+
+# What are the common appointment errors that can be extracted?
+# Create/Edit/Copy/Move
+# - Create:
+#   - Treatment ID doesn't exist
+#   - Patient ID doesn't exist
+#   - Treatment and Staff ID mismatch (not offered)
+#   - Date and time are empty
+# - Edit:
+#   - NEW Treatment ID doesn't exist
+#   - NEW Patient ID doesn't exist
+#   - Treatment/Staff ID mismatch
+#   - Time is empty (date cannot be changed)
+# - Copy: 
+#   - New Staff ID doesn't exist -> Treatment/Staff ID mismatch
+#     - Treatment ID is old (cannot be changed on copy)
+#   - NEW Date and Time are empty
+# - Move: 
+#   - Functionally identical to Copy EXCEPT it edits the existing 
+#     appointment instead of creating a new one
+# Commons (#common_appointment_errors)
+# - Treatment and Staff ID mismatch
+# - Date/Time empty
 
 # - If staff ID is not clinical
 def non_clinical_staff_id_error(staff_id)
@@ -604,9 +697,9 @@ def treatment_practitioner_mismatch_error(staff, treatment_id)
 end
 
 # - If patient does not exist.
-def nonexistent_patient_id_error(patient_id)
-  unless @storage.record_exists?('patients', patient_id)
-    "No patient with that ID (#{patient_id}) was found."
+def missing_record_error(table_name, id)
+  unless @storage.record_exists?(table_name, id)
+    "No #{table_name.singularize} with that ID (#{id}) was found."
   end
 end
 
