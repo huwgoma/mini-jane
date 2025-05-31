@@ -546,7 +546,7 @@ class PGAdapter
     type.new(id, first_name, last_name)
   end
 
-  def format_staff(staff, practitioner: false)
+  def format_staff(staff, practitioner:)
     id = staff['id'].to_i
     first_name, last_name = staff.values_at('first_name', 'last_name')
     email, phone = staff.values_at('email', 'phone')

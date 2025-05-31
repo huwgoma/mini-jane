@@ -129,7 +129,7 @@ get '/admin/appointments/new' do
   @date = Date.parse(params[:date] || Date.today.to_s)
   redirect_if_bad_id('staff', practitioner_id, "/admin/schedule/#{@date}")
 
-  @practitioner = @storage.load_staff(practitioner_id, 
+  @practitioner = @storage.load_staff(practitioner_id, practitioner: true,
     user_fields: { first_name: true, last_name: true })
   @treatments = @storage.load_treatment_listings_by_practitioner(practitioner_id)
   @patients = @storage.load_all_patients
@@ -146,7 +146,7 @@ post '/admin/appointments/new' do
   
   redirect_if_bad_id('staff', practitioner_id, "/admin/schedule/#{@date}")
 
-  @practitioner = @storage.load_staff(practitioner_id, 
+  @practitioner = @storage.load_staff(practitioner_id, practitioner: true,
       user_fields: { first_name: true, last_name: true })
 
   session[:errors].push(*new_appointment_errors(
@@ -195,7 +195,7 @@ post '/admin/appointments/:appointment_id/edit' do
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
   
   @appointment = @storage.load_appointment_info(appointment_id)
-  @practitioner = @storage.load_staff(@appointment.practitioner.id,
+  @practitioner = @storage.load_staff(@appointment.practitioner.id, practitioner: true,
     user_fields: { first_name: true, last_name: true })
   treatment_id, patient_id = params.values_at(:treatment_id, :patient_id)
   @date = @appointment.date
@@ -234,13 +234,13 @@ post '/admin/appointments/:appointment_id/copy' do
   appointment_id = params[:appointment_id]
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
 
-  staff_id = params[:staff_id]
+  practitioner_id = params[:practitioner_id]
   binding.pry
   redirect_if_bad_id('staff', staff_id, 
     "/admin/appointments/#{appointment_id}/copy")
 
   appointment = @storage.load_appointment_info(appointment_id)
-  staff = @storage.load_staff(staff_id,
+  staff = @storage.load_staff(staff_id, practitioner: true,
     user_fields: { first_name: true, last_name: true })
   datetime = DateTime.parse(params[:datetime])
   date, time = datetime.to_date, datetime.to_time
