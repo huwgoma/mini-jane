@@ -235,8 +235,7 @@ post '/admin/appointments/:appointment_id/copy' do
   redirect_if_bad_id('appointments', appointment_id, '/admin/schedule')
 
   practitioner_id = params[:practitioner_id]
-  binding.pry
-  redirect_if_bad_id('staff', staff_id, 
+  redirect_if_bad_id('staff', practitioner_id, 
     "/admin/appointments/#{appointment_id}/copy")
 
   appointment = @storage.load_appointment_info(appointment_id)
@@ -247,9 +246,12 @@ post '/admin/appointments/:appointment_id/copy' do
 
   session[:errors].push(*copy_move_appointment_errors(staff, 
     appointment.treatment.id, date, time))
-  
-    binding.pry
-  # staff tx id date time
+
+  if session[:errors].any?
+    
+  else
+
+  end
 end
 
 
@@ -395,7 +397,7 @@ post '/admin/patients/new' do
     render_with_layout(:new_patient)
   else
     email, phone = params[:email], params[:phone] 
-    birthday = normalize_date_input(params[:birthday])
+    birthday = nil_if_empty(params[:birthday])
 
     patient_id = @storage.create_patient_return_user_id(
                   first_name, last_name, email: email, 
@@ -440,7 +442,7 @@ post '/admin/patients/:patient_id/edit' do
     render_with_layout(:edit_patient)
   else
     email, phone = params[:email], params[:phone] 
-    birthday = normalize_date_input(params[:birthday])
+    birthday = nil_if_empty(params[:birthday])
 
     @storage.update_patient(patient_id, first_name, last_name,
                             email: email, phone: phone, birthday: birthday)
@@ -610,15 +612,17 @@ def redirect_if_bad_id(type, id, path, message=nil)
   end
 end
 
-# Formatting # 
-def normalize_date_input(date_string)
-  date_string.to_s.strip.empty? ? nil : date_string
+# Formatting #
+# - Convert strings to nil if empty for 
+def nil_if_empty(string)
+  return if string.to_s.strip.empty?
+  
+  string
 end
 
 def group_treatments_by_discipline(treatments)
   treatments.group_by { |tx| tx.discipline.id }
 end
-
 
 # Error Message Setting #
 # - Errors for creating a new appointment
@@ -685,13 +689,6 @@ def treatment_practitioner_mismatch_error(staff, treatment_id)
   unless Staff.from_partial_data(id: staff.id).offers_treatment?(treatment_id, @storage)
     "#{staff.full_name} does not offer the selected treatment."  
   end 
-end
-
-# - If patient does not exist.
-def missing_record_error(table_name, id)
-  unless @storage.record_exists?(table_name, id)
-    "No #{table_name.singularize} with that ID (#{id}) was found."
-  end
 end
 
 # - Errors for inserting a new staff member
@@ -782,6 +779,12 @@ def empty_field_error(attr_name, attr_value)
   attr_name = attr_name.to_s.gsub('_', ' ')
 
   "Please enter a #{attr_name}." if empty_string?(attr_value)
+end
+
+def missing_record_error(table_name, id)
+  unless @storage.record_exists?(table_name, id)
+    "No #{table_name.singularize} with that ID (#{id}) was found."
+  end
 end
 
 def invalid_select_error(attr_name, option_value, options)
