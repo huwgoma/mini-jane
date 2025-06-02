@@ -432,7 +432,22 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_copy_appointment_error_treatment_practitioner_mismatch
-    
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
+
+    bad_staff_id = return_id(create_user('Hugo Ma'))
+    create_staff_member(bad_staff_id)
+
+    appt_id = context[:appointment_id]
+
+    post "/admin/appointments/#{appt_id}/copy", 
+      practitioner_id: bad_staff_id, datetime: context[:datetime]
+
+    assert_includes(last_response.body, 'Hugo Ma does not offer')
   end
 
   # Staff CRUD #

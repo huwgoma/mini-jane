@@ -253,25 +253,9 @@ post '/admin/appointments/:appointment_id/copy' do
 
     render_with_layout(:copy_appointment)
   else
-    
+
   end
 end
-
-# parse_datetime_string(string)
-# - returns [date, time]
-# Input: string representing date (potentially bad format)
-# Output: Array with Date and Time objects, or empty string(s) ['', ''] if invalid
-# 
-# Algorithm:
-# - #parse the string into a DateTime object using DateTime#parse
-#   - Valid: -> DateTime object
-#   - date = DateTime.to_date
-#   - time = DateTime.to_time
-# - If string is invalid, raises Date::Error
-# - Rescue Date::Error. If Date::Error is raised:
-#   - date = ''
-#   - time = ''
-# return [date, time]
 
 # # Admin - Staff # #
 # Form - Create new staff member
