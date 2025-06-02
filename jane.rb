@@ -253,7 +253,11 @@ post '/admin/appointments/:appointment_id/copy' do
 
     render_with_layout(:copy_appointment)
   else
+    appt = @storage.create_appointment(staff_id: staff.id, patient_id: @appointment.patient.id, 
+      treatment_id: treatment.id, datetime: params[:datetime])
+    copied_appt_id = appt.first['id']
 
+    redirect "/admin/appointments/#{copied_appt_id}"
   end
 end
 

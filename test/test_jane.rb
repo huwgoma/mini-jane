@@ -390,7 +390,34 @@ class TestJane < Minitest::Test
   end
 
   def test_admin_copy_appointment_success
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
     
+    appts_count = @storage.query("SELECT * FROM appointments").ntuples
+    assert_equal(1, appts_count)
+
+    appt_id = context[:appointment_id]
+    
+    new_staff_id = return_id(create_user('Kevin Ho')).to_s
+    create_staff_member(new_staff_id)
+    create_staff_discipline_associations(new_staff_id, context[:discipline_id])
+    new_datetime = DateTime.parse('2025-06-02T12:35')
+
+    post "/admin/appointments/#{appt_id}/copy", 
+      practitioner_id: new_staff_id, datetime: new_datetime
+
+    appts = @storage.query("SELECT * FROM appointments ORDER BY id;")
+    assert_equal(2, appts.ntuples)
+
+    copied_appt = appts[1]
+    assert_equal(new_staff_id, copied_appt['staff_id'])
+    assert_equal(new_datetime, DateTime.parse(copied_appt['datetime']))
+
+    assert_equal(302, last_response.status)
   end
 
   def test_admin_copy_appointment_error_empty_datetime

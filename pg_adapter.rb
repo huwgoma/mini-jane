@@ -73,7 +73,7 @@ class PGAdapter
 
   def create_appointment(staff_id:, patient_id:, treatment_id:, datetime:)
     sql = "INSERT INTO appointments(staff_id, patient_id, treatment_id, datetime)
-           VALUES ($1, $2, $3, $4);"
+           VALUES ($1, $2, $3, $4) RETURNING *;"
     query(sql, staff_id, patient_id, treatment_id, datetime)
   end
 
