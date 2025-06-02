@@ -1,10 +1,7 @@
 <h2>Copy Appointment</h2>
 
 <form action="/admin/appointments/<%= @appointment.id %>/copy" method="post">
-  <h4>Copying Appointment for 
-    <%= @appointment.patient.full_name %> -
-    <%= @appointment.treatment.name %>:
-  </h4>
+  <h4>Copying Appointment for <%= pretty_appointment(@appointment) %></h4>
   
   <hr>
 
