@@ -412,8 +412,23 @@ class TestJane < Minitest::Test
   end
 
 
-  def test_admin_copy_appointment_error_empty_staff
+  def test_admin_copy_appointment_error_empty_staff_redirects
+    context = create_appointment_cascade(
+      staff: { name: 'Annie Hu', create_profile: true }, 
+      patient: { name: 'Gina P', create_profile: true },
+      discipline: { name: 'Physiotherapy', title: 'PT' },
+      treatment: { name: 'PT - Initial', length: 45, price: 100.00 }
+    )
+
+    appt_id = context[:appointment_id]
     
+    post "/admin/appointments/#{appt_id}/copy", 
+      practitioner_id: '', datetime: context[:datetime]
+
+    assert_equal(302, last_response.status)
+    get last_response['location']
+
+    assert_includes(last_response.body, 'could not be found')
   end
 
   def test_admin_copy_appointment_error_treatment_practitioner_mismatch
@@ -1405,7 +1420,7 @@ class TestJane < Minitest::Test
 
     # Return the IDs of the created objects for subsequent use
     { appointment_id: appointment_id, staff_id: staff_id, patient_id: patient_id, 
-      discipline_id: discipline_id, treatment_id: treatment_id }
+      discipline_id: discipline_id, treatment_id: treatment_id, datetime: datetime }
   end
 
   # Return the ID from a PG::Result object

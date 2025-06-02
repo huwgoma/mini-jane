@@ -253,7 +253,7 @@ post '/admin/appointments/:appointment_id/copy' do
 
     render_with_layout(:copy_appointment)
   else
-
+    
   end
 end
 
